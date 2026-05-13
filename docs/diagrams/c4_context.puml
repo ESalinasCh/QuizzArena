@@ -1,0 +1,20 @@
+@startuml
+!include <C4/C4_Context>
+
+title Diagrama de Contexto de Sistema (Nivel 1) - QuizArena
+
+Person(instructor, "Instructor", "Crea contenido, sube grabaciones de clase y lanza partidas de trivia en vivo.")
+Person(estudiante, "Estudiante", "Compite en trivias en tiempo real desde su dispositivo móvil.")
+System(quizarena, "QuizArena", "Plataforma educativa: Gamificación en vivo con generación de contenido por IA.")
+System_Ext(ollama, "Ollama", "Servidor local de inferencia LLM.")
+System_Ext(whisper, "Whisper", "Motor local de transcripción Speech-to-Text.")
+System_Ext(idp, "Identity Provider", "Servicio externo de identidad (OIDC).")
+
+Rel(instructor, quizarena, "Gestiona contenido y lanza partidas", "HTTPS / WSS")
+Rel(estudiante, quizarena, "Compite en vivo", "HTTPS / WSS")
+Rel(instructor, idp, "Se autentica")
+Rel(estudiante, idp, "Se autentica (opcional, puede ingresar como invitado con PIN)")
+Rel(quizarena, idp, "Verifica tokens JWT", "HTTPS / JWKS")
+Rel(quizarena, ollama, "Solicita generación de preguntas", "HTTP REST")
+Rel(quizarena, whisper, "Solicita transcripción de audio/video", "HTTP / CLI")
+@enduml

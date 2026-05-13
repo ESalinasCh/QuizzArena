@@ -29,37 +29,9 @@ Problemas transversales resueltos por estándares de la industria.
 
 ## 2. Context Mapping y Patrones de Integración
 
-```plantuml
-@startuml
-skinparam componentStyle rectangle
+![Context Map](https://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/ESalinasCh/QuizzArena/main/docs/diagrams/ddd_context_map.puml)
 
-package "Generic Subdomains" {
-  [Identity Context] as ID
-}
-
-package "Core Domain" {
-  [LiveArena Context] as ARENA
-}
-
-package "Supporting Subdomains" {
-  [Assessment Context] as ASSESS
-  [AIKnowledge Context] as AI
-}
-
-package "V2" #LightGray {
-  [Broadcasting Context] as BROAD
-}
-
-' Integration Patterns
-ID -down-> ASSESS : Shared Kernel [UserId]
-ID -down-> ARENA : Shared Kernel [UserId]
-
-ASSESS <.. ARENA : Customer/Supplier [Downstream]
-ASSESS <.. AI : Anti-Corruption Layer (ACL)
-
-BROAD -right-> ARENA : Conformist [V2]
-@enduml
-```
+> Código fuente: [`docs/diagrams/ddd_context_map.puml`](docs/diagrams/ddd_context_map.puml)
 
 ### Especificación de Patrones
 1.  **Anti-Corruption Layer:** Se implementa entre `AIKnowledge` y `Assessment`. Dado el comportamiento no determinista de los LLMs, el módulo de Assessment emplea una ACL para validar y sanitizar el payload JSON proveniente de la IA, transformándolo en entidades válidas de negocio tras validación manual.

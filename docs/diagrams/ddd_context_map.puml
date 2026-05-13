@@ -1,0 +1,29 @@
+@startuml
+skinparam componentStyle rectangle
+
+package "Generic Subdomains" {
+  [Identity Context] as ID
+}
+
+package "Core Domain" {
+  [LiveArena Context] as ARENA
+}
+
+package "Supporting Subdomains" {
+  [Assessment Context] as ASSESS
+  [AIKnowledge Context] as AI
+}
+
+package "V2" #LightGray {
+  [Broadcasting Context] as BROAD
+}
+
+' Integration Patterns
+ID -down-> ASSESS : Shared Kernel [UserId]
+ID -down-> ARENA : Shared Kernel [UserId]
+
+ASSESS <.. ARENA : Customer/Supplier [Downstream]
+ASSESS <.. AI : Anti-Corruption Layer (ACL)
+
+BROAD -right-> ARENA : Conformist [V2]
+@enduml
