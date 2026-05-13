@@ -11,25 +11,29 @@ Este documento desglosa el alcance funcional del MVP en Épicas e Historias de U
 
 *Prerrequisitos técnicos del Sprint 0.*
 
-### EN-0.1: Andamiaje de la Arquitectura
+### EN-0.1: Andamiaje de la Arquitectura(German Luigi)
 *   **Tipo:** Tarea Técnica.
 *   **Descripción:** Crear la solución `QuizArena.sln` en .NET 8 y aislar los proyectos físicos según la Screaming Architecture.
 *   **Definition of Done:** La solución compila en limpio y las dependencias de proyectos respetan la regla de dependencia hacia adentro.
 
-### EN-0.2: Aprovisionamiento de Infraestructura Local
+### EN-0.2: Aprovisionamiento de Infraestructura Local(David)
 *   **Tipo:** Tarea Técnica.
 *   **Descripción:** Configurar `docker-compose.yml` para levantar PostgreSQL con pgvector y un contenedor de Ollama. Evaluar la inclusión de un contenedor de Whisper para transcripción local.
 *   **Definition of Done:** Un desarrollador puede ejecutar `docker compose up -d` y tener el entorno de datos e IA operativo.
 
-### EN-0.3: CI/CD Pipeline Base
+### EN-0.3: CI/CD Pipeline Base(Juan)
 *   **Tipo:** Tarea Técnica.
 *   **Descripción:** Configurar un pipeline de GitHub Actions que compile la solución y ejecute pruebas unitarias en cada Pull Request.
 
-### EN-0.4: Sistema de Diseño y Mockups
+### EN-0.4: Sistema de Diseño y Mockups(Bruno y Geronimo)
 *   **Tipo:** Habilitador de Diseño.
 *   **Descripción:** Establecer el Design System y generar los mockups de alta fidelidad para las pantallas críticas del MVP.
 *   **Definition of Done:** Los mockups están aprobados por Producto y listos para implementación en el Sprint 1.
 
+### EN-0.5: Persistencia (Roger y Edson)
+*   **Tipo:** Habilitador de Persistencia.
+*   **Descripción:** Establecer el model ER que soporte el MVP.
+*   **Definition of Done:** Las entidas en un modelo ER en el Sprint 1.
 ---
 
 ## Epic 1: Identidad y Seguridad (Identity Context)
