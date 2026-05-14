@@ -13,7 +13,7 @@ Este documento desglosa el alcance funcional del MVP en Épicas e Historias de U
 
 ### EN-0.1: Andamiaje de la Arquitectura(German Luigi)
 *   **Tipo:** Tarea Técnica.
-*   **Descripción:** Crear la solución `QuizArena.sln` en .NET 8 y aislar los proyectos físicos según la Screaming Architecture.
+*   **Descripción:** Crear la solución `QuizArena.sln` en .NET 10 y aislar los proyectos físicos según la Screaming Architecture.
 *   **Definition of Done:** La solución compila en limpio y las dependencias de proyectos respetan la regla de dependencia hacia adentro.
 
 ### EN-0.2: Aprovisionamiento de Infraestructura Local(David)

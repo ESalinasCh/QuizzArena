@@ -9,8 +9,8 @@ System_Ext(whisper, "Whisper", "Transcripción Speech-to-Text")
 System_Ext(idp, "Identity Provider", "OAuth2 / OIDC")
 
 System_Boundary(c1, "Plataforma QuizArena") {
-    Container(spa, "Single Page Application", "Angular 17+", "Provee todas las interfaces de usuario.")
-    Container(webapi, "Monolito Web API", ".NET 8 ASP.NET Core", "Expone APIs REST, aloja el Hub SignalR e implementa Screaming Architecture.")
+    Container(spa, "Single Page Application", "Angular 20", "Provee todas las interfaces de usuario.")
+    Container(webapi, "Monolito Web API", ".NET 10 ASP.NET Core", "Expone APIs REST, aloja el Hub SignalR e implementa Screaming Architecture.")
     ContainerDb(db, "Base de Datos Principal", "PostgreSQL + pgvector", "Almacena perfiles, preguntas, base de conocimiento vectorizada y métricas de partidas.")
     Container(storage, "Almacenamiento Local", "Local Disk", "Persiste archivos multimedia subidos por los instructores.")
 }

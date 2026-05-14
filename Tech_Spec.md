@@ -29,8 +29,8 @@ QuizArena es una plataforma educativa de trivia competitiva N-vs-N que integra g
 El sistema se construye bajo un patrón de **Monolito Modular** utilizando **Screaming Architecture**.
 
 ### Stack Tecnológico
-- **Backend:** .NET 8, ASP.NET Core Web API
-- **Frontend:** Angular 17+
+- **Backend:** .NET 10, ASP.NET Core Web API
+- **Frontend:** Angular 21
 - **Base de Datos:** PostgreSQL con extensión `pgvector`, Entity Framework Core
 - **Tiempo Real:** SignalR
 - **Inferencia de IA:** Ollama

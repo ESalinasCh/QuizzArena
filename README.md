@@ -33,8 +33,8 @@ La siguiente tabla presenta todos los documentos de diseño y planificación del
 
 | Capa | Tecnología |
 |---|---|
-| Backend | .NET 8, ASP.NET Core |
-| Frontend | Angular 17+ |
+| Backend | .NET 10, ASP.NET Core |
+| Frontend | Angular 21 |
 | Base de Datos | PostgreSQL + pgvector |
 | Tiempo Real | SignalR |
 | Inferencia IA | Ollama |

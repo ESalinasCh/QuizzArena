@@ -17,7 +17,7 @@ Este documento define el alcance estricto de la primera versión funcional del p
 ## 2. Alcance Funcional
 
 ### A. LiveArena
-*   Sincronización de eventos en tiempo real mediante SignalR.
+*   Inicialmente la realizacion del examen sera "asincronica", todos empiezan el quiz al tiempo pero lo hacen a su ritmo.
 *   El Profesor actúa como Host, controlando el flujo del juego.
 *   Los Estudiantes ingresan a una Sala usando un PIN autogenerado y un apodo. Si ya están autenticados en la plataforma, ingresan directamente.
 *   El cálculo de puntajes se basa en la correctitud de la respuesta y la velocidad.
@@ -39,6 +39,7 @@ Este documento define el alcance estricto de la primera versión funcional del p
 
 ## 3. Fuera de Alcance (V2)
 
+*   **Competencia en vivo**: Sincronización de eventos en tiempo real mediante SignalR.
 *   **Broadcasting Context (WebRTC):** No habrá streaming de video nativo. Se asume que el profesor utilizará herramientas externas para la clase en vivo y QuizArena como complemento de gamificación.
 *   **Overlay Quizzes:** Sin reproductor de video nativo, no se implementarán interfaces superpuestas sobre un flujo multimedia.
 *   **Exámenes Asíncronos:** El MVP se enfoca exclusivamente en la competencia multijugador síncrona.

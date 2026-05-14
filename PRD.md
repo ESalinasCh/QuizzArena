@@ -42,9 +42,12 @@ La educación remota enfrenta un desafío constante: mantener la atención del e
 - **User Story:** Como estudiante, quiero unirme a una sala de trivia en tiempo real para competir con mis compañeros y ver quién domina mejor un tema.
 - **Criterios de Aceptación:**
   - Creación de sala mediante un código PIN de invitación.
-  - El servidor garantiza que todos los jugadores reciban la pregunta en el mismo instante.
-  - El sistema recompensa con más puntos a quienes respondan correctamente en menor tiempo.
-  - Al concluir cada pregunta, se despliega una tabla de posiciones actualizada.
+  - (sugerencia) Los estudiantes pueden ingresar al quiz con el link de invitacion
+  - (sugerencia) Los estudiantes responderan las preguntas a su tiempo. El sistema medira el tiempo en que responden las preguntas para calcular el puntaje.
+  - (sugerencia) Al finalizar todos, se genera una tabla final de puntajes y posiciones
+  - (fuera de scope?) El servidor garantiza que todos los jugadores reciban la pregunta en el mismo instante.
+  - (fuera de scope?) El sistema recompensa con más puntos a quienes respondan correctamente en menor tiempo.
+  - (fuera de scope?) Al concluir cada pregunta, se despliega una tabla de posiciones actualizada.
 
 ### Epic 4: Base de Conocimiento y Generación por IA `[MVP]`
 - **User Story:** Como instructor, quiero procesar una grabación de mi clase para generar múltiples cuestionarios bajo demanda.
