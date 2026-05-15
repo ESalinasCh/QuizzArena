@@ -14,6 +14,7 @@ namespace QuizzArena.Host
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            // Adding Controllers
             builder.Services.AddControllers()
             .AddApplicationPart(typeof(IQuizzingInfrastructureMarker).Assembly)
             .AddApplicationPart(typeof(IUsersInfrastructureMaker).Assembly)
@@ -23,10 +24,12 @@ namespace QuizzArena.Host
 
             // TODO: ADD DB CONNECTION
 
+
             // Dependency Injection
             builder.Services.AddScoped<ISignUpUserUseCase, SignUpUserUseCase>();
             builder.Services.AddScoped<ILogInUserUseCase, LogInUserUseCase>();
             builder.Services.AddScoped<IUserRepository, SqlUserRepository>();
+
 
             WebApplication app = builder.Build();
 
