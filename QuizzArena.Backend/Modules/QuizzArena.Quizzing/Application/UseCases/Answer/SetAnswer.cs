@@ -1,4 +1,5 @@
-﻿using QuizzArena.Quizzing.Application.Ports.In.Answer;
+﻿using QuizzArena.Quizzing.Application.DTOs.Answer;
+using QuizzArena.Quizzing.Application.Ports.In.Answer;
 using QuizzArena.Quizzing.Application.Ports.Out;
 using System;
 using System.Collections.Generic;
@@ -11,5 +12,10 @@ namespace QuizzArena.Quizzing.Application.UseCases.Answer
         private readonly IAnswerRepository _repository;
 
         public SetAnswer(IAnswerRepository repository) => _repository = repository;
+
+        public async Task<SetAnswerResponseDto> Execute(SetAnswerRequestDto dto)
+        {
+            return new SetAnswerResponseDto();
+        }
     }
 }

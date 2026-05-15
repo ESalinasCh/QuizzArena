@@ -1,4 +1,5 @@
-﻿using QuizzArena.Quizzing.Application.Ports.In.Question;
+﻿using QuizzArena.Quizzing.Application.DTOs.Question;
+using QuizzArena.Quizzing.Application.Ports.In.Question;
 using QuizzArena.Quizzing.Application.Ports.Out;
 using System;
 using System.Collections.Generic;
@@ -11,5 +12,10 @@ namespace QuizzArena.Quizzing.Application.UseCases.Question
         private readonly IQuestionRepository _repository;
 
         public DeleteQuestion(IQuestionRepository repository) => _repository = repository;
+
+        public async Task<DeleteQuestionResponseDto> Execute(DeleteQuestionRequestDto dto)
+        {
+            return new DeleteQuestionResponseDto();
+        }
     }
 }

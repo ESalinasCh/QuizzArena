@@ -1,4 +1,5 @@
-﻿using QuizzArena.Quizzing.Application.Ports.In.QuizAttempt;
+﻿using QuizzArena.Quizzing.Application.DTOs.QuizAttempt;
+using QuizzArena.Quizzing.Application.Ports.In.QuizAttempt;
 using QuizzArena.Quizzing.Application.Ports.Out;
 using System;
 using System.Collections.Generic;
@@ -11,5 +12,10 @@ namespace QuizzArena.Quizzing.Application.UseCases.QuizAttempt
         private readonly IQuizAttemptRepository _repository;
 
         public EndQuizAttempt(IQuizAttemptRepository repository) => _repository = repository;
+
+        public async Task<EndQuizAttemptResponseDto> Execute(EndQuizAttemptRequestDto dto)
+        {
+            return new EndQuizAttemptResponseDto();
+        }
     }
 }

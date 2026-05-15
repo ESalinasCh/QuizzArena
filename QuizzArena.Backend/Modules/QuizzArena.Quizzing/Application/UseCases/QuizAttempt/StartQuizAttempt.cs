@@ -1,4 +1,6 @@
-﻿using QuizzArena.Quizzing.Application.Ports.In.QuizAttempt;
+﻿using QuizzArena.Quizzing.Application.DTOs.QuizAttempt;
+using QuizzArena.Quizzing.Application.Ports.In.QuizAttempt;
+using QuizzArena.Quizzing.Application.Ports.Out;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,5 +9,13 @@ namespace QuizzArena.Quizzing.Application.UseCases.QuizAttempt
 {
     internal class StartQuizAttempt : IStartQuizAttempt
     {
+        private readonly IQuizAttemptRepository _repository;
+
+        public StartQuizAttempt(IQuizAttemptRepository repository) => _repository = repository;
+
+        public async Task<StartQuizAttemptResponseDto> Execute(StartQuizAttemptRequestDto dto)
+        {
+            return new StartQuizAttemptResponseDto();
+        }
     }
 }

@@ -1,10 +1,12 @@
-﻿using System;
+﻿using QuizzArena.Quizzing.Application.DTOs.Question;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace QuizzArena.Quizzing.Application.Ports.In.Question
 {
-    internal class IDeleteQuestion
+    internal interface IDeleteQuestion
     {
+        Task<DeleteQuestionResponseDto> Execute(DeleteQuestionRequestDto dto);
     }
 }
