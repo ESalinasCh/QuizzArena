@@ -10,6 +10,6 @@ namespace QuizzArena.Quizzing.Application.Ports.Out
         Task<Question> GetById(Guid id);
         Task<Question> Create(Guid id);
         Task<Question> Update(Guid id);
-        Task<Question> Delete(Guid id);
+        Task Delete(Guid id);
     }
 }
