@@ -10,9 +10,9 @@ namespace QuizzArena.Users.Infrastructure.Adapters.In.Web
     [Route("api/users/professors")]
     internal class UserController : ControllerBase
     {
-        private readonly IRegisterUserUseCase _registerUseCase;
+        private readonly ISignUpUserUseCase _registerUseCase;
 
-        public UserController(IRegisterUserUseCase registerUseCase)
+        public UserController(ISignUpUserUseCase registerUseCase)
         {
             _registerUseCase = registerUseCase;
         }
