@@ -5,7 +5,7 @@ using System.Text;
 
 namespace QuizzArena.Users.Application.Ports.In
 {
-    internal interface ISignUpUserUseCase
+    public interface ISignUpUserUseCase
     {
         Task<SignUpResponseDto> Execute(SignUpRequestDto dto);
     }

@@ -6,7 +6,7 @@ using Users.Domain.Entities;
 
 namespace QuizzArena.Users.Infrastructure.Adapters.Out
 {
-    internal class SqlUserRepository : IUserRepository
+    public class SqlUserRepository : IUserRepository
     {
         public async Task<User> GetById(Guid id)
         {

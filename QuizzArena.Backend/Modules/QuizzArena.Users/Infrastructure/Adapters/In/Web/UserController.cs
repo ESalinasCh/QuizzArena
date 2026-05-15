@@ -8,17 +8,14 @@ using System.Text;
 namespace QuizzArena.Users.Infrastructure.Adapters.In.Web
 {
     [ApiController]
-    [Route("api/users/professors")]
-    internal class UserController : ControllerBase
+    [Route("api/[controller]")]
+    public class UserController(
+        ISignUpUserUseCase registerUseCase,
+        ILogInUserUseCase loginUseCase
+    ) : ControllerBase
     {
-        private readonly ISignUpUserUseCase _registerUseCase;
 
-        public UserController(ISignUpUserUseCase registerUseCase)
-        {
-            _registerUseCase = registerUseCase;
-        }
-
-        [HttpPost]
+        [HttpGet]
         public IActionResult RegisterProfessor()
         {
             return Ok("Profesor registrado");

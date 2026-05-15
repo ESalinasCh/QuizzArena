@@ -5,7 +5,7 @@ using Users.Domain.Entities;
 
 namespace QuizzArena.Users.Application.Ports.Out
 {
-    internal interface IUserRepository
+    public interface IUserRepository
     {
         Task<User> GetById(Guid id);
         Task Register(User quiz);

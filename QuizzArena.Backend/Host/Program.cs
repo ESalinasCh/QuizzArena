@@ -1,5 +1,10 @@
 ﻿using QuizzArena.Quizzing.Infraestructure.Adapters.In.Web;
+using QuizzArena.Users.Application.Ports.In;
+using QuizzArena.Users.Application.Ports.Out;
+using QuizzArena.Users.Application.UseCases.User;
 using QuizzArena.Users.Infrastructure.Adapters.In.Web;
+using QuizzArena.Users.Infrastructure.Adapters.Out;
+using System.Text.Json.Serialization;
 
 namespace QuizzArena.Host
 {
@@ -10,9 +15,18 @@ namespace QuizzArena.Host
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddControllers()
-                .AddApplicationPart(typeof(QuizController).Assembly);
+            .AddApplicationPart(typeof(IQuizzingInfrastructureMarker).Assembly)
+            .AddApplicationPart(typeof(IUsersInfrastructureMaker).Assembly)
+            .AddJsonOptions(options => {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
 
             // TODO: ADD DB CONNECTION
+
+            // Dependency Injection
+            builder.Services.AddScoped<ISignUpUserUseCase, SignUpUserUseCase>();
+            builder.Services.AddScoped<ILogInUserUseCase, LogInUserUseCase>();
+            builder.Services.AddScoped<IUserRepository, SqlUserRepository>();
 
             WebApplication app = builder.Build();
 

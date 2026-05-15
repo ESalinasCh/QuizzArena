@@ -7,12 +7,8 @@ using System.Text;
 
 namespace QuizzArena.Users.Application.UseCases.User
 {
-    internal class RegisterUserUseCase : ISignUpUserUseCase
+    public class SignUpUserUseCase(IUserRepository repository) : ISignUpUserUseCase
     {
-        private readonly IUserRepository _repository;
-
-        public RegisterUserUseCase(IUserRepository repository) => _repository = repository;
-
         public async Task<SignUpResponseDto> Execute(SignUpRequestDto dto)
         {
             return new SignUpResponseDto();

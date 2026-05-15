@@ -4,7 +4,7 @@ using System.Text;
 
 namespace QuizzArena.Users.Application.DTOs.User
 {
-    internal record SignUpResponseDto
+    public record SignUpResponseDto
     {
     }
 }
