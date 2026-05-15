@@ -1,6 +1,6 @@
 ﻿namespace Users.Domain.Entities
 {
-    public class Student
+    public class Student : User
     {
     }
 }
