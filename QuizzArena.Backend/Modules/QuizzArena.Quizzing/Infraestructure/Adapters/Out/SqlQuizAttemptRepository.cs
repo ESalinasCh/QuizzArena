@@ -6,7 +6,7 @@ using System.Text;
 
 namespace QuizzArena.Quizzing.Infraestructure.Adapters.Out
 {
-    internal class SqlQuizAttemptRepository : IQuizAttemptRepository
+    public class SqlQuizAttemptRepository : IQuizAttemptRepository
     {
         public async Task<QuizAttempt> End()
         {

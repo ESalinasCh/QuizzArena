@@ -5,7 +5,7 @@ using System.Text;
 
 namespace QuizzArena.Quizzing.Application.Ports.In.Quiz
 {
-    internal interface ICreateQuiz
+    public interface ICreateQuizUseCase
     {
         Task<CreateQuizResponseDto> Execute(CreateQuizRequestDto dto);
     }

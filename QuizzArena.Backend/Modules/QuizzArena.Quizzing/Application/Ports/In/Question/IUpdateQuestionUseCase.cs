@@ -1,13 +1,12 @@
 ﻿using QuizzArena.Quizzing.Application.DTOs.Question;
-using QuizzArena.Quizzing.Application.DTOs.Quiz;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace QuizzArena.Quizzing.Application.Ports.In.Question
 {
-    internal interface ICreateQuestion
+    public interface IUpdateQuestionUseCase
     {
-        Task<CreateQuestionResponseDto> Execute(CreateQuizRequestDto dto);
+        Task<UpdateQuestionResponseDto> Execute(UpdateQuestionRequestDto dto);
     }
 }

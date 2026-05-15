@@ -5,7 +5,7 @@ using System.Text;
 
 namespace QuizzArena.Quizzing.Application.Ports.In.Question
 {
-    internal interface IDeleteQuestion
+    public interface IDeleteQuestionUseCase
     {
         Task<DeleteQuestionResponseDto> Execute(DeleteQuestionRequestDto dto);
     }

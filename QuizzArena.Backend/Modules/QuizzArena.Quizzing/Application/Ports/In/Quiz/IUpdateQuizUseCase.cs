@@ -5,7 +5,7 @@ using System.Text;
 
 namespace QuizzArena.Quizzing.Application.Ports.In.Quiz
 {
-    internal interface IUpdateQuiz
+    public interface IUpdateQuizUseCase
     {
         Task<UpdateQuizResponseDto> Execute(UpdateQuizRequestDto dto);
     }

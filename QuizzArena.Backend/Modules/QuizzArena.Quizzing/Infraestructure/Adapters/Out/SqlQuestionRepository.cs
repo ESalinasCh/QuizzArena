@@ -6,7 +6,7 @@ using System.Text;
 
 namespace QuizzArena.Quizzing.Infraestructure.Adapters.Out
 {
-    internal class SqlQuestionRepository : IQuestionRepository
+    public class SqlQuestionRepository : IQuestionRepository
     {
         public async Task<Question> GetById(Guid id)
         {

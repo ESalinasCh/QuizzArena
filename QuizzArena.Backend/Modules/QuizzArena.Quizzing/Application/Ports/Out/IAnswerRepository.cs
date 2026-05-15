@@ -5,7 +5,7 @@ using System.Text;
 
 namespace QuizzArena.Quizzing.Application.Ports.Out
 {
-    internal interface IAnswerRepository
+    public interface IAnswerRepository
     {
         Task<Answer> SetAnswer(Guid id);
     }
