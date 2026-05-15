@@ -1,4 +1,5 @@
-﻿using QuizzArena.Users.Application.Ports.In;
+﻿using Microsoft.AspNetCore.Mvc;
+using QuizzArena.Users.Application.Ports.In;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
