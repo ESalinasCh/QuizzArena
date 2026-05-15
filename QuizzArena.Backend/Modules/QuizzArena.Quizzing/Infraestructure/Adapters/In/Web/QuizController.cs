@@ -4,7 +4,7 @@ using System.Text;
 
 namespace QuizzArena.Quizzing.Infraestructure.Adapters.In.Web
 {
-    internal class QuizController
+    public class QuizController
     {
     }
 }
