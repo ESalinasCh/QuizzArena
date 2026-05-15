@@ -7,12 +7,8 @@ using System.Text;
 
 namespace QuizzArena.Quizzing.Application.UseCases.Question
 {
-    internal class DeleteQuestion : IDeleteQuestion
+    public class DeleteQuestionUseCase(IQuestionRepository repository) : IDeleteQuestionUseCase
     {
-        private readonly IQuestionRepository _repository;
-
-        public DeleteQuestion(IQuestionRepository repository) => _repository = repository;
-
         public async Task<DeleteQuestionResponseDto> Execute(DeleteQuestionRequestDto dto)
         {
             return new DeleteQuestionResponseDto();

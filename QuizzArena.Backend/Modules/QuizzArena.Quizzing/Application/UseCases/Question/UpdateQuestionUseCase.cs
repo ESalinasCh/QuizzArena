@@ -7,12 +7,8 @@ using System.Text;
 
 namespace QuizzArena.Quizzing.Application.UseCases.Question
 {
-    internal class UpdateQuestion : IUpdateQuestion
+    public class UpdateQuestionUseCase(IQuestionRepository repository) : IUpdateQuestionUseCase
     {
-        private readonly IQuestionRepository _repository;
-
-        public UpdateQuestion(IQuestionRepository repository) => _repository = repository;
-
         public async Task<UpdateQuestionResponseDto> Execute(UpdateQuestionRequestDto dto)
         {
             return new UpdateQuestionResponseDto();

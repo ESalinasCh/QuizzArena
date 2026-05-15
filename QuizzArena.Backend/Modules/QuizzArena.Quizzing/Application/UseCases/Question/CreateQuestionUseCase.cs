@@ -8,13 +8,9 @@ using System.Text;
 
 namespace QuizzArena.Quizzing.Application.UseCases.Question
 {
-    internal class CreateQuestion : ICreateQuestion
+    public class CreateQuestionUseCase(IQuestionRepository repository) : ICreateQuestionUseCase
     {
-        private readonly IQuestionRepository _repository;
-
-        public CreateQuestion(IQuestionRepository repository) => _repository = repository;
-
-        public async Task<CreateQuestionResponseDto> Execute(CreateQuizRequestDto dto)
+        public async Task<CreateQuestionResponseDto> Execute(CreateQuestionRequestDto dto)
         {
             return new CreateQuestionResponseDto();
         }

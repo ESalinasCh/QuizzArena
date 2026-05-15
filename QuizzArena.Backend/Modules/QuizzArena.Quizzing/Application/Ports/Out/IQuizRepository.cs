@@ -5,7 +5,7 @@ using System.Text;
 
 namespace QuizzArena.Quizzing.Application.Ports.Out
 {
-    internal interface IQuizRepository
+    public interface IQuizRepository
     {
         Task<Quiz> GetById(Guid id);
         Task<Quiz> Create(Guid id);

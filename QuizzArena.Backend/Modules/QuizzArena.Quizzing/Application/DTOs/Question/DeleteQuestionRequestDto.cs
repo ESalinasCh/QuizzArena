@@ -4,7 +4,7 @@ using System.Text;
 
 namespace QuizzArena.Quizzing.Application.DTOs.Question
 {
-    internal record DeleteQuestionRequestDto
+    public record DeleteQuestionRequestDto
     {
     }
 }

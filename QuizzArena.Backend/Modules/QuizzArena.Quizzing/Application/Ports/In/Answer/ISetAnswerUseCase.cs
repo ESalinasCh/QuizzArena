@@ -5,7 +5,7 @@ using System.Text;
 
 namespace QuizzArena.Quizzing.Application.Ports.In.Answer
 {
-    internal interface ISetAnswer
+    public interface ISetAnswerUseCase
     {
         Task<SetAnswerResponseDto> Execute(SetAnswerRequestDto dto);
     }

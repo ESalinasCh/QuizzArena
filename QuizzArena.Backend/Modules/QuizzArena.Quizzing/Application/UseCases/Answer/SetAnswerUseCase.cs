@@ -7,12 +7,8 @@ using System.Text;
 
 namespace QuizzArena.Quizzing.Application.UseCases.Answer
 {
-    internal class SetAnswer : ISetAnswer
+    public class SetAnswerUseCase(IAnswerRepository repository) : ISetAnswerUseCase
     {
-        private readonly IAnswerRepository _repository;
-
-        public SetAnswer(IAnswerRepository repository) => _repository = repository;
-
         public async Task<SetAnswerResponseDto> Execute(SetAnswerRequestDto dto)
         {
             return new SetAnswerResponseDto();

@@ -7,15 +7,11 @@ using System.Text;
 
 namespace QuizzArena.Quizzing.Application.UseCases.Quiz
 {
-    internal class DeleteQuiz : IDeleteQuiz
+    public class UpdateQuizUseCase(IQuizRepository repository) : IUpdateQuizUseCase
     {
-        private readonly IQuizRepository _repository;
-
-        public DeleteQuiz(IQuizRepository repository) => _repository = repository;
-
-        public async Task<DeleteQuizResponseDto> Execute(DeleteQuizRequestDto dto)
+        public async Task<UpdateQuizResponseDto> Execute(UpdateQuizRequestDto dto)
         {
-            return new DeleteQuizResponseDto();
+            return new UpdateQuizResponseDto();
         }
     }
 }

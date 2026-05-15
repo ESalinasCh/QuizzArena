@@ -4,7 +4,7 @@ using System.Text;
 
 namespace QuizzArena.Quizzing.Domain.Entities
 {
-    internal class Question
+    public class Question
     {
     }
 }

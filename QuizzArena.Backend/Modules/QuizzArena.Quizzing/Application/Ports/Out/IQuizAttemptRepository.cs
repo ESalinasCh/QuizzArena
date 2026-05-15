@@ -5,7 +5,7 @@ using System.Text;
 
 namespace QuizzArena.Quizzing.Application.Ports.Out
 {
-    internal interface IQuizAttemptRepository
+    public interface IQuizAttemptRepository
     {
         Task<QuizAttempt> Start();
         Task<QuizAttempt> End();

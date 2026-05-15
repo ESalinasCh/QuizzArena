@@ -7,12 +7,8 @@ using System.Text;
 
 namespace QuizzArena.Quizzing.Application.UseCases.Quiz
 {
-    internal class CreateQuiz : ICreateQuiz
+    public class CreateQuizUseCase(IQuizRepository repository) : ICreateQuizUseCase
     {
-        private readonly IQuizRepository _repository;
-
-        public CreateQuiz(IQuizRepository repository) => _repository = repository;
-
         public async Task<CreateQuizResponseDto> Execute(CreateQuizRequestDto dto)
         {
             return new CreateQuizResponseDto();
