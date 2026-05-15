@@ -1,1 +1,8 @@
 QuizArena_Proyecto_Base.md
+/Modules/Users/bin
+/Modules/Users/obj
+
+[Bb]in/
+[Oo]bj/
+.vs/
+.vscode/
