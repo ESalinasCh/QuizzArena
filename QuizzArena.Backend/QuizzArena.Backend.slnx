@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/Modules/">
+    <Project Path="Modules/QuizzArena.Quizzing/QuizzArena.Quizzing.csproj" />
+    <Project Path="Modules/QuizzArena.Users/QuizzArena.Users.csproj" />
+  </Folder>
+  <Project Path="Host/Host.csproj" Id="603f6573-59b0-42ad-84d1-d632231d9416" />
+</Solution>
