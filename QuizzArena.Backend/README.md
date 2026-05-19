@@ -92,6 +92,24 @@ This layer handles the "How" (How we store data, How we send messages).
 
 ---
 
+
+## 🔗 Shared Module & Inter-Module Communication
+
+### Purpose of the Shared Module
+The **Shared** module acts as a contract boundary for cross-module communication. It contains interfaces, DTOs, and contracts that define how different modules interact without creating direct dependencies between their internal implementations.
+
+### How Communication Works
+- **Decoupling via Contracts:** Instead of referencing each other's internal classes, modules depend on interfaces defined in the Shared module (e.g., `IUsersContract`).
+- **Implementation in Infrastructure:** Each module provides its own implementation of the shared contracts in its Infrastructure layer (e.g., `UsersContractImpl` in the Users module).
+- **Dependency Injection:** The module registers its implementation with the DI container, so when another module requests the contract, it receives the correct implementation.
+- **Usage Example:**
+    - The Quizzing module needs to check if a user is a professor. It depends on the `IUsersContract` interface from Shared, not on the Users module directly.
+    - The Users module implements `IUsersContract` and registers it in its DI setup.
+    - At runtime, the DI container injects the Users module's implementation wherever `IUsersContract` is required, enabling safe, decoupled communication.
+
+This approach ensures that modules remain independent, testable, and maintainable, while still enabling rich interactions across bounded contexts.
+
+---
 ## 💎 Design Patterns & Principles Applied
 
 | Pattern | Benefit |
@@ -102,7 +120,17 @@ This layer handles the "How" (How we store data, How we send messages).
 
 ---
 
-## 🛠️ Tech Stack Specs
+
+## 📦 Pre-installed Packages Per Module
+
+Each module comes with the following NuGet packages ready to use:
+
+- **Npgsql.EntityFrameworkCore.PostgreSQL** — PostgreSQL provider for Entity Framework Core
+- **Microsoft.EntityFrameworkCore.Design** — Design-time utilities for Entity Framework Core
+- **AutoMapper** — Object-object mapping for DTOs and entities
+- **FluentValidation** — Powerful validation library for .NET
+- **Asp.Versioning.Mvc** — API versioning support for ASP.NET Core MVC
+
 
 - **Runtime:** .NET 10.0 (Latest Release)
 - **Database:** PostgreSQL + pgvector (for vector similarity search)
