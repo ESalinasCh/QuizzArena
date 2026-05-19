@@ -4,26 +4,26 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace QuizzArena.Quizzing.Infraestructure.Adapters.Out
+namespace QuizzArena.Quizzing.Infraestructure.Adapters.Out.Persistence
 {
-    public class SqlQuizRepository : IQuizRepository
+    public class SqlQuestionRepository : IQuestionRepository
     {
-        public async Task<Quiz> GetById(Guid id)
+        public async Task<Question> GetById(Guid id)
         {
             //throw new NotImplementedException();
-            return new Quiz();
+            return new Question();
         }
 
-        public async Task<Quiz> Create(Guid id)
+        public async Task<Question> Create(Guid id)
         {
             //throw new NotImplementedException();
-            return new Quiz();
+            return new Question();
         }
 
-        public async Task<Quiz> Update(Guid id)
+        public async Task<Question> Update(Guid id)
         {
             //throw new NotImplementedException();
-            return new Quiz();
+            return new Question();
         }
 
         public async Task Delete(Guid id)

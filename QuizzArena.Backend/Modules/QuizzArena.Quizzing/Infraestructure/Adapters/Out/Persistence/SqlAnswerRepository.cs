@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace QuizzArena.Quizzing.Infraestructure.Adapters.Out
+namespace QuizzArena.Quizzing.Infraestructure.Adapters.Out.Persistence
 {
     public class SqlAnswerRepository : IAnswerRepository
     {
