@@ -1,6 +1,7 @@
 # 🏆 QuizzArena: Advanced Modular Architecture Guide
 
-This repository hosts the **QuizzArena Backend**, a high-performance system built with **.NET 10**. The project is architected as a **Modular Monolith**, strictly adhering to **Hexagonal Architecture (Ports & Adapters)** and **Domain-Driven Design (DDD)** principles.
+
+This repository hosts the **QuizzArena Backend**, a high-performance system built with **.NET 10**. The project is architected as a **Modular Monolith**, strictly adhering to **Hexagonal Architecture (Ports & Adapters)**, **Domain-Driven Design (DDD)** principles, and the **Screaming Architecture** methodology.
 
 
 ## 🏛️ Architectural Manifesto
@@ -29,19 +30,21 @@ The primary goal of this architecture is **Independence**. By decoupling the bus
         │   │   ├── In/
         │   │   └── Out/
         │   ├── UseCases/
-        │   ├── DTOs/                       
+        │   ├── DTOs/
+        │   ├── Validators/
         │   └── Mappers/ 
         └── Infrastructure/                 
             └── Adapters/
                 ├── In/
-                │   └── web/
+                │   └── Web/
                 └── Out/
-                    └── persistence/
+                    ├── ExternalServices/
+                    └── Persistence/
 ```
 
 ### 🛠️ 1. The Host (Composition Root)
 The `Host/` directory is the only executable project. It serves as the **Orchestrator**.
-- **Responsibilities:** Dependency Injection (DI) container configuration, Middleware pipeline setup (Auth, Logging, Swagger), and merging modular routes into a single API surface.
+- **Responsibilities:** Imports the modules' extension methods to compose the application and merges modular routes into a single API surface. The Host no longer performs direct dependency injection configuration; all DI is handled within each module.
 
 ---
 
@@ -62,6 +65,7 @@ This layer implements the **Use Cases**. It tells the domain what to do.
 - **UseCases:** Commands and logic that satisfy a user requirement (e.g., `SubmitQuizHandler.cs`).
 - **DTOs (Data Transfer Objects):** Simple contracts for input/output. They ensure the Domain Entities never leak to the outside world.
 - **Mappers:** Responsible for the transformation between Entities and DTOs (using AutoMapper or manual mapping).
+- **Validators:** Input validation logic, typically implemented using FluentValidation, to ensure data integrity before processing use cases.
 - **Ports (The Hexagon's Boundary):**
     - **Inbound Ports:** Interfaces defining the "Entry Points" for the application.
     - **Outbound Ports:** Interfaces defining what the application needs from the infrastructure (e.g., `IUserRepository`, `IEmailService`).
@@ -72,8 +76,8 @@ This layer handles the "How" (How we store data, How we send messages).
 - **Adapters In (Web):**
     - **Web API:** ASP.NET Core Controllers. They translate HTTP requests into Application Use Cases.
 - **Adapters Out (Persistence):**
-    - **Database:** EF Core implementations, Migrations, and Repository concrete classes (e.g., `SqlQuizRepository.cs`).
-    - **External Services:** Implementations for third-party APIs or Cloud providers.
+    - **Persistence:** EF Core implementations, Migrations, and Repository concrete classes (e.g., `SqlQuizRepository.cs`).
+    - **External Services:** Implementations of shared contracts/interfaces that are used across modules (e.g., `IUsersContract`).
 
 ---
 
