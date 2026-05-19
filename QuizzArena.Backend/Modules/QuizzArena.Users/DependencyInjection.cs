@@ -4,6 +4,8 @@ using QuizzArena.Users.Application.Ports.Out;
 using QuizzArena.Users.Application.UseCases.User;
 using QuizzArena.Users.Infrastructure.Adapters.In.Web;
 using QuizzArena.Users.Infrastructure.Adapters.Out;
+using QuizzArena.Users.Infrastructure.Adapters.Out.ExternalServices;
+using Shared.Contracts;
 
 namespace QuizzArena.Users
 {
@@ -17,6 +19,7 @@ namespace QuizzArena.Users
             services.AddScoped<ISignUpUserUseCase, SignUpUserUseCase>();
             services.AddScoped<ILogInUserUseCase, LogInUserUseCase>();
             services.AddScoped<IUserRepository, SqlUserRepository>();
+            services.AddScoped<IUsersContract, UsersContractImpl>();
 
             // TODO: Add DB Connection
 

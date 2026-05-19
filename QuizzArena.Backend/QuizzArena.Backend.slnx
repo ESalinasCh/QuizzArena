@@ -6,4 +6,5 @@
     <Project Path="Modules/QuizzArena.Quizzing/QuizzArena.Quizzing.csproj" />
     <Project Path="Modules/QuizzArena.Users/QuizzArena.Users.csproj" />
   </Folder>
+  <Project Path="Shared/Shared.csproj" />
 </Solution>
