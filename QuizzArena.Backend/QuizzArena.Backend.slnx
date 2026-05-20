@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/Host/">
+    <Project Path="Host/Host.csproj" />
+  </Folder>
+  <Folder Name="/Modules/">
+    <Project Path="Modules/QuizzArena.Quizzing/QuizzArena.Quizzing.csproj" />
+    <Project Path="Modules/QuizzArena.Users/QuizzArena.Users.csproj" />
+    <Project Path="Modules/QuizzArena.DocumentProcessing/QuizzArena.DocumentProcessing.csproj" />
+  </Folder>
+  <Project Path="Shared/Shared.csproj" />
+</Solution>
