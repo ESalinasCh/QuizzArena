@@ -1,7 +1,4 @@
 ﻿using QuizzArena.Users.Application.Ports.Out;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Users.Domain.Entities;
 
 namespace QuizzArena.Users.Infrastructure.Adapters.Out.Persistence
@@ -11,7 +8,7 @@ namespace QuizzArena.Users.Infrastructure.Adapters.Out.Persistence
         public async Task<User> GetById(Guid id)
         {
             //throw new NotImplementedException();
-            return new Student();
+            return new User();
         }
 
         public async Task Register(User quiz)

@@ -1,8 +1,5 @@
 ﻿using QuizzArena.Quizzing.Application.Ports.Out;
 using QuizzArena.Quizzing.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace QuizzArena.Quizzing.Infraestructure.Adapters.Out.Persistence
 {

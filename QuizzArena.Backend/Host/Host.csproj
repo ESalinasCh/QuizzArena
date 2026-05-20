@@ -17,5 +17,6 @@
 	<ItemGroup>
 		<ProjectReference Include="..\Modules\QuizzArena.Quizzing\QuizzArena.Quizzing.csproj" />
 		<ProjectReference Include="..\Modules\QuizzArena.Users\QuizzArena.Users.csproj" />
+		<ProjectReference Include="..\Modules\QuizzArena.DocumentProcessing\QuizzArena.DocumentProcessing.csproj" />
 	</ItemGroup>
 </Project>

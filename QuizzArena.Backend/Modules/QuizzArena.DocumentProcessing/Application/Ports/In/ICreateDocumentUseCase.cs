@@ -2,8 +2,8 @@
 
 namespace QuizzArena.DocumentProcessing.Application.Ports.In
 {
-    internal interface ICreateDocumentUseCase
+    public interface ICreateDocumentUseCase
     {
-        Task<DocumentChunkDto> Execute(CreateDocumentChunkDto dto);
+        Task<DocumentChunkDto> Execute(CreateDocumentDto dto);
     }
 }

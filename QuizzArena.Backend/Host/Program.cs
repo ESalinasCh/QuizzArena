@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using QuizzArena.Users;                        
 using QuizzArena.Quizzing;
+using QuizzArena.DocumentProcessing;
 
 namespace QuizzArena.Host
 {
@@ -19,7 +20,7 @@ namespace QuizzArena.Host
 
             builder.Services.AddUsersModule();
             builder.Services.AddQuizzingModule();
-
+            builder.Services.AddDocumentProcessingModule();
 
             WebApplication app = builder.Build();
 

@@ -1,6 +1,6 @@
 ﻿namespace QuizzArena.DocumentProcessing.Domain.Entities
 {
-    internal class DocumentChunk
+    public class DocumentChunk
     {
         public Guid Id { get; set; }
         public int ChunkOrder { get; set; }

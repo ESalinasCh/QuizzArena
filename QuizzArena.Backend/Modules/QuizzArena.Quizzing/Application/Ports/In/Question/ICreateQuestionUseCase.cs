@@ -1,12 +1,9 @@
 ﻿using QuizzArena.Quizzing.Application.DTOs.Question;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace QuizzArena.Quizzing.Application.Ports.In.Question
 {
-    public interface IDeleteQuestionUseCase
+    public interface ICreateQuestionUseCase
     {
-        Task<CreateQuestionResponseDto> Execute(CreateQuestionResponseDto dto);
+        Task<CreateQuestionResponseDto> Execute(CreateQuestionRequestDto dto);
     }
 }

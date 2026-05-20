@@ -5,7 +5,7 @@
   <Folder Name="/Modules/">
     <Project Path="Modules/QuizzArena.Quizzing/QuizzArena.Quizzing.csproj" />
     <Project Path="Modules/QuizzArena.Users/QuizzArena.Users.csproj" />
-    <Project Path="QuizzArena.DocumentProcessing/QuizzArena.DocumentProcessing.csproj" Id="c47b16ec-fd52-40e1-97a9-76d2c4a57c2b" />
+    <Project Path="Modules/QuizzArena.DocumentProcessing/QuizzArena.DocumentProcessing.csproj" />
   </Folder>
   <Project Path="Shared/Shared.csproj" />
 </Solution>
