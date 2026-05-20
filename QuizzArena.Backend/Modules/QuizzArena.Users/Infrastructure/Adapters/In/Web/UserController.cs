@@ -5,7 +5,7 @@ using QuizzArena.Users.Application.Ports.In;
 namespace QuizzArena.Users.Infrastructure.Adapters.In.Web
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class UserController(
         ISignUpUserUseCase signupUseCase,
         ILogInUserUseCase loginUseCase

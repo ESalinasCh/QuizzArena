@@ -8,7 +8,7 @@ using System.Text;
 namespace QuizzArena.Quizzing.Infraestructure.Adapters.In.Web
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class QuizController(
         ICreateQuizUseCase createQuizUseCase,
         IUpdateQuizUseCase updateQuizUseCase,

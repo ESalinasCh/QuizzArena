@@ -5,7 +5,7 @@ using QuizzArena.Quizzing.Application.Ports.In.Question;
 namespace QuizzArena.Quizzing.Infraestructure.Adapters.In.Web
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class QuestionController(
         ICreateQuestionUseCase createQuestionUseCase,
         IUpdateQuestionUseCase updateQuestionUseCase,

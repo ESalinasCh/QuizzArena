@@ -1,7 +1,8 @@
-﻿using System.Text.Json.Serialization;
-using QuizzArena.Users;                        
-using QuizzArena.Quizzing;
+﻿using Asp.Versioning;
 using QuizzArena.DocumentProcessing;
+using QuizzArena.Quizzing;
+using QuizzArena.Users;                        
+using System.Text.Json.Serialization;
 
 namespace QuizzArena.Host
 {
@@ -17,6 +18,12 @@ namespace QuizzArena.Host
             {
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
+
+            builder.Services.AddApiVersioning(options =>
+            {
+                options.DefaultApiVersion = new Asp.Versioning.ApiVersion(1, 0);
+                options.AssumeDefaultVersionWhenUnspecified = true;
+            }).AddMvc();
 
             builder.Services.AddUsersModule();
             builder.Services.AddQuizzingModule();
