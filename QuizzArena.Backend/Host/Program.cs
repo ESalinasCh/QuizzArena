@@ -1,5 +1,4 @@
 ﻿using System.Text.Json.Serialization;
-using Microsoft.Extensions.DependencyInjection;
 using QuizzArena.Users;                        
 using QuizzArena.Quizzing;
 

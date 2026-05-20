@@ -1,12 +1,12 @@
 ﻿namespace QuizzArena.Quizzing.Domain.Entities
 {
-    public class Option
+    internal class QuizQuestion
     {
         public Guid Id { get; set; }
-        public string Description { get; set; } = string.Empty;
-        public bool IsCorrect { get; set; }
         public int Position { get; set; }
+        public int ValueScore { get; set; }
 
+        public Guid QuizId { get; set; }
         public Guid QuestionId { get; set; }
     }
 }

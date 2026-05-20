@@ -1,10 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using QuizzArena.Users.Application.DTOs.User;
 using QuizzArena.Users.Application.Ports.In;
-using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
 
 namespace QuizzArena.Users.Infrastructure.Adapters.In.Web
 {

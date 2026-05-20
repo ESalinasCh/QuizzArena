@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Users.Domain.Entities;
+﻿using Users.Domain.Entities;
 
 namespace QuizzArena.Users.Application.Ports.Out
 {
