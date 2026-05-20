@@ -1,0 +1,61 @@
+# PERFILES DISPONIBLES:
+#   Alto rendimiento (16GB+ RAM):  docker compose --profile high up -d
+#   Bajo rendimiento (8GB RAM):    docker compose --profile low up -d
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    container_name: quizarena_db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: quizarena_ollama
+    ports:
+      - '11434:11434'
+    volumes:
+      - ollama_models:/root/.ollama
+    healthcheck:
+      test: ['CMD', 'ollama', 'list']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+  whisper-high:
+    image: onerahmet/openai-whisper-asr-webservice:latest
+    profiles: ['high']
+    environment:
+      ASR_MODEL: small
+      ASR_ENGINE: openai_whisper
+    ports:
+      - '9000:9000'
+    restart: unless-stopped
+
+  whisper-low:
+    image: onerahmet/openai-whisper-asr-webservice:latest
+    profiles: ['low']
+    environment:
+      ASR_MODEL: tiny
+      ASR_ENGINE: openai_whisper
+    ports:
+      - '9000:9000'
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  ollama_models:
