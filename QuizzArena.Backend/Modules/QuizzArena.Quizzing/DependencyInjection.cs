@@ -9,7 +9,7 @@ using QuizzArena.Quizzing.Application.UseCases.Question;
 using QuizzArena.Quizzing.Application.UseCases.Quiz;
 using QuizzArena.Quizzing.Application.UseCases.QuizAttempt;
 using QuizzArena.Quizzing.Infraestructure.Adapters.In.Web;
-using QuizzArena.Quizzing.Infraestructure.Adapters.Out.Persistence;
+using QuizzArena.Quizzing.Infraestructure.Adapters.Out.Persistence.Repositories;
 
 namespace QuizzArena.Quizzing
 {
