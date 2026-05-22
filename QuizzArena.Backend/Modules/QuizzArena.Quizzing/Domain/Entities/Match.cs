@@ -2,7 +2,7 @@
 
 namespace QuizzArena.Quizzing.Domain.Entities
 {
-    internal class Match
+    public class Match
     {
         public Guid Id { get; set; }
         public string Code { get; set; } = string.Empty;

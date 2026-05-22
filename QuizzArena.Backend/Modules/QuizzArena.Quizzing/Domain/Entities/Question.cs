@@ -14,5 +14,7 @@ namespace QuizzArena.Quizzing.Domain.Entities
         public DateTimeOffset UpdatedAt { get; set; }
 
         public Guid? ProcessingJobId { get; set; }
+
+        public ICollection<Option> Options { get; set; } //add
     }
 }

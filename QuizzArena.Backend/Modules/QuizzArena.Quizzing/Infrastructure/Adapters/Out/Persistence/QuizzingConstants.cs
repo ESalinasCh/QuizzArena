@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace QuizzArena.Quizzing.Infraestructure.Adapters.Out.Persistence
+namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence
 {
     internal static class QuizzingConstants
     {

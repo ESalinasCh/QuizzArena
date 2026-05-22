@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace QuizzArena.Quizzing.Infraestructure.Adapters.In.Web
+namespace QuizzArena.Quizzing.Infrastructure.Adapters.In.Web
 {
     [ApiController]
     [Route("api/v{version:apiVersion}/[controller]")]

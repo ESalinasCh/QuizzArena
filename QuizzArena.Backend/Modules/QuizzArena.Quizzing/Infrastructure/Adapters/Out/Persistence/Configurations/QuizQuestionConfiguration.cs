@@ -1,11 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using QuizzArena.Quizzing.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence;
 
-namespace QuizzArena.Quizzing.Infraestructure.Adapters.Out.Persistence.Configurations
+
+namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Configurations
 {
     internal sealed class QuizQuestionConfiguration : IEntityTypeConfiguration<QuizQuestion>
     {

@@ -1,6 +1,6 @@
 ﻿namespace QuizzArena.Quizzing.Domain.Entities
 {
-    internal class QuizQuestion
+    public class QuizQuestion
     {
         public Guid Id { get; set; }
         public int Position { get; set; }

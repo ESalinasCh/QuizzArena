@@ -2,7 +2,7 @@
 using QuizzArena.Quizzing.Application.DTOs.Question;
 using QuizzArena.Quizzing.Application.Ports.In.Question;
 
-namespace QuizzArena.Quizzing.Infraestructure.Adapters.In.Web
+namespace QuizzArena.Quizzing.Infrastructure.Adapters.In.Web
 {
     [ApiController]
     [Route("api/v{version:apiVersion}/[controller]")]

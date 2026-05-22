@@ -6,7 +6,7 @@ namespace QuizzArena.Quizzing.Domain.Entities
     {
         public Guid Id { get; set; }
         public DateTimeOffset StartDateTime { get; set; }
-        public DateTimeOffset EndDateTime { get; set; }
+        public DateTimeOffset? EndDateTime { get; set; }
         public DateTimeOffset JoinedAt { get; set; }
         public string Nickname { get; set; } = string.Empty;
         public QuizAttemptStatus Status { get; set; }

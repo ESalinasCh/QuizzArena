@@ -1,11 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using QuizzArena.Quizzing.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence;
 
-namespace QuizzArena.Quizzing.Infraestructure.Adapters.Out.Persistence.Configurations
+
+namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Configurations
 {
     internal sealed class QuestionConfiguration : IEntityTypeConfiguration<Question>
     {
@@ -22,10 +21,10 @@ namespace QuizzArena.Quizzing.Infraestructure.Adapters.Out.Persistence.Configura
                 .IsRequired();
 
             builder.Property(x => x.Status)
-                .IsRequired();
+                .IsRequired().HasColumnType($"{QuizzingConstants.Schema}.question_status");
 
             builder.Property(x => x.Type)
-                .IsRequired();
+                .IsRequired().HasColumnType($"{QuizzingConstants.Schema}.question_type");
 
             builder.Property(x => x.WasModified)
                 .IsRequired();
@@ -48,6 +47,11 @@ namespace QuizzArena.Quizzing.Infraestructure.Adapters.Out.Persistence.Configura
             builder.HasIndex(x => x.Type);
 
             builder.HasIndex(x => x.Deleted);
+
+            builder.HasMany(x => x.Options)
+            .WithOne()
+            .HasForeignKey(x => x.QuestionId)
+            .OnDelete(DeleteBehavior.Cascade);
         }
     
     }

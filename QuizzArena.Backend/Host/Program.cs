@@ -26,7 +26,7 @@ namespace QuizzArena.Host
             }).AddMvc();
 
             builder.Services.AddUsersModule();
-            builder.Services.AddQuizzingModule();
+            builder.Services.AddQuizzingModule(builder.Configuration);
             builder.Services.AddDocumentProcessingModule();
 
             WebApplication app = builder.Build();

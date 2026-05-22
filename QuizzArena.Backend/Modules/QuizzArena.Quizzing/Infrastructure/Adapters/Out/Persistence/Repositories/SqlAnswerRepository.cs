@@ -1,7 +1,7 @@
 ﻿using QuizzArena.Quizzing.Application.Ports.Out;
 using QuizzArena.Quizzing.Domain.Entities;
 
-namespace QuizzArena.Quizzing.Infraestructure.Adapters.Out.Persistence.Repositories
+namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Repositories
 {
     public class SqlAnswerRepository : IAnswerRepository
     {
