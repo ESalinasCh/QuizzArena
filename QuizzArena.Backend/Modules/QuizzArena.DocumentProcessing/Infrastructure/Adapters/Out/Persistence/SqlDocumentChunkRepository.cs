@@ -3,7 +3,7 @@ using QuizzArena.DocumentProcessing.Domain.Entities;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence
 {
-    internal class SqlDocumentChunkRepository: IDocumentChunkRepository
+    internal class SqlDocumentChunkRepository : IDocumentChunkRepository
     {
         public async Task<DocumentChunk> Create(Guid id)
         {

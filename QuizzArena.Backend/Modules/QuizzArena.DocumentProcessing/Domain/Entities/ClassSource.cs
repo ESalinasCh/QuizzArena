@@ -4,7 +4,7 @@ namespace QuizzArena.DocumentProcessing.Domain.Entities
 {
     internal class ClassSource
     {
-        public Guid Id { get; set; } 
+        public Guid Id { get; set; }
         public SourceType Type { get; set; }
         public SourceStatus Status { get; set; }
         public string Name { get; set; } = string.Empty;

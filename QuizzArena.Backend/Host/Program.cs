@@ -1,7 +1,7 @@
 ﻿using Asp.Versioning;
 using QuizzArena.DocumentProcessing;
 using QuizzArena.Quizzing;
-using QuizzArena.Users;                        
+using QuizzArena.Users;
 using System.Text.Json.Serialization;
 
 namespace QuizzArena.Host
