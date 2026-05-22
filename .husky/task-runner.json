@@ -7,7 +7,8 @@
          "args": [
             "-c",
             "grep -qE '^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\\([^)]+\\))?!?: .{1,}' \"$1\" || { echo 'Commit message must follow Conventional Commits: <type>(<scope>)?: <subject>'; exit 1; }",
-            "--"
+            "--",
+            "${args}"
          ],
          "windows": {
             "command": "pwsh",
@@ -15,7 +16,8 @@
                "-NoProfile",
                "-Command",
                "if (-not ((Get-Content $args[0] -Raw) -match '^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\\([^)]+\\))?!?: .{1,}')) { Write-Host 'Commit message must follow Conventional Commits: <type>(<scope>)?: <subject>'; exit 1 }",
-               "--"
+               "--",
+               "${args}"
             ]
          }
       }
