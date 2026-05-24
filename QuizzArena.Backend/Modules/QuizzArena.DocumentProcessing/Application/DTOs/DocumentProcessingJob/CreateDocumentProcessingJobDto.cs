@@ -1,6 +1,5 @@
-﻿namespace QuizzArena.DocumentProcessing.Application.DTOs.DocumentProcessingJob
+﻿namespace QuizzArena.DocumentProcessing.Application.DTOs.DocumentProcessingJob;
+
+internal class CreateDocumentProcessingJobDto
 {
-    internal class CreateDocumentProcessingJobDto
-    {
-    }
 }

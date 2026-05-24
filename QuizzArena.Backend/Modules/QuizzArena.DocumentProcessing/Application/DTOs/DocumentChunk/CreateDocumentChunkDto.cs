@@ -1,6 +1,5 @@
-﻿namespace QuizzArena.DocumentProcessing.Application.DTOs.DocumentChunk
+﻿namespace QuizzArena.DocumentProcessing.Application.DTOs.DocumentChunk;
+
+public record CreateDocumentDto
 {
-    public record CreateDocumentDto
-    {
-    }
 }

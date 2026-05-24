@@ -1,4 +1,3 @@
-﻿namespace QuizzArena.DocumentProcessing.Application.DTOs.DocumentChunk
-{
-    public record DocumentChunkDto();
-}
+﻿namespace QuizzArena.DocumentProcessing.Application.DTOs.DocumentChunk;
+
+public record DocumentChunkDto();

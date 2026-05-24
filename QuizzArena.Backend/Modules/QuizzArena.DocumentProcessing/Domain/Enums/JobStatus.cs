@@ -1,10 +1,9 @@
-﻿namespace QuizzArena.DocumentProcessing.Domain.Enums
+﻿namespace QuizzArena.DocumentProcessing.Domain.Enums;
+
+internal enum JobStatus
 {
-    internal enum JobStatus
-    {
-        Pending = 0,
-        Processing = 1,
-        Completed = 2,
-        Failed = 3,
-    }
+    Pending = 0,
+    Processing = 1,
+    Completed = 2,
+    Failed = 3,
 }

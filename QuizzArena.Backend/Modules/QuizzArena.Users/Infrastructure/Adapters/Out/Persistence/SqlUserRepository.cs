@@ -1,26 +1,25 @@
 ﻿using QuizzArena.Users.Application.Ports.Out;
 using Users.Domain.Entities;
 
-namespace QuizzArena.Users.Infrastructure.Adapters.Out.Persistence
+namespace QuizzArena.Users.Infrastructure.Adapters.Out.Persistence;
+
+public class SqlUserRepository : IUserRepository
 {
-    public class SqlUserRepository : IUserRepository
+    public async Task<User> GetById(Guid id)
     {
-        public async Task<User> GetById(Guid id)
-        {
-            //throw new NotImplementedException();
-            return new User();
-        }
+        //throw new NotImplementedException();
+        return new User();
+    }
 
-        public async Task Register(User quiz)
-        {
-            //throw new NotImplementedException();
-            return;
-        }
+    public async Task Register(User quiz)
+    {
+        //throw new NotImplementedException();
+        return;
+    }
 
-        public async Task Delete(Guid id)
-        {
-            //throw new NotImplementedException();
-            return;
-        }
+    public async Task Delete(Guid id)
+    {
+        //throw new NotImplementedException();
+        return;
     }
 }

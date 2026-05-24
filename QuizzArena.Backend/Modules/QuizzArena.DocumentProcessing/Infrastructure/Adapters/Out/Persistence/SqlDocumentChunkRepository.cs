@@ -1,13 +1,12 @@
 ﻿using QuizzArena.DocumentProcessing.Application.Ports.Out;
 using QuizzArena.DocumentProcessing.Domain.Entities;
 
-namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence
+namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence;
+
+internal class SqlDocumentChunkRepository : IDocumentChunkRepository
 {
-    internal class SqlDocumentChunkRepository : IDocumentChunkRepository
+    public async Task<DocumentChunk> Create(Guid id)
     {
-        public async Task<DocumentChunk> Create(Guid id)
-        {
-            return new DocumentChunk();
-        }
+        return new DocumentChunk();
     }
 }

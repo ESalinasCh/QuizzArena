@@ -1,9 +1,8 @@
-﻿namespace QuizzArena.Quizzing.Domain.Enums
+﻿namespace QuizzArena.Quizzing.Domain.Enums;
+
+public enum QuizStatus
 {
-    public enum QuizStatus
-    {
-        draft = 0,
-        published = 1,
-        archived = 2,
-    }
+    draft = 0,
+    published = 1,
+    archived = 2,
 }

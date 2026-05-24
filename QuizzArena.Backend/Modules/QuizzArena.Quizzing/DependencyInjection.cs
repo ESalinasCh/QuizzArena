@@ -11,35 +11,34 @@ using QuizzArena.Quizzing.Application.UseCases.QuizAttempt;
 using QuizzArena.Quizzing.Infraestructure.Adapters.In.Web;
 using QuizzArena.Quizzing.Infraestructure.Adapters.Out.Persistence;
 
-namespace QuizzArena.Quizzing
+namespace QuizzArena.Quizzing;
+
+public static class DependencyInjection
 {
-    public static class DependencyInjection
+    public static IServiceCollection AddQuizzingModule(this IServiceCollection services)
     {
-        public static IServiceCollection AddQuizzingModule(this IServiceCollection services)
-        {
-            services.AddControllers()
-                .AddApplicationPart(typeof(IQuizzingInfrastructureMarker).Assembly);
+        services.AddControllers()
+            .AddApplicationPart(typeof(IQuizzingInfrastructureMarker).Assembly);
 
-            services.AddScoped<ISetAnswerUseCase, SetAnswerUseCase>();
-            services.AddScoped<IAnswerRepository, SqlAnswerRepository>();
+        services.AddScoped<ISetAnswerUseCase, SetAnswerUseCase>();
+        services.AddScoped<IAnswerRepository, SqlAnswerRepository>();
 
-            services.AddScoped<ICreateQuizUseCase, CreateQuizUseCase>();
-            services.AddScoped<IUpdateQuizUseCase, UpdateQuizUseCase>();
-            services.AddScoped<IDeleteQuizUseCase, DeleteQuizUseCase>();
-            services.AddScoped<IQuizRepository, SqlQuizRepository>();
+        services.AddScoped<ICreateQuizUseCase, CreateQuizUseCase>();
+        services.AddScoped<IUpdateQuizUseCase, UpdateQuizUseCase>();
+        services.AddScoped<IDeleteQuizUseCase, DeleteQuizUseCase>();
+        services.AddScoped<IQuizRepository, SqlQuizRepository>();
 
-            services.AddScoped<ICreateQuestionUseCase, CreateQuestionUseCase>();
-            services.AddScoped<IUpdateQuestionUseCase, UpdateQuestionUseCase>();
-            services.AddScoped<IDeleteQuestionUseCase, DeleteQuestionUseCase>();
-            services.AddScoped<IQuestionRepository, SqlQuestionRepository>();
+        services.AddScoped<ICreateQuestionUseCase, CreateQuestionUseCase>();
+        services.AddScoped<IUpdateQuestionUseCase, UpdateQuestionUseCase>();
+        services.AddScoped<IDeleteQuestionUseCase, DeleteQuestionUseCase>();
+        services.AddScoped<IQuestionRepository, SqlQuestionRepository>();
 
-            services.AddScoped<IStartQuizAttemptUseCase, StartQuizAttemptUseCase>();
-            services.AddScoped<IEndQuizAttemptUseCase, EndQuizAttemptUseCase>();
-            services.AddScoped<IQuizAttemptRepository, SqlQuizAttemptRepository>();
+        services.AddScoped<IStartQuizAttemptUseCase, StartQuizAttemptUseCase>();
+        services.AddScoped<IEndQuizAttemptUseCase, EndQuizAttemptUseCase>();
+        services.AddScoped<IQuizAttemptRepository, SqlQuizAttemptRepository>();
 
-            // TODO: Add DB Connection
+        // TODO: Add DB Connection
 
-            return services;
-        }
+        return services;
     }
 }

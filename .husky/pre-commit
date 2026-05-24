@@ -19,4 +19,4 @@
 ## or put your custom commands -------------------
 #echo 'Husky.Net is awesome!'
 
-dotnet format QuizzArena.Backend/QuizzArena.Backend.slnx --verify-no-changes
+dotnet format QuizzArena.Backend/QuizzArena.Backend.slnx

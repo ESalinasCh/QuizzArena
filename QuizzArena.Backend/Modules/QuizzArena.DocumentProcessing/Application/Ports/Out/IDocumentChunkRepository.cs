@@ -1,9 +1,8 @@
 ﻿using QuizzArena.DocumentProcessing.Domain.Entities;
 
-namespace QuizzArena.DocumentProcessing.Application.Ports.Out
+namespace QuizzArena.DocumentProcessing.Application.Ports.Out;
+
+public interface IDocumentChunkRepository
 {
-    public interface IDocumentChunkRepository
-    {
-        Task<DocumentChunk> Create(Guid id);
-    }
+    Task<DocumentChunk> Create(Guid id);
 }
