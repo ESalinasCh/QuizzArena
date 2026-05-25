@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace Shared.Contracts;
 
-namespace Shared.Contracts
+public interface IUsersContract
 {
-    public interface IUsersContract
-    {
-        Task<bool> IsProfessor(Guid userId);
-    }
+    Task<bool> IsProfessor(Guid userId);
 }

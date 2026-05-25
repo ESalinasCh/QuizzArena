@@ -1,48 +1,43 @@
-﻿using Asp.Versioning;
+﻿using System.Text.Json.Serialization;
 using QuizzArena.DocumentProcessing;
 using QuizzArena.Quizzing;
-using QuizzArena.Users;                        
-using System.Text.Json.Serialization;
+using QuizzArena.Users;
 
-namespace QuizzArena.Host
+namespace QuizzArena.Host;
+
+public class Program
 {
-    public class Program
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
+        var builder = WebApplication.CreateBuilder(args);
+
+        // Adding Controllers
+        builder.Services.AddControllers()
+        .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+        builder.Services.AddApiVersioning(options =>
         {
-            var builder = WebApplication.CreateBuilder(args);
+            options.DefaultApiVersion = new Asp.Versioning.ApiVersion(1, 0);
+            options.AssumeDefaultVersionWhenUnspecified = true;
+        }).AddMvc();
 
-            // Adding Controllers
-            builder.Services.AddControllers()
-            .AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-            });
+        builder.Services.AddUsersModule();
+        builder.Services.AddQuizzingModule();
+        builder.Services.AddDocumentProcessingModule();
 
-            builder.Services.AddApiVersioning(options =>
-            {
-                options.DefaultApiVersion = new Asp.Versioning.ApiVersion(1, 0);
-                options.AssumeDefaultVersionWhenUnspecified = true;
-            }).AddMvc();
+        WebApplication app = builder.Build();
 
-            builder.Services.AddUsersModule();
-            builder.Services.AddQuizzingModule();
-            builder.Services.AddDocumentProcessingModule();
-
-            WebApplication app = builder.Build();
-
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
-            app.UseHttpsRedirection();
-
-            app.UseAuthorization();
-
-            app.MapControllers();
-
-            app.Run();
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseDeveloperExceptionPage();
         }
+
+        app.UseHttpsRedirection();
+
+        app.UseAuthorization();
+
+        app.MapControllers();
+
+        app.Run();
     }
 }

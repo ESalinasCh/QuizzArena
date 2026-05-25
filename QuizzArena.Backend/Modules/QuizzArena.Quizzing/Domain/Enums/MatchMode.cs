@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace QuizzArena.Quizzing.Domain.Enums;
 
-namespace QuizzArena.Quizzing.Domain.Enums
+public enum MatchMode
 {
-    public enum MatchMode
-    {
-        // TODO
-        Single = 0,
-        Multiple = 1,
-    }
+    // TODO
+    Single = 0,
+    Multiple = 1,
 }

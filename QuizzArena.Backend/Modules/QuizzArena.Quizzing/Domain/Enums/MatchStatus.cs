@@ -1,9 +1,8 @@
-﻿namespace QuizzArena.Quizzing.Domain.Enums
+﻿namespace QuizzArena.Quizzing.Domain.Enums;
+
+public enum MatchStatus
 {
-    public enum MatchStatus
-    {
-        Pending = 0,
-        Active = 1,
-        Expired = 2,
-    }
+    Pending = 0,
+    Active = 1,
+    Expired = 2,
 }

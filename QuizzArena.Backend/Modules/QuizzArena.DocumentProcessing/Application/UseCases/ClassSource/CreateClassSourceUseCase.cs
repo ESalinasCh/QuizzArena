@@ -1,6 +1,5 @@
-﻿namespace QuizzArena.DocumentProcessing.Application.DTOs.ClassSource
+﻿namespace QuizzArena.DocumentProcessing.Application.DTOs.ClassSource;
+
+internal class CreateClassSourceUseCase
 {
-    internal class CreateClassSourceUseCase
-    {
-    }
 }

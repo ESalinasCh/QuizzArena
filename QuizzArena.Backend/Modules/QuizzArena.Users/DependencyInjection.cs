@@ -7,23 +7,22 @@ using QuizzArena.Users.Infrastructure.Adapters.Out.ExternalServices;
 using QuizzArena.Users.Infrastructure.Adapters.Out.Persistence;
 using Shared.Contracts;
 
-namespace QuizzArena.Users
+namespace QuizzArena.Users;
+
+public static class DependencyInjection
 {
-    public static class DependencyInjection
+    public static IServiceCollection AddUsersModule(this IServiceCollection services)
     {
-        public static IServiceCollection AddUsersModule(this IServiceCollection services)
-        {
-            services.AddControllers()
-                .AddApplicationPart(typeof(IUsersInfrastructureMaker).Assembly);
+        services.AddControllers()
+            .AddApplicationPart(typeof(IUsersInfrastructureMaker).Assembly);
 
-            services.AddScoped<ISignUpUserUseCase, SignUpUserUseCase>();
-            services.AddScoped<ILogInUserUseCase, LogInUserUseCase>();
-            services.AddScoped<IUserRepository, SqlUserRepository>();
-            services.AddScoped<IUsersContract, UsersContractImpl>();
+        services.AddScoped<ISignUpUserUseCase, SignUpUserUseCase>();
+        services.AddScoped<ILogInUserUseCase, LogInUserUseCase>();
+        services.AddScoped<IUserRepository, SqlUserRepository>();
+        services.AddScoped<IUsersContract, UsersContractImpl>();
 
-            // TODO: Add DB Connection
+        // TODO: Add DB Connection
 
-            return services;
-        }
+        return services;
     }
 }

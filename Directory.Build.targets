@@ -1,0 +1,11 @@
+<Project>
+  <Target Name="husky" BeforeTargets="Restore;CollectPackageReferences"
+          Condition="'$(HUSKY)' != 0 AND !Exists('$(MSBuildThisFileDirectory).husky/_/husky.sh')">
+    <Exec Command="dotnet tool restore"
+          WorkingDirectory="$(MSBuildThisFileDirectory)"
+          StandardOutputImportance="Low" />
+    <Exec Command="dotnet husky install"
+          WorkingDirectory="$(MSBuildThisFileDirectory)"
+          StandardOutputImportance="Low" />
+  </Target>
+</Project>

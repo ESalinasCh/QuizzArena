@@ -1,6 +1,5 @@
-﻿namespace QuizzArena.Users.Application.DTOs.User
+﻿namespace QuizzArena.Users.Application.DTOs.User;
+
+public record SignUpRequestDto
 {
-    public record SignUpRequestDto
-    {
-    }
 }

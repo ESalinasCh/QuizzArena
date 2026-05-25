@@ -1,9 +1,8 @@
 ﻿using QuizzArena.Quizzing.Application.DTOs.Question;
 
-namespace QuizzArena.Quizzing.Application.Ports.In.Question
+namespace QuizzArena.Quizzing.Application.Ports.In.Question;
+
+public interface ICreateQuestionUseCase
 {
-    public interface ICreateQuestionUseCase
-    {
-        Task<CreateQuestionResponseDto> Execute(CreateQuestionRequestDto dto);
-    }
+    Task<CreateQuestionResponseDto> Execute(CreateQuestionRequestDto dto);
 }

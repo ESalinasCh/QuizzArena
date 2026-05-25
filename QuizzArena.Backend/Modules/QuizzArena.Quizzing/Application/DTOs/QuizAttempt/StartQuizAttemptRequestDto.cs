@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace QuizzArena.Quizzing.Application.DTOs.QuizAttempt;
 
-namespace QuizzArena.Quizzing.Application.DTOs.QuizAttempt
+public record StartQuizAttemptRequestDto
 {
-    public record StartQuizAttemptRequestDto
-    {
-    }
 }
