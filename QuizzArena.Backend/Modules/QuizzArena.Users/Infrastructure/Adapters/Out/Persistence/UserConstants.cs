@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace QuizzArena.Users.Infrastructure.Adapters.Out.Persistence;
 
-namespace QuizzArena.Users.Infraestructure.Adapters.Out.Persistence
+internal static class UserConstants
 {
-    internal static class UserConstants
-    {
-        public const string Schema = "users";
+    public const string Schema = "users";
 
-        public static Guid AdminId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+    public static Guid AdminId = Guid.Parse("11111111-1111-1111-1111-111111111111");
 
-        public static Guid TeacherId = Guid.Parse("22222222-2222-2222-2222-222222222222");
+    public static Guid TeacherId = Guid.Parse("22222222-2222-2222-2222-222222222222");
 
-        public static Guid StudentId = Guid.Parse("33333333-3333-3333-3333-333333333333");
+    public static Guid StudentId = Guid.Parse("33333333-3333-3333-3333-333333333333");
 
-        public static Guid CourseId = Guid.Parse("44444444-4444-4444-4444-444444444444");
-    }
+    public static Guid CourseId = Guid.Parse("44444444-4444-4444-4444-444444444444");
 }

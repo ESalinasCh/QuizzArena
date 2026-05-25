@@ -1,9 +1,8 @@
-﻿namespace QuizzArena.Quizzing.Domain.Enums
+﻿namespace QuizzArena.Quizzing.Domain.Enums;
+
+public enum QuizAttemptStatus
 {
-    public enum QuizAttemptStatus
-    {
-        InProgress = 0,
-        Completed = 1,
-        Timeout = 2,
-    }
+    InProgress = 0,
+    Completed = 1,
+    Timeout = 2,
 }

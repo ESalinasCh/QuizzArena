@@ -14,7 +14,7 @@ using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence;
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.Migrations
 {
     [DbContext(typeof(DocumentProcessingDbContext))]
-    [Migration("20260525162731_InitialCreate")]
+    [Migration("20260525233421_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -64,9 +64,7 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.
                         .HasColumnType("character varying(255)");
 
                     b.Property<SourceStatus>("Status")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("document_processing.source_status")
-                        .HasDefaultValueSql("'pending'::document_processing.source_status");
+                        .HasColumnType("document_processing.source_status");
 
                     b.Property<string>("TranscriptUrl")
                         .HasMaxLength(255)
@@ -159,10 +157,8 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.
                         .HasColumnName("finished_at");
 
                     b.Property<JobStatus>("Status")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("document_processing.job_status")
-                        .HasColumnName("status")
-                        .HasDefaultValueSql("'pending'::document_processing.job_status");
+                        .HasColumnName("status");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamptz")

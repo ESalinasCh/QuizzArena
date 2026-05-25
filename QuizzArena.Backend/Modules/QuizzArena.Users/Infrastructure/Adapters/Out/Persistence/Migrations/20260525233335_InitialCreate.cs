@@ -77,8 +77,7 @@ namespace QuizzArena.Users.Infrastructure.Adapters.Out.Persistence.Migrations
                     StudentId = table.Column<Guid>(type: "uuid", nullable: false),
                     CourseId = table.Column<Guid>(type: "uuid", nullable: false),
                     Deleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamptz", nullable: true),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: true)
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamptz", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -97,12 +96,6 @@ namespace QuizzArena.Users.Infrastructure.Adapters.Out.Persistence.Migrations
                         principalTable: "user",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_course_student_user_UserId",
-                        column: x => x.UserId,
-                        principalSchema: "users",
-                        principalTable: "user",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -122,12 +115,6 @@ namespace QuizzArena.Users.Infrastructure.Adapters.Out.Persistence.Migrations
                 schema: "users",
                 table: "course_student",
                 column: "StudentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_course_student_UserId",
-                schema: "users",
-                table: "course_student",
-                column: "UserId");
         }
 
         /// <inheritdoc />

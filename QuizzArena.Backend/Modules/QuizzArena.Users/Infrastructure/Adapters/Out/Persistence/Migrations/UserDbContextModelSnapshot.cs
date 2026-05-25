@@ -85,21 +85,16 @@ namespace QuizzArena.Users.Infrastructure.Adapters.Out.Persistence.Migrations
                     b.Property<Guid>("StudentId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CourseId");
 
                     b.HasIndex("StudentId");
 
-                    b.HasIndex("UserId");
-
                     b.ToTable("course_student", "users");
                 });
 
-            modelBuilder.Entity("Users.Domain.Entities.User", b =>
+            modelBuilder.Entity("QuizzArena.Users.Domain.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -162,7 +157,7 @@ namespace QuizzArena.Users.Infrastructure.Adapters.Out.Persistence.Migrations
 
             modelBuilder.Entity("QuizzArena.Users.Domain.Entities.Course", b =>
                 {
-                    b.HasOne("Users.Domain.Entities.User", null)
+                    b.HasOne("QuizzArena.Users.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("TeacherId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -178,23 +173,14 @@ namespace QuizzArena.Users.Infrastructure.Adapters.Out.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Users.Domain.Entities.User", null)
+                    b.HasOne("QuizzArena.Users.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.HasOne("Users.Domain.Entities.User", null)
-                        .WithMany("CourseStudents")
-                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("QuizzArena.Users.Domain.Entities.Course", b =>
-                {
-                    b.Navigation("CourseStudents");
-                });
-
-            modelBuilder.Entity("Users.Domain.Entities.User", b =>
                 {
                     b.Navigation("CourseStudents");
                 });

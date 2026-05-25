@@ -1,12 +1,8 @@
 ﻿using QuizzArena.Quizzing.Application.DTOs.Quiz;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace QuizzArena.Quizzing.Application.Ports.In.Quiz
+namespace QuizzArena.Quizzing.Application.Ports.In.Quiz;
+
+public interface ICreateQuizUseCase
 {
-    public interface ICreateQuizUseCase
-    {
-        Task<CreateQuizResponseDto> Execute(CreateQuizRequestDto dto);
-    }
+    Task<CreateQuizResponseDto> Execute(CreateQuizRequestDto dto);
 }

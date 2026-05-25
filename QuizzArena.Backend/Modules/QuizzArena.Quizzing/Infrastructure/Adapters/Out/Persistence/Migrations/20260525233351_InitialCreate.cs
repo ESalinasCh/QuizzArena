@@ -30,7 +30,7 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Content = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Status = table.Column<QuestionStatus>(type: "quizzing.question_status", nullable: false, defaultValueSql: "'draft'::quizzing.question_status"),
+                    Status = table.Column<QuestionStatus>(type: "quizzing.question_status", nullable: false),
                     WasModified = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
                     Type = table.Column<QuestionType>(type: "quizzing.question_type", nullable: false),
                     Deleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
@@ -52,7 +52,7 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Title = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Status = table.Column<QuizStatus>(type: "quizzing.quiz_status", nullable: false, defaultValueSql: "'published'::quizzing.quiz_status"),
+                    Status = table.Column<QuizStatus>(type: "quizzing.quiz_status", nullable: false),
                     Deleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false),
                     UpdatedAt = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false),
@@ -97,7 +97,7 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Code = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    Status = table.Column<MatchStatus>(type: "quizzing.match_status", nullable: false, defaultValueSql: "'pending'::quizzing.match_status"),
+                    Status = table.Column<MatchStatus>(type: "quizzing.match_status", nullable: false),
                     StartedAt = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false),
                     FinishedAt = table.Column<DateTimeOffset>(type: "timestamptz", nullable: true),
                     Mode = table.Column<MatchMode>(type: "quizzing.match_mode", nullable: false),
@@ -165,7 +165,7 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                     EndDateTime = table.Column<DateTimeOffset>(type: "timestamptz", nullable: true),
                     JoinedAt = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false),
                     Nickname = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    Status = table.Column<QuizAttemptStatus>(type: "quizzing.quiz_attempt_status", nullable: false, defaultValueSql: "'in_progress'::quizzing.quiz_attempt_status"),
+                    Status = table.Column<QuizAttemptStatus>(type: "quizzing.quiz_attempt_status", nullable: false),
                     Score = table.Column<int>(type: "integer", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     MatchId = table.Column<Guid>(type: "uuid", nullable: false)

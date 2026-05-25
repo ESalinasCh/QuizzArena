@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence;
 
-namespace QuizzArena.DocumentProcessing.Infraestructure.Adapters.Out.Persistence
+internal static class DocumentProcessingConstants
 {
-    internal static class DocumentProcessingConstants
-    {
-        public const string Schema = "document_processing";
-    }
+    public const string Schema = "document_processing";
 }

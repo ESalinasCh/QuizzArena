@@ -1,34 +1,31 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using QuizzArena.Users.Domain.Entities;
 using QuizzArena.Users.Domain.Enums;
-using QuizzArena.Users.Infraestructure.Adapters.Out.Persistence;
-using Users.Domain.Entities;
 
-namespace QuizzArena.Users.Infrastructure.Adapters.Out.Persistence
+namespace QuizzArena.Users.Infrastructure.Adapters.Out.Persistence;
+
+internal class UserDbContext : DbContext
 {
-    internal class UserDbContext : DbContext
+    public UserDbContext(
+        DbContextOptions<UserDbContext> options)
+        : base(options)
     {
-        public UserDbContext(
-            DbContextOptions<UserDbContext> options)
-            : base(options)
-        {
-        }
+    }
 
-        public DbSet<User> Users => Set<User>();
-        public DbSet<Course> Courses => Set<Course>();
-        public DbSet<CourseStudent> CourseStudents => Set<CourseStudent>();
+    public DbSet<User> Users => Set<User>();
+    public DbSet<Course> Courses => Set<Course>();
+    public DbSet<CourseStudent> CourseStudents => Set<CourseStudent>();
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
 
-            // user_management schema
-            modelBuilder.HasDefaultSchema(UserConstants.Schema);
-            modelBuilder.HasPostgresEnum<UserRole>(schema: UserConstants.Schema, name: "user_role");
+        // user_management schema
+        modelBuilder.HasDefaultSchema(UserConstants.Schema);
+        modelBuilder.HasPostgresEnum<UserRole>(schema: UserConstants.Schema, name: "user_role");
 
-            modelBuilder.ApplyConfigurationsFromAssembly(
-                typeof(UserDbContext).Assembly
-            );
-        }
+        modelBuilder.ApplyConfigurationsFromAssembly(
+            typeof(UserDbContext).Assembly
+        );
     }
 }

@@ -1,12 +1,11 @@
-﻿using Users.Domain.Entities;
+﻿using QuizzArena.Users.Domain.Entities;
 
-namespace QuizzArena.Users.Application.Ports.Out
+namespace QuizzArena.Users.Application.Ports.Out;
+
+public interface IUserRepository
 {
-    public interface IUserRepository
-    {
-        Task<User> GetById(Guid id);
-        Task Register(User quiz);
-        Task Delete(Guid id);
+    Task<User> GetById(Guid id);
+    Task Register(User quiz);
+    Task Delete(Guid id);
 
-    }
 }

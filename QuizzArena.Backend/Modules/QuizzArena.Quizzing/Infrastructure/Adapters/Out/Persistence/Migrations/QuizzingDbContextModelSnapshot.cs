@@ -102,9 +102,7 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                         .HasColumnType("timestamptz");
 
                     b.Property<MatchStatus>("Status")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("quizzing.match_status")
-                        .HasDefaultValueSql("'pending'::quizzing.match_status");
+                        .HasColumnType("quizzing.match_status");
 
                     b.Property<int>("TimeMinutes")
                         .HasColumnType("integer");
@@ -190,9 +188,7 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<QuestionStatus>("Status")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("quizzing.question_status")
-                        .HasDefaultValueSql("'draft'::quizzing.question_status");
+                        .HasColumnType("quizzing.question_status");
 
                     b.Property<QuestionType>("Type")
                         .HasColumnType("quizzing.question_type");
@@ -239,9 +235,7 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                         .HasColumnType("character varying(255)");
 
                     b.Property<QuizStatus>("Status")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("quizzing.quiz_status")
-                        .HasDefaultValueSql("'published'::quizzing.quiz_status");
+                        .HasColumnType("quizzing.quiz_status");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -283,9 +277,7 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                         .HasColumnType("timestamptz");
 
                     b.Property<QuizAttemptStatus>("Status")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("quizzing.quiz_attempt_status")
-                        .HasDefaultValueSql("'in_progress'::quizzing.quiz_attempt_status");
+                        .HasColumnType("quizzing.quiz_attempt_status");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");

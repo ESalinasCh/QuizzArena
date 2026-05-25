@@ -30,8 +30,4 @@
 	  <ProjectReference Include="..\..\Shared\Shared.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Infrastructure\Adapters\Out\Persistence\Migrations\" />
-	</ItemGroup>
-
 </Project>

@@ -17,82 +17,82 @@ using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence;
 using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Repositories;
 using Shared.Contracts;
 
-namespace QuizzArena.Quizzing
+namespace QuizzArena.Quizzing;
+
+public static class DependencyInjection
 {
-    public static class DependencyInjection
+    public static IServiceCollection AddQuizzingModule(this IServiceCollection services, IConfiguration configuration)
     {
-        public static IServiceCollection AddQuizzingModule(this IServiceCollection services, IConfiguration configuration)
-        {
-            services.AddControllers()
-                .AddApplicationPart(typeof(IQuizzingInfrastructureMarker).Assembly);
+        services.AddControllers()
+            .AddApplicationPart(typeof(IQuizzingInfrastructureMarker).Assembly);
 
-            services.AddScoped<ISetAnswerUseCase, SetAnswerUseCase>();
-            services.AddScoped<IAnswerRepository, SqlAnswerRepository>();
+        services.AddScoped<ISetAnswerUseCase, SetAnswerUseCase>();
+        services.AddScoped<IAnswerRepository, SqlAnswerRepository>();
 
-            services.AddScoped<ICreateQuizUseCase, CreateQuizUseCase>();
-            services.AddScoped<IUpdateQuizUseCase, UpdateQuizUseCase>();
-            services.AddScoped<IDeleteQuizUseCase, DeleteQuizUseCase>();
-            services.AddScoped<IQuizRepository, SqlQuizRepository>();
+        services.AddScoped<ICreateQuizUseCase, CreateQuizUseCase>();
+        services.AddScoped<IUpdateQuizUseCase, UpdateQuizUseCase>();
+        services.AddScoped<IDeleteQuizUseCase, DeleteQuizUseCase>();
+        services.AddScoped<IQuizRepository, SqlQuizRepository>();
 
-            services.AddScoped<ICreateQuestionUseCase, CreateQuestionUseCase>();
-            services.AddScoped<IUpdateQuestionUseCase, UpdateQuestionUseCase>();
-            services.AddScoped<IDeleteQuestionUseCase, DeleteQuestionUseCase>();
-            services.AddScoped<IQuestionRepository, SqlQuestionRepository>();
+        services.AddScoped<ICreateQuestionUseCase, CreateQuestionUseCase>();
+        services.AddScoped<IUpdateQuestionUseCase, UpdateQuestionUseCase>();
+        services.AddScoped<IDeleteQuestionUseCase, DeleteQuestionUseCase>();
+        services.AddScoped<IQuestionRepository, SqlQuestionRepository>();
 
-            services.AddScoped<IStartQuizAttemptUseCase, StartQuizAttemptUseCase>();
-            services.AddScoped<IEndQuizAttemptUseCase, EndQuizAttemptUseCase>();
-            services.AddScoped<IQuizAttemptRepository, SqlQuizAttemptRepository>();
+        services.AddScoped<IStartQuizAttemptUseCase, StartQuizAttemptUseCase>();
+        services.AddScoped<IEndQuizAttemptUseCase, EndQuizAttemptUseCase>();
+        services.AddScoped<IQuizAttemptRepository, SqlQuizAttemptRepository>();
 
-            #region BDD
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
+        #region BDD
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
 
-            var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+        var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
 
-            dataSourceBuilder.MapEnum<MatchMode>($"{QuizzingConstants.Schema}.match_mode");
-            dataSourceBuilder.MapEnum<MatchStatus>($"{QuizzingConstants.Schema}.match_status");
-            dataSourceBuilder.MapEnum<QuestionStatus>($"{QuizzingConstants.Schema}.question_status");
-            dataSourceBuilder.MapEnum<QuestionType>($"{QuizzingConstants.Schema}.question_type");
-            dataSourceBuilder.MapEnum<QuizAttemptStatus>($"{QuizzingConstants.Schema}.quiz_attempt_status");
-            dataSourceBuilder.MapEnum<QuizStatus>($"{QuizzingConstants.Schema}.quiz_status");
+        dataSourceBuilder.MapEnum<MatchMode>($"{QuizzingConstants.Schema}.match_mode");
+        dataSourceBuilder.MapEnum<MatchStatus>($"{QuizzingConstants.Schema}.match_status");
+        dataSourceBuilder.MapEnum<QuestionStatus>($"{QuizzingConstants.Schema}.question_status");
+        dataSourceBuilder.MapEnum<QuestionType>($"{QuizzingConstants.Schema}.question_type");
+        dataSourceBuilder.MapEnum<QuizAttemptStatus>($"{QuizzingConstants.Schema}.quiz_attempt_status");
+        dataSourceBuilder.MapEnum<QuizStatus>($"{QuizzingConstants.Schema}.quiz_status");
 
-            var dataSource = dataSourceBuilder.Build();
+        var dataSource = dataSourceBuilder.Build();
 
-            services.AddDbContext<QuizzingDbContext>(options =>
-                    options.UseNpgsql(
-                        dataSource,
-                        o => {
-                            o.MapEnum<MatchMode>(
-                                "match_mode",
-                                QuizzingConstants.Schema
-                                 );
-                            o.MapEnum<MatchStatus>(
-                               "match_status",
-                               QuizzingConstants.Schema
+        services.AddDbContext<QuizzingDbContext>(options =>
+                options.UseNpgsql(
+                    dataSource,
+                    o =>
+                    {
+                        o.MapEnum<MatchMode>(
+                            "match_mode",
+                            QuizzingConstants.Schema
                                 );
-                            o.MapEnum<QuestionStatus>(
-                              "question_status",
-                              QuizzingConstants.Schema
-                               );
-                            o.MapEnum<QuestionType>(
-                              "question_type",
-                              QuizzingConstants.Schema
-                               );
-                            o.MapEnum<QuizAttemptStatus>(
-                              "quiz_attempt_status",
-                              QuizzingConstants.Schema
-                               );
-                            o.MapEnum<QuizStatus>(
-                              "quiz_status",
-                              QuizzingConstants.Schema
-                               );
-                        }
-                    )
-                );
+                        o.MapEnum<MatchStatus>(
+                            "match_status",
+                            QuizzingConstants.Schema
+                            );
+                        o.MapEnum<QuestionStatus>(
+                            "question_status",
+                            QuizzingConstants.Schema
+                            );
+                        o.MapEnum<QuestionType>(
+                            "question_type",
+                            QuizzingConstants.Schema
+                            );
+                        o.MapEnum<QuizAttemptStatus>(
+                            "quiz_attempt_status",
+                            QuizzingConstants.Schema
+                            );
+                        o.MapEnum<QuizStatus>(
+                            "quiz_status",
+                            QuizzingConstants.Schema
+                            );
+                    }
+                )
+            );
 
-            services.AddTransient<IModuleInitializer, QuizzingModuleInitializer>();
-            #endregion
+        services.AddTransient<IModuleInitializer, QuizzingModuleInitializer>();
+        #endregion
 
-            return services;
-        }
+        return services;
     }
 }

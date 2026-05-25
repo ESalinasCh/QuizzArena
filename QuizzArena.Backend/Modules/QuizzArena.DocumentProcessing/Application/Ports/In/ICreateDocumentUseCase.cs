@@ -1,9 +1,8 @@
 ﻿using QuizzArena.DocumentProcessing.Application.DTOs.DocumentChunk;
 
-namespace QuizzArena.DocumentProcessing.Application.Ports.In
+namespace QuizzArena.DocumentProcessing.Application.Ports.In;
+
+public interface ICreateDocumentUseCase
 {
-    public interface ICreateDocumentUseCase
-    {
-        Task<DocumentChunkDto> Execute(CreateDocumentDto dto);
-    }
+    Task<DocumentChunkDto> Execute(CreateDocumentDto dto);
 }

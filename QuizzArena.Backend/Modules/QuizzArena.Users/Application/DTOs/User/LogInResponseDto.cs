@@ -1,6 +1,5 @@
-﻿namespace QuizzArena.Users.Application.DTOs.User
+﻿namespace QuizzArena.Users.Application.DTOs.User;
+
+public class LogInResponseDto
 {
-    public class LogInResponseDto
-    {
-    }
 }

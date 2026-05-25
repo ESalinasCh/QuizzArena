@@ -1,30 +1,31 @@
-﻿using QuizzArena.Quizzing.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using QuizzArena.Quizzing.Domain.Entities;
 using QuizzArena.Quizzing.Domain.Enums;
-using Microsoft.EntityFrameworkCore;
 
 
-namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Seeds
+namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Seeds;
+
+internal class QuizzSeeder
 {
-    internal class QuizzSeeder
+    public static async Task SeedAsync(QuizzingDbContext context)
     {
-        public static async Task SeedAsync(QuizzingDbContext context)
+        if (await context.Quizzes.AnyAsync())
         {
-            if (await context.Quizzes.AnyAsync())
-                return;
-
-            var quiz = new Quiz
-            {
-                Id = QuizzingConstants.QuizzId,
-                Title = "Quizz 1",
-                Description = "Test quiz",
-                Status = QuizStatus.published,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
-
-            context.Quizzes.Add(quiz);
-
-            await context.SaveChangesAsync();
+            return;
         }
+
+        var quiz = new Quiz
+        {
+            Id = QuizzingConstants.QuizzId,
+            Title = "Quizz 1",
+            Description = "Test quiz",
+            Status = QuizStatus.published,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        context.Quizzes.Add(quiz);
+
+        await context.SaveChangesAsync();
     }
 }

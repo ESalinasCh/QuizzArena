@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace Shared.Contracts;
 
-namespace Shared.Contracts
+public interface IModuleInitializer
 {
-    public interface IModuleInitializer
-    {
-        void Initialize(IServiceProvider serviceProvider);
-    }
+    void Initialize(IServiceProvider serviceProvider);
 }

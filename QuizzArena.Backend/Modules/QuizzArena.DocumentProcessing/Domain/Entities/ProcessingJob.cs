@@ -1,16 +1,15 @@
 ﻿using QuizzArena.DocumentProcessing.Domain.Enums;
 
-namespace QuizzArena.DocumentProcessing.Domain.Entities
-{
-    internal class ProcessingJob
-    {
-        public Guid Id { get; set; }
-        public JobStatus Status { get; set; }
-        public string? ErrorMessage { get; set; }
-        public DateTimeOffset CreatedAt { get; set; }
-        public DateTimeOffset UpdatedAt { get; set; }
-        public DateTimeOffset? FinishedAt { get; set; }
+namespace QuizzArena.DocumentProcessing.Domain.Entities;
 
-        public ICollection<DocumentProcessingJob> DocumentProcessingJobs { get; set; } = [];
-    }
+internal class ProcessingJob
+{
+    public Guid Id { get; set; }
+    public JobStatus Status { get; set; } = JobStatus.Pending;
+    public string? ErrorMessage { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
+    public DateTimeOffset? FinishedAt { get; set; }
+
+    public ICollection<DocumentProcessingJob> DocumentProcessingJobs { get; set; } = [];
 }

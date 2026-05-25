@@ -1,9 +1,8 @@
 ﻿using QuizzArena.Quizzing.Application.DTOs.Question;
 
-namespace QuizzArena.Quizzing.Application.Ports.In.Question
+namespace QuizzArena.Quizzing.Application.Ports.In.Question;
+
+public interface IDeleteQuestionUseCase
 {
-    public interface IDeleteQuestionUseCase
-    {
-        Task<DeleteQuestionResponseDto> Execute(DeleteQuestionRequestDto dto);
-    }
+    Task<DeleteQuestionResponseDto> Execute(DeleteQuestionRequestDto dto);
 }

@@ -1,11 +1,8 @@
-﻿
+﻿namespace QuizzArena.Users.Domain.Enums;
 
-namespace QuizzArena.Users.Domain.Enums
+public enum UserRole
 {
-    public enum UserRole
-    {
-        Teacher = 0,
-        Student = 1,
-        Admin = 2,
-    }
+    Teacher = 0,
+    Student = 1,
+    Admin = 2,
 }
