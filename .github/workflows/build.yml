@@ -10,6 +10,9 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
+    env:
+      HUSKY: 0
+
     defaults:
       run:
         working-directory: QuizzArena.Backend
