@@ -9,6 +9,7 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Seeds
             await QuizzSeeder.SeedAsync(context);
             await QuestionSeeder.SeedAsync(context);
             await OptionSeeder.SeedAsync(context);
+            await MatchSeeder.SeedAsync(context);
         }
     }
 }
