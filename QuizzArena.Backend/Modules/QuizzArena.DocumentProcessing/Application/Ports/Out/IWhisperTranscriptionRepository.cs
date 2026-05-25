@@ -4,5 +4,8 @@ namespace QuizzArena.DocumentProcessing.Application.Ports.Out;
 
 public interface IDocumentChunkRepository
 {
-    Task<DocumentChunk> Create(Guid id);
+    public interface IWhisperTranscriptionRepository
+    {
+        Task<String> Transcribe();
+    }
 }
