@@ -58,7 +58,36 @@ namespace QuizzArena.Quizzing
             var dataSource = dataSourceBuilder.Build();
 
             services.AddDbContext<QuizzingDbContext>(options =>
-                options.UseNpgsql(dataSource));
+                    options.UseNpgsql(
+                        dataSource,
+                        o => {
+                            o.MapEnum<MatchMode>(
+                                "match_mode",
+                                QuizzingConstants.Schema
+                                 );
+                            o.MapEnum<MatchStatus>(
+                               "match_status",
+                               QuizzingConstants.Schema
+                                );
+                            o.MapEnum<QuestionStatus>(
+                              "question_status",
+                              QuizzingConstants.Schema
+                               );
+                            o.MapEnum<QuestionType>(
+                              "question_type",
+                              QuizzingConstants.Schema
+                               );
+                            o.MapEnum<QuizAttemptStatus>(
+                              "quiz_attempt_status",
+                              QuizzingConstants.Schema
+                               );
+                            o.MapEnum<QuizStatus>(
+                              "quiz_status",
+                              QuizzingConstants.Schema
+                               );
+                        }
+                    )
+                );
 
             services.AddTransient<IModuleInitializer, QuizzingModuleInitializer>();
             #endregion

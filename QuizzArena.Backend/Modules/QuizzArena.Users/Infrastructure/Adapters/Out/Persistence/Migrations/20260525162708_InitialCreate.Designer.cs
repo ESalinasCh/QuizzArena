@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using QuizzArena.Users.Domain.Enums;
 using QuizzArena.Users.Infrastructure.Adapters.Out.Persistence;
 
 #nullable disable
@@ -12,7 +13,7 @@ using QuizzArena.Users.Infrastructure.Adapters.Out.Persistence;
 namespace QuizzArena.Users.Infrastructure.Adapters.Out.Persistence.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20260525035940_InitialCreate")]
+    [Migration("20260525162708_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -108,7 +109,6 @@ namespace QuizzArena.Users.Infrastructure.Adapters.Out.Persistence.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("AvatarUrl")
-                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("avatar_url");
 
@@ -143,12 +143,11 @@ namespace QuizzArena.Users.Infrastructure.Adapters.Out.Persistence.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("ProviderId")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
                         .HasColumnName("provider_id");
 
-                    b.Property<int>("Role")
+                    b.Property<UserRole>("Role")
                         .HasColumnType("users.user_role");
 
                     b.Property<DateTimeOffset>("UpdatedAt")

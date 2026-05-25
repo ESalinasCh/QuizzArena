@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using QuizzArena.Quizzing.Domain.Enums;
 using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence;
 
 #nullable disable
@@ -12,7 +13,7 @@ using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence;
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
 {
     [DbContext(typeof(QuizzingDbContext))]
-    [Migration("20260525040934_InitialCreate")]
+    [Migration("20260525163040_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -94,7 +95,7 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                     b.Property<DateTimeOffset?>("FinishedAt")
                         .HasColumnType("timestamptz");
 
-                    b.Property<int>("Mode")
+                    b.Property<MatchMode>("Mode")
                         .HasColumnType("quizzing.match_mode");
 
                     b.Property<Guid>("QuizId")
@@ -103,7 +104,7 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                     b.Property<DateTimeOffset>("StartedAt")
                         .HasColumnType("timestamptz");
 
-                    b.Property<int>("Status")
+                    b.Property<MatchStatus>("Status")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("quizzing.match_status")
                         .HasDefaultValueSql("'pending'::quizzing.match_status");
@@ -191,12 +192,12 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                     b.Property<Guid?>("ProcessingJobId")
                         .HasColumnType("uuid");
 
-                    b.Property<int>("Status")
+                    b.Property<QuestionStatus>("Status")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("quizzing.question_status")
                         .HasDefaultValueSql("'draft'::quizzing.question_status");
 
-                    b.Property<int>("Type")
+                    b.Property<QuestionType>("Type")
                         .HasColumnType("quizzing.question_type");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
@@ -240,7 +241,7 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<int>("Status")
+                    b.Property<QuizStatus>("Status")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("quizzing.quiz_status")
                         .HasDefaultValueSql("'published'::quizzing.quiz_status");
@@ -284,7 +285,7 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                     b.Property<DateTimeOffset>("StartDateTime")
                         .HasColumnType("timestamptz");
 
-                    b.Property<int>("Status")
+                    b.Property<QuizAttemptStatus>("Status")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("quizzing.quiz_attempt_status")
                         .HasDefaultValueSql("'in_progress'::quizzing.quiz_attempt_status");

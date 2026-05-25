@@ -39,7 +39,25 @@ namespace QuizzArena.DocumentProcessing
             var dataSource = dataSourceBuilder.Build();
 
             services.AddDbContext<DocumentProcessingDbContext>(options =>
-                options.UseNpgsql(dataSource));
+                    options.UseNpgsql(
+                        dataSource,
+                        o => {
+                            o.MapEnum<JobStatus>(
+                                "job_status",
+                                DocumentProcessingConstants.Schema
+                                 );
+                            o.MapEnum<SourceStatus>(
+                               "source_status",
+                               DocumentProcessingConstants.Schema
+                                );
+                            o.MapEnum<SourceType>(
+                               "source_type",
+                               DocumentProcessingConstants.Schema
+                                );
+                        }
+                    )
+                );
+            ;
 
             services.AddTransient<IModuleInitializer, DocumentProcessingModuleInitializer>();
             #endregion

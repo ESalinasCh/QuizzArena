@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pgvector;
+using QuizzArena.DocumentProcessing.Domain.Enums;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence;
 
 #nullable disable
@@ -13,7 +14,7 @@ using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence;
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.Migrations
 {
     [DbContext(typeof(DocumentProcessingDbContext))]
-    [Migration("20260525042036_InitialCreate")]
+    [Migration("20260525162731_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -62,7 +63,7 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<int>("Status")
+                    b.Property<SourceStatus>("Status")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("document_processing.source_status")
                         .HasDefaultValueSql("'pending'::document_processing.source_status");
@@ -71,7 +72,7 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<int>("Type")
+                    b.Property<SourceType>("Type")
                         .HasColumnType("document_processing.source_type");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
@@ -157,7 +158,7 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.
                         .HasColumnType("timestamptz")
                         .HasColumnName("finished_at");
 
-                    b.Property<int>("Status")
+                    b.Property<JobStatus>("Status")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("document_processing.job_status")
                         .HasColumnName("status")

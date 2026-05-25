@@ -37,7 +37,14 @@ namespace QuizzArena.Users
             var dataSource = dataSourceBuilder.Build();
 
             services.AddDbContext<UserDbContext>(options =>
-                options.UseNpgsql(dataSource));
+                    options.UseNpgsql(
+                        dataSource,
+                        o => o.MapEnum<UserRole>(
+                            "user_role",
+                            UserConstants.Schema
+                        )
+                    )
+                );
 
             services.AddTransient<IModuleInitializer, UserModuleInitializer>();
             #endregion

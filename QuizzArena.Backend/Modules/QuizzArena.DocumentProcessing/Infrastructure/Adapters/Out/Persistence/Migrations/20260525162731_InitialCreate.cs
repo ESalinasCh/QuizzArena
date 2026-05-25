@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pgvector;
+using QuizzArena.DocumentProcessing.Domain.Enums;
 
 #nullable disable
 
@@ -28,8 +29,8 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Type = table.Column<int>(type: "document_processing.source_type", nullable: false),
-                    Status = table.Column<int>(type: "document_processing.source_status", nullable: false, defaultValueSql: "'pending'::document_processing.source_status"),
+                    Type = table.Column<SourceType>(type: "document_processing.source_type", nullable: false),
+                    Status = table.Column<SourceStatus>(type: "document_processing.source_status", nullable: false, defaultValueSql: "'pending'::document_processing.source_status"),
                     Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     TranscriptUrl = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     FileUrl = table.Column<string>(type: "text", nullable: true),
@@ -51,7 +52,7 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    status = table.Column<int>(type: "document_processing.job_status", nullable: false, defaultValueSql: "'pending'::document_processing.job_status"),
+                    status = table.Column<JobStatus>(type: "document_processing.job_status", nullable: false, defaultValueSql: "'pending'::document_processing.job_status"),
                     error_message = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     created_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false),
                     updated_at = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false),

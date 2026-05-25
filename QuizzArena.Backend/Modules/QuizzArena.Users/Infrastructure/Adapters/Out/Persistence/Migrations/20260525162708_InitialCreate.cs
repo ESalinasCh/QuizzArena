@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using QuizzArena.Users.Domain.Enums;
 
 #nullable disable
 
@@ -29,9 +30,9 @@ namespace QuizzArena.Users.Infrastructure.Adapters.Out.Persistence.Migrations
                     Email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     ExternalProvider = table.Column<string>(type: "text", nullable: false),
                     Deleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    Role = table.Column<int>(type: "users.user_role", nullable: false),
-                    avatar_url = table.Column<string>(type: "text", nullable: false),
-                    provider_id = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Role = table.Column<UserRole>(type: "users.user_role", nullable: false),
+                    avatar_url = table.Column<string>(type: "text", nullable: true),
+                    provider_id = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false),
                     UpdatedAt = table.Column<DateTimeOffset>(type: "timestamptz", nullable: false),
                     DeletedAt = table.Column<DateTimeOffset>(type: "timestamptz", nullable: true)
