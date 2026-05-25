@@ -36,7 +36,7 @@ namespace QuizzArena.Host
                 app.UseDeveloperExceptionPage();
                 app.ApplyMigrations();
             }
-
+            
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
