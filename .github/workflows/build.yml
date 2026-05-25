@@ -32,5 +32,8 @@ jobs:
       - name: Build
         run: dotnet build --no-restore
 
+      - name: Verify formatting
+        run: dotnet format QuizzArena.Backend.slnx --severity warn --verify-no-changes --no-restore
+
       - name: Test
         run: dotnet test --no-build --verbosity normal
