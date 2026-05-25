@@ -6,5 +6,6 @@ namespace QuizzArena.Users.Domain.Enums
     {
         Teacher = 0,
         Student = 1,
+        Admin = 2,
     }
 }

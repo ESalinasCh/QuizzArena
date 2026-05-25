@@ -1,4 +1,5 @@
-﻿using QuizzArena.Users.Domain.Enums;
+﻿using QuizzArena.Users.Domain.Entities;
+using QuizzArena.Users.Domain.Enums;
 
 namespace Users.Domain.Entities
 {
@@ -16,6 +17,9 @@ namespace Users.Domain.Entities
         public string ProviderId { get; set; } = string.Empty;
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset UpdatedAt { get; set; }
-        public DateTimeOffset DeletedAt { get; set; }
+        public DateTimeOffset? DeletedAt { get; set; }
+
+        public ICollection<CourseStudent> CourseStudents { get; set; } = null!;
+
     }
 }

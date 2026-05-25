@@ -8,14 +8,16 @@ namespace QuizzArena.DocumentProcessing.Domain.Entities
         public SourceType Type { get; set; }
         public SourceStatus Status { get; set; }
         public string Name { get; set; } = string.Empty;
-        public string TranscriptUrl { get; set; } = string.Empty;
+        public string? TranscriptUrl { get; set; } = string.Empty;
+        public string? FileUrl { get; set; }
         public bool Deleted { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset UpdatedAt { get; set; }
-        public DateTimeOffset DeletedAt { get; set; }
+        public DateTimeOffset? DeletedAt { get; set; }
 
-        // FK 
         public Guid CourseId { get; set; }
         public Guid UserId { get; set; }
+
+        public ICollection<DocumentChunk> DocumentChunks { get; set; } = [];
     }
 }

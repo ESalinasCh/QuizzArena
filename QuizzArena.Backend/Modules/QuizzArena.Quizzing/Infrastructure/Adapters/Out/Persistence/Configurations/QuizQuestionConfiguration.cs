@@ -31,6 +31,21 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Configurat
             builder.Property(x => x.QuestionId)
                 .IsRequired();
 
+            builder.Property(x => x.Deleted)
+              .IsRequired()
+              .HasDefaultValue(false); ;
+
+            builder.Property(x => x.CreatedAt)
+                .HasColumnType("timestamptz")
+                .IsRequired();
+
+            builder.Property(x => x.UpdatedAt)
+                .HasColumnType("timestamptz")
+                .IsRequired();
+
+            builder.Property(x => x.DeletedAt)
+               .HasColumnType("timestamptz");
+
             builder.HasIndex(x => new
             {
                 x.QuizId,
@@ -42,11 +57,6 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Configurat
                 x.QuizId,
                 x.QuestionId
             }).IsUnique();
-
-            builder.HasOne<Quiz>()
-                .WithMany()
-                .HasForeignKey(x => x.QuizId)
-                .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne<Question>()
                 .WithMany()

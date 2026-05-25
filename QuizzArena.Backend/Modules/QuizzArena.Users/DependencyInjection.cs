@@ -38,6 +38,8 @@ namespace QuizzArena.Users
 
             services.AddDbContext<UserDbContext>(options =>
                 options.UseNpgsql(dataSource));
+
+            services.AddTransient<IModuleInitializer, UserModuleInitializer>();
             #endregion
 
             return services;

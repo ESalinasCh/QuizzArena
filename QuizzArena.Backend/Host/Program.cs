@@ -25,15 +25,16 @@ namespace QuizzArena.Host
                 options.AssumeDefaultVersionWhenUnspecified = true;
             }).AddMvc();
 
-            builder.Services.AddUsersModule();
+            builder.Services.AddUsersModule(builder.Configuration);
             builder.Services.AddQuizzingModule(builder.Configuration);
-            builder.Services.AddDocumentProcessingModule();
+            builder.Services.AddDocumentProcessingModule(builder.Configuration);
 
             WebApplication app = builder.Build();
 
             if (app.Environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.ApplyMigrations();
             }
 
             app.UseHttpsRedirection();

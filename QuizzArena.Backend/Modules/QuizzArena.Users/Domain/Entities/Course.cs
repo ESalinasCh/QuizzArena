@@ -10,9 +10,10 @@ namespace QuizzArena.Users.Domain.Entities
         public bool Deleted { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset UpdatedAt { get; set; }
-        public DateTimeOffset DeletedAt { get; set; }
+        public DateTimeOffset? DeletedAt { get; set; }
 
-        // FK
         public Guid TeacherId { get; set; }
+
+        public ICollection<CourseStudent> CourseStudents { get; set; } = null!;
     }
 }

@@ -17,25 +17,16 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.
             builder.HasKey(x => x.Id);
 
             builder.Property(x => x.ChunkOrder)
-                .HasColumnName("chunk_order")
                 .HasConversion<int>();
 
             builder.Property(x => x.Content)
                 .HasColumnName("content")
-                .HasConversion<string>();
+                .HasColumnType("text"); 
 
             builder.Property(x => x.Embedding)
-                .HasColumnName("embedding")
-                .HasColumnType("vector(768)")
+                .HasColumnType("vector(1024)")
                 .IsRequired();
 
-
-            // FK
-            builder.HasOne<ClassSource>()
-                .WithMany()
-                .HasForeignKey(x => x.DocumentId)
-                .HasConstraintName("FK_DocumentChunk_ClassSource_DocumentId")
-                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

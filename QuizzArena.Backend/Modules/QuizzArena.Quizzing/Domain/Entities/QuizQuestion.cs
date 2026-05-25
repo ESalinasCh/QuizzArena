@@ -5,7 +5,10 @@
         public Guid Id { get; set; }
         public int Position { get; set; }
         public int ValueScore { get; set; }
-
+        public bool Deleted { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset UpdatedAt { get; set; }
+        public DateTimeOffset? DeletedAt { get; set; }
         public Guid QuizId { get; set; }
         public Guid QuestionId { get; set; }
     }

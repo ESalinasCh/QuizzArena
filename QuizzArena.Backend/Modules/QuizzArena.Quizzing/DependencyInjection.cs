@@ -15,6 +15,7 @@ using QuizzArena.Quizzing.Domain.Enums;
 using QuizzArena.Quizzing.Infrastructure.Adapters.In.Web;
 using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence;
 using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Repositories;
+using Shared.Contracts;
 
 namespace QuizzArena.Quizzing
 {
@@ -58,6 +59,8 @@ namespace QuizzArena.Quizzing
 
             services.AddDbContext<QuizzingDbContext>(options =>
                 options.UseNpgsql(dataSource));
+
+            services.AddTransient<IModuleInitializer, QuizzingModuleInitializer>();
             #endregion
 
             return services;

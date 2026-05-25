@@ -18,24 +18,20 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.
             builder.HasKey(x => x.Id);
 
             builder.Property(x => x.Type)
-                .HasColumnName("type")
                 .HasColumnType($"{DocumentProcessingConstants.Schema}.source_type");
 
             builder.Property(x => x.Status)
-                .HasColumnName("status")
-                .HasColumnType($"{DocumentProcessingConstants.Schema}.job_status");
+                .HasColumnType($"{DocumentProcessingConstants.Schema}.source_status")
+                .HasDefaultValueSql($"'{SourceStatus.Pending.ToString().ToLower()}'::{DocumentProcessingConstants.Schema}.source_status");
 
             builder.Property(x => x.Name)
-                .HasColumnName("name")
                 .HasMaxLength(255)
                 .IsRequired();
 
             builder.Property(x => x.TranscriptUrl)
-                .HasColumnName("transcript_url")
                 .HasMaxLength(255);
 
             builder.Property(x => x.Deleted)
-                .HasColumnName("deleted")
                 .HasDefaultValue(false);
 
             builder.Property(x => x.CreatedAt)
@@ -50,7 +46,6 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.
                 .HasColumnName("deleted_at")
                 .HasColumnType("timestamptz");
 
-            // FK
             builder.Property(x => x.CourseId)
                 .HasColumnName("course_id")
                 .IsRequired();
@@ -58,6 +53,8 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.
             builder.Property(x => x.UserId)
                 .HasColumnName("user_d")
                 .IsRequired();
+
+            builder.HasMany(x => x.DocumentChunks).WithOne().HasForeignKey(x => x.DocumentId);
         }
     }
 }

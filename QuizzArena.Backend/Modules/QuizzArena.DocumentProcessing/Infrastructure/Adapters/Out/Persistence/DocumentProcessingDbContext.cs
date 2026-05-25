@@ -22,9 +22,8 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence
         {
             base.OnModelCreating(modelBuilder);
 
-            // user_management schema
             modelBuilder.HasDefaultSchema(DocumentProcessingConstants.Schema);
-
+            modelBuilder.HasPostgresExtension("vector");
             modelBuilder.HasPostgresEnum<JobStatus>(schema: DocumentProcessingConstants.Schema, name: "job_status");
             modelBuilder.HasPostgresEnum<SourceStatus>(schema: DocumentProcessingConstants.Schema, name: "source_status");
             modelBuilder.HasPostgresEnum<SourceType>(schema: DocumentProcessingConstants.Schema, name: "source_type");
@@ -32,6 +31,11 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence
             modelBuilder.ApplyConfigurationsFromAssembly(
                 typeof(DocumentProcessingDbContext).Assembly
             );
+        }
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            base.OnConfiguring(optionsBuilder);
+            optionsBuilder.UseNpgsql(o => o.UseVector());
         }
     }
 }

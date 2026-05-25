@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using QuizzArena.Quizzing.Domain.Entities;
+using QuizzArena.Quizzing.Domain.Enums;
 
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Configurations
 {
@@ -25,8 +26,9 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Configurat
             builder.Property(x => x.JoinedAt)
                 .HasColumnType("timestamptz");
 
-       
-            builder.Property(x => x.Status).HasColumnType($"{QuizzingConstants.Schema}.quiz_attempt_status");
+            builder.Property(x => x.Status).HasColumnType($"{QuizzingConstants.Schema}.quiz_attempt_status")
+                .HasDefaultValueSql($"'in_progress'::{QuizzingConstants.Schema}.quiz_attempt_status");
+
             builder.Property(x => x.Score);
             builder.Property(x => x.UserId);
 
@@ -34,6 +36,8 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Configurat
                 .WithMany()
                 .HasForeignKey(x => x.MatchId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasMany(x => x.Answers).WithOne().HasForeignKey(x => x.QuizAttemptId);
         }
     }
 }

@@ -6,28 +6,27 @@ using Users.Domain.Entities;
 
 namespace QuizzArena.Users.Infrastructure.Adapters.Out.Persistence.Configurations
 {
-    internal class CourseStudentConfiguration : IEntityTypeConfiguration<CourseStudent>
+    internal sealed class CourseStudentConfiguration : IEntityTypeConfiguration<CourseStudent>
     {
         public void Configure(EntityTypeBuilder<CourseStudent> builder)
         {
             builder.ToTable(
-                "course_students",
+                "course_student",
                 schema: UserConstants.Schema
                 );
 
             builder.HasKey(x => x.Id);
+            
+            builder.Property(x => x.Deleted).
+                HasDefaultValue(false);
+            
+            builder.Property(x => x.DeletedAt).
+                HasColumnType("timestamptz");
 
             builder.HasOne<User>()
                 .WithMany()
                 .HasForeignKey(x => x.StudentId)
-                .HasConstraintName("FK_Course_User_StudentId")
                 .OnDelete(DeleteBehavior.Restrict);
-
-            builder.HasOne<Course>()
-                .WithMany()
-                .HasForeignKey(x => x.CourseId)
-                .HasConstraintName("FK_User_Course_CourseId")
-                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

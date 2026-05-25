@@ -77,7 +77,18 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                     b.Property<Guid>("CourseId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTimeOffset>("FinishedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamptz");
+
+                    b.Property<bool>("Deleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamptz");
+
+                    b.Property<DateTimeOffset?>("FinishedAt")
                         .HasColumnType("timestamptz");
 
                     b.Property<int>("Mode")
@@ -90,10 +101,15 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                         .HasColumnType("timestamptz");
 
                     b.Property<int>("Status")
-                        .HasColumnType("quizzing.match_status");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("quizzing.match_status")
+                        .HasDefaultValueSql("'pending'::quizzing.match_status");
 
                     b.Property<int>("TimeMinutes")
                         .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamptz");
 
                     b.HasKey("Id");
 
@@ -111,6 +127,17 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamptz");
+
+                    b.Property<bool>("Deleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamptz");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -124,6 +151,9 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
 
                     b.Property<Guid>("QuestionId")
                         .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamptz");
 
                     b.HasKey("Id");
 
@@ -148,13 +178,20 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                         .HasColumnType("timestamptz");
 
                     b.Property<bool>("Deleted")
-                        .HasColumnType("boolean");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamptz");
 
                     b.Property<Guid?>("ProcessingJobId")
                         .HasColumnType("uuid");
 
                     b.Property<int>("Status")
-                        .HasColumnType("quizzing.question_status");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("quizzing.question_status")
+                        .HasDefaultValueSql("'draft'::quizzing.question_status");
 
                     b.Property<int>("Type")
                         .HasColumnType("quizzing.question_type");
@@ -163,7 +200,9 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                         .HasColumnType("timestamptz");
 
                     b.Property<bool>("WasModified")
-                        .HasColumnType("boolean");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
 
                     b.HasKey("Id");
 
@@ -186,7 +225,12 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                         .HasColumnType("timestamptz");
 
                     b.Property<bool>("Deleted")
-                        .HasColumnType("boolean");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamptz");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -194,7 +238,9 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                         .HasColumnType("character varying(255)");
 
                     b.Property<int>("Status")
-                        .HasColumnType("quizzing.quiz_status");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("quizzing.quiz_status")
+                        .HasDefaultValueSql("'published'::quizzing.quiz_status");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -236,7 +282,9 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                         .HasColumnType("timestamptz");
 
                     b.Property<int>("Status")
-                        .HasColumnType("quizzing.quiz_attempt_status");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("quizzing.quiz_attempt_status")
+                        .HasDefaultValueSql("'in_progress'::quizzing.quiz_attempt_status");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -254,6 +302,17 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamptz");
+
+                    b.Property<bool>("Deleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamptz");
+
                     b.Property<int>("Position")
                         .HasColumnType("integer");
 
@@ -262,6 +321,9 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
 
                     b.Property<Guid>("QuizId")
                         .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamptz");
 
                     b.Property<int>("ValueScore")
                         .HasColumnType("integer");
@@ -294,9 +356,9 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                         .IsRequired();
 
                     b.HasOne("QuizzArena.Quizzing.Domain.Entities.QuizAttempt", null)
-                        .WithMany()
+                        .WithMany("Answers")
                         .HasForeignKey("QuizAttemptId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -312,7 +374,7 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
             modelBuilder.Entity("QuizzArena.Quizzing.Domain.Entities.Option", b =>
                 {
                     b.HasOne("QuizzArena.Quizzing.Domain.Entities.Question", null)
-                        .WithMany()
+                        .WithMany("Options")
                         .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -336,10 +398,25 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                         .IsRequired();
 
                     b.HasOne("QuizzArena.Quizzing.Domain.Entities.Quiz", null)
-                        .WithMany()
+                        .WithMany("QuizQuestions")
                         .HasForeignKey("QuizId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("QuizzArena.Quizzing.Domain.Entities.Question", b =>
+                {
+                    b.Navigation("Options");
+                });
+
+            modelBuilder.Entity("QuizzArena.Quizzing.Domain.Entities.Quiz", b =>
+                {
+                    b.Navigation("QuizQuestions");
+                });
+
+            modelBuilder.Entity("QuizzArena.Quizzing.Domain.Entities.QuizAttempt", b =>
+                {
+                    b.Navigation("Answers");
                 });
 #pragma warning restore 612, 618
         }

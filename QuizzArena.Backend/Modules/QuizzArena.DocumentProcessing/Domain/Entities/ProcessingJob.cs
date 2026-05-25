@@ -10,5 +10,7 @@ namespace QuizzArena.DocumentProcessing.Domain.Entities
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset UpdatedAt { get; set; }
         public DateTimeOffset? FinishedAt { get; set; }
+
+        public ICollection<DocumentProcessingJob> DocumentProcessingJobs { get; set; } = [];
     }
 }

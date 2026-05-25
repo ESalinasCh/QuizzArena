@@ -32,10 +32,6 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Configurat
                 .HasForeignKey(x => x.QuestionId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne<QuizAttempt>()
-                .WithMany()
-                .HasForeignKey(x => x.QuizAttemptId)
-                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

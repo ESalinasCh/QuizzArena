@@ -11,5 +11,8 @@ namespace QuizzArena.Quizzing.Domain.Entities
         public bool Deleted { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset UpdatedAt { get; set; }
+        public DateTimeOffset? DeletedAt { get; set; }
+
+        public ICollection<QuizQuestion> QuizQuestions { get; set; } = []; 
     }
 }

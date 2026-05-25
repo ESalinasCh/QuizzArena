@@ -10,7 +10,7 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.
         public void Configure(EntityTypeBuilder<DocumentProcessingJob> builder)
         {
             builder.ToTable(
-                "course_students",
+                "document_processing_job",
                 schema: DocumentProcessingConstants.Schema
                 );
 
@@ -22,11 +22,6 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.
                 .HasConstraintName("FK_ProcessingJob_ClassSource_DocumentId")
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne<ProcessingJob>()
-                .WithMany()
-                .HasForeignKey(x => x.ProcessingJobId)
-                .HasConstraintName("FK_ClassSource_ProcessingJob_ProcessingJobId")
-                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

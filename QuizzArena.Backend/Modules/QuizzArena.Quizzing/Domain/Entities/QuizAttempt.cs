@@ -14,5 +14,7 @@ namespace QuizzArena.Quizzing.Domain.Entities
 
         public Guid UserId { get; set; }
         public Guid MatchId { get; set; }
+
+        public ICollection<Answer> Answers { get; set; } = [];
     }
 }

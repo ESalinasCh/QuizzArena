@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using QuizzArena.Quizzing.Domain.Entities;
+using QuizzArena.Quizzing.Domain.Enums;
 using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,8 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Configurat
                 .IsRequired();
 
             builder.Property(x => x.Status)
-                .IsRequired().HasColumnType($"{QuizzingConstants.Schema}.match_status");
+                .IsRequired().HasColumnType($"{QuizzingConstants.Schema}.match_status")
+                .HasDefaultValueSql($"'{MatchStatus.Pending.ToString().ToLower()}'::{QuizzingConstants.Schema}.match_status");
 
             builder.Property(x => x.Mode)
                 .IsRequired().HasColumnType($"{QuizzingConstants.Schema}.match_mode");
@@ -36,14 +38,27 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Configurat
                 .IsRequired();
 
             builder.Property(x => x.FinishedAt)
-                .HasColumnType("timestamptz")
-                .IsRequired();
+                .HasColumnType("timestamptz");
 
             builder.Property(x => x.CourseId);
 
+            builder.Property(x => x.Deleted)
+            .IsRequired()
+            .HasDefaultValue(false); 
+
+            builder.Property(x => x.CreatedAt)
+                .HasColumnType("timestamptz")
+                .IsRequired();
+
+            builder.Property(x => x.UpdatedAt)
+                .HasColumnType("timestamptz")
+                .IsRequired();
+
+            builder.Property(x => x.DeletedAt)
+               .HasColumnType("timestamptz");
+
             builder.HasIndex(x => x.Code)
                 .IsUnique();
-
 
             builder.HasOne<Quiz>()
                 .WithMany()

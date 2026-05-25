@@ -25,11 +25,27 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Configurat
             builder.Property(x => x.Position)
                 .IsRequired();
 
+            builder.Property(x => x.Deleted)
+            .IsRequired()
+            .HasDefaultValue(false); 
+
+            builder.Property(x => x.CreatedAt)
+                .HasColumnType("timestamptz")
+                .IsRequired();
+
+            builder.Property(x => x.UpdatedAt)
+                .HasColumnType("timestamptz")
+                .IsRequired();
+
+            builder.Property(x => x.DeletedAt)
+               .HasColumnType("timestamptz");
+
             builder.HasIndex(x => new
             {
                 x.QuestionId,
                 x.Position
             }).IsUnique();
+
         }
     }
 }

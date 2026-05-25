@@ -1,14 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using QuizzArena.DocumentProcessing.Domain.Entities;
+using QuizzArena.DocumentProcessing.Domain.Enums;
 using QuizzArena.DocumentProcessing.Infraestructure.Adapters.Out.Persistence;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.Configurations
 {
-    internal class ProcessingJobConfiguration : IEntityTypeConfiguration<ProcessingJob>
+    internal sealed class ProcessingJobConfiguration : IEntityTypeConfiguration<ProcessingJob>
     {
         public void Configure(EntityTypeBuilder<ProcessingJob> builder)
         {
@@ -21,7 +19,8 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.
 
             builder.Property(x => x.Status)
                 .HasColumnName("status")
-                .HasColumnType($"{DocumentProcessingConstants.Schema}.job_status");
+                .HasColumnType($"{DocumentProcessingConstants.Schema}.job_status")
+                .HasDefaultValueSql($"'{JobStatus.Pending.ToString().ToLower()}'::{DocumentProcessingConstants.Schema}.job_status");
 
             builder.Property(x => x.ErrorMessage)
                 .HasColumnName("error_message")
@@ -39,6 +38,8 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.
             builder.Property(x => x.FinishedAt)
                 .HasColumnName("finished_at")
                 .HasColumnType("timestamptz");
+
+            builder.HasMany(x => x.DocumentProcessingJobs).WithOne().HasForeignKey(x => x.ProcessingJobId);
         }
     }
 }

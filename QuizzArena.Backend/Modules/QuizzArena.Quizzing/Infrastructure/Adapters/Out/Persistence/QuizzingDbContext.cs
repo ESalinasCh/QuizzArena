@@ -13,13 +13,13 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence
         {
 
         }
-        public DbSet<Option> Options { get; set; }
-        public DbSet<Question> Questions { get; set; }
-        public DbSet<QuizQuestion> QuizQuestions { get; set; }
-        public DbSet<Quiz> Quizzes { get; set; }
-        public DbSet<Match> Matches { get; set; }
-        public DbSet<QuizAttempt> QuizAttempts { get; set; }
-        public DbSet<Answer> Answers { get; set; }
+        public DbSet<Option> Options => Set<Option>();
+        public DbSet<Question> Questions => Set<Question>();
+        public DbSet<QuizQuestion> QuizQuestions => Set<QuizQuestion>();
+        public DbSet<Quiz> Quizzes => Set<Quiz>();
+        public DbSet<Match> Matches => Set<Match>();
+        public DbSet<QuizAttempt> QuizAttempts => Set<QuizAttempt>();
+        public DbSet<Answer> Answers => Set<Answer>();
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

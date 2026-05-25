@@ -10,6 +10,7 @@ using QuizzArena.DocumentProcessing.Infraestructure.Adapters.Out.Persistence;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Web;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.Repositories;
+using Shared.Contracts;
 using System.Reflection.Emit;
 
 namespace QuizzArena.DocumentProcessing
@@ -29,6 +30,7 @@ namespace QuizzArena.DocumentProcessing
             var connectionString = configuration.GetConnectionString("DefaultConnection");
 
             var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+            dataSourceBuilder.UseVector();
 
             dataSourceBuilder.MapEnum<JobStatus>($"{DocumentProcessingConstants.Schema}.job_status");
             dataSourceBuilder.MapEnum<SourceStatus>($"{DocumentProcessingConstants.Schema}.source_status");
@@ -38,6 +40,8 @@ namespace QuizzArena.DocumentProcessing
 
             services.AddDbContext<DocumentProcessingDbContext>(options =>
                 options.UseNpgsql(dataSource));
+
+            services.AddTransient<IModuleInitializer, DocumentProcessingModuleInitializer>();
             #endregion
 
             return services;

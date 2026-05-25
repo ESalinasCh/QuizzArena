@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using QuizzArena.Quizzing.Domain.Entities;
+using QuizzArena.Quizzing.Domain.Enums;
 using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence;
 
 
@@ -21,16 +22,19 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Configurat
                 .IsRequired();
 
             builder.Property(x => x.Status)
-                .IsRequired().HasColumnType($"{QuizzingConstants.Schema}.question_status");
+                .IsRequired().HasColumnType($"{QuizzingConstants.Schema}.question_status")
+                .HasDefaultValueSql($"'{QuestionStatus.Draft.ToString().ToLower()}'::{QuizzingConstants.Schema}.question_status");
 
             builder.Property(x => x.Type)
                 .IsRequired().HasColumnType($"{QuizzingConstants.Schema}.question_type");
 
             builder.Property(x => x.WasModified)
-                .IsRequired();
+                .IsRequired().
+                HasDefaultValue(false);
 
             builder.Property(x => x.Deleted)
-                .IsRequired();
+                .IsRequired()
+                .HasDefaultValue(false); ;
 
             builder.Property(x => x.CreatedAt)
                 .HasColumnType("timestamptz")
@@ -39,6 +43,8 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Configurat
             builder.Property(x => x.UpdatedAt)
                 .HasColumnType("timestamptz")
                 .IsRequired();
+            builder.Property(x => x.DeletedAt)
+               .HasColumnType("timestamptz");
 
             builder.Property(x => x.ProcessingJobId);
 
