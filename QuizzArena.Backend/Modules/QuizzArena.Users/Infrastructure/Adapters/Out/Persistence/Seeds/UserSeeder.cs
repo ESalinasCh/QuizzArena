@@ -35,7 +35,7 @@ namespace QuizzArena.Users.Infrastructure.Adapters.Out.Persistence.Seeds
                 UserName = "student01",
                 FirstName = "Juan",
                 LastName = "Student",
-                Email = "teacher@test.com",
+                Email = "user@test.com",
                 Role = UserRole.Student,
                 ExternalProvider = "",
                 CreatedAt = DateTime.UtcNow,
