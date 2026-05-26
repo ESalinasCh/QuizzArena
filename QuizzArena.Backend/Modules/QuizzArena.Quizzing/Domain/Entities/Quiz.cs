@@ -7,8 +7,11 @@ public class Quiz
     public Guid Id { get; set; }
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public QuizStatus Status { get; set; }
+    public QuizStatus Status { get; set; } = QuizStatus.draft;
     public bool Deleted { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
+    public DateTimeOffset? DeletedAt { get; set; }
+
+    internal ICollection<QuizQuestion> QuizQuestions { get; set; } = [];
 }

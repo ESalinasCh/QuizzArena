@@ -1,4 +1,4 @@
-﻿using Users.Domain.Entities;
+﻿using QuizzArena.Users.Domain.Entities;
 
 namespace QuizzArena.Users.Application.Ports.Out;
 

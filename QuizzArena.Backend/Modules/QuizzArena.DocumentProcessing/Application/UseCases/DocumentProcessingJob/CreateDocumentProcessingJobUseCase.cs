@@ -1,4 +1,4 @@
-﻿namespace QuizzArena.DocumentProcessing.Application.DTOs.DocumentProcessingJob;
+﻿namespace QuizzArena.DocumentProcessing.Application.UseCases.DocumentProcessingJob;
 
 internal class CreateDocumentProcessingJobUseCase
 {

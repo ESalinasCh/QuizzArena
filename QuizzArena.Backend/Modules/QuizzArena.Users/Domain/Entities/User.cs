@@ -1,6 +1,6 @@
 ﻿using QuizzArena.Users.Domain.Enums;
 
-namespace Users.Domain.Entities;
+namespace QuizzArena.Users.Domain.Entities;
 
 public class User
 {
@@ -12,8 +12,10 @@ public class User
     public string ExternalProvider { get; set; } = string.Empty;
     public bool Deleted { get; set; }
     public UserRole Role { get; set; }
-    public string AvatarUrl { get; set; } = string.Empty;
-    public string ProviderId { get; set; } = string.Empty;
+    public string? AvatarUrl { get; set; }
+    public string? ProviderId { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
+    public DateTimeOffset? DeletedAt { get; set; }
+
 }

@@ -3,7 +3,7 @@ using QuizzArena.DocumentProcessing;
 using QuizzArena.Quizzing;
 using QuizzArena.Users;
 
-namespace QuizzArena.Host;
+namespace Host;
 
 public class Program
 {
@@ -21,15 +21,16 @@ public class Program
             options.AssumeDefaultVersionWhenUnspecified = true;
         }).AddMvc();
 
-        builder.Services.AddUsersModule();
-        builder.Services.AddQuizzingModule();
-        builder.Services.AddDocumentProcessingModule();
+        builder.Services.AddUsersModule(builder.Configuration);
+        builder.Services.AddQuizzingModule(builder.Configuration);
+        builder.Services.AddDocumentProcessingModule(builder.Configuration);
 
         WebApplication app = builder.Build();
 
         if (app.Environment.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
+            app.ApplyMigrations();
         }
 
         app.UseHttpsRedirection();
