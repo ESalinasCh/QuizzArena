@@ -1,5 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using Host.Security;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http.Features;
 using QuizzArena.DocumentProcessing;
 using QuizzArena.Quizzing;
 using QuizzArena.Users;
@@ -27,6 +29,23 @@ public class Program
         builder.Services.AddUsersModule(builder.Configuration);
         builder.Services.AddQuizzingModule(builder.Configuration);
         builder.Services.AddDocumentProcessingModule(builder.Configuration);
+            var builder = WebApplication.CreateBuilder(args);
+            //swagger
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
+            // Adding Controllers
+            builder.Services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
+
+        builder.Services.Configure<FormOptions>(options =>
+            {
+                options.MultipartHeadersLengthLimit = int.MaxValue;
+                options.MultipartBodyLengthLimit = long.MaxValue; // Sin límite
+                options.ValueLengthLimit = int.MaxValue;
+            });
 
         WebApplication app = builder.Build();
 
@@ -34,6 +53,8 @@ public class Program
         {
             app.UseDeveloperExceptionPage();
             app.ApplyMigrations();
+            app.UseSwagger();
+            app.UseSwaggerUI();
         }
 
         app.UseHttpsRedirection();

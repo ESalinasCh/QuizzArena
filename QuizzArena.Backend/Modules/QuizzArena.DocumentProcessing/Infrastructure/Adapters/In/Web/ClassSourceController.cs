@@ -11,7 +11,9 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Web
     ) : ControllerBase
     {
         [HttpPost]
-        public async Task<ActionResult<UploadClassSourceResponseDto>> UploadClassSource(UploadClassSourceRequestDto dto)
+        [RequestSizeLimit(500_000_000)]
+        [RequestFormLimits(MultipartBodyLengthLimit = 500_000_000)]
+        public async Task<ActionResult<UploadClassSourceResponseDto>> UploadClassSource( [FromForm] UploadClassSourceRequestDto dto)
         {
             UploadClassSourceResponseDto response = await uploadSourceUseCase.Execute(dto);
             return Ok(response);

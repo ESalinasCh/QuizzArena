@@ -20,8 +20,7 @@ public static class DependencyInjection
         services.AddControllers()
             .AddApplicationPart(typeof(IDocumentProcessingInfrastructureMarker).Assembly);
 
-            services.AddScoped<ICreateDocumentUseCase, CreateDocumentUseCase>();
-            services.AddScoped<IWhisperTranscriptionRepository, SqlDocumentChunkRepository>();
+            services.AddScoped<IUploadSourceUseCase, UploadSourceUseCase>();
 
         #region BDD
         var connectionString = configuration.GetConnectionString("DefaultConnection");
