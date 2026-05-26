@@ -1,5 +1,4 @@
-﻿
-using Shared.Contracts;
+﻿using Shared.Contracts;
 
 public static class MigrationExtension
 {

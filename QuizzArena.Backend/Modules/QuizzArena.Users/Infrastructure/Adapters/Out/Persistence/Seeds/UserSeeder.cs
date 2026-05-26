@@ -24,7 +24,8 @@ internal class UserSeeder
             LastName = "Teacher",
             Email = "teacher@test.com",
             Role = UserRole.Teacher,
-            ExternalProvider = "",
+            ExternalProvider = "Keycloak",
+            ProviderId = UserConstants.ProviderTeacherId.ToString(),
             CreatedAt = DateTime.UtcNow
         };
 
@@ -38,7 +39,8 @@ internal class UserSeeder
             LastName = "Student",
             Email = "user@test.com",
             Role = UserRole.Student,
-            ExternalProvider = "",
+            ExternalProvider = "Keycloak",
+            ProviderId = UserConstants.ProviderStudentId.ToString(),
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
