@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using QuizzArena.Quizzing.Domain.Entities;
-using QuizzArena.Quizzing.Domain.Enums;
 
 
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Configurations;
