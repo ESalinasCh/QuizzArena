@@ -17,7 +17,7 @@ public class SqlClassSourceRepository : IClassSourceRepository
             UserId = dto.UserId,
             Status = SourceStatus.Pending,
             Type = SourceType.Text,
-            // UploadedAt = DateTimeOffset.UtcNow, falta poner esto en el class source 
+            CreatedAt = DateTimeOffset.UtcNow,
             UpdatedAt = DateTimeOffset.UtcNow,
             Deleted = false
         };
