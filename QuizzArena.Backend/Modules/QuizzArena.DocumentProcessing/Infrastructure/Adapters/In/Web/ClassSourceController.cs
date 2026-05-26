@@ -5,7 +5,7 @@ using QuizzArena.DocumentProcessing.Application.Ports.In;
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Web
 {
     [ApiController]
-    [Route("api/v{version:apiVersion}/[controller]")]
+    [Route("api/v{version:apiVersion}/class-sources")]
     public class ClassSourceController(
         IUploadSourceUseCase uploadSourceUseCase
     ) : ControllerBase
