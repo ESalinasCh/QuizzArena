@@ -1,6 +1,6 @@
 ﻿namespace QuizzArena.DocumentProcessing.Domain.Enums;
 
-internal enum SourceType
+public enum SourceType
 {
     Video = 0,
     Audio = 1,

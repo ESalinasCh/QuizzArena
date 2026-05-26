@@ -2,7 +2,7 @@
 
 namespace QuizzArena.DocumentProcessing.Domain.Entities;
 
-internal class ClassSource
+public class ClassSource
 {
     public Guid Id { get; set; }
     public SourceType Type { get; set; }

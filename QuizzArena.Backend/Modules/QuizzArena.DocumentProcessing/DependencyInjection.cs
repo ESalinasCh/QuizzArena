@@ -2,13 +2,11 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
+using QuizzArena.DocumentProcessing.Application.DTOs.ClassSource;
 using QuizzArena.DocumentProcessing.Application.Ports.In;
-using QuizzArena.DocumentProcessing.Application.Ports.Out;
-using QuizzArena.DocumentProcessing.Application.UseCases.DocumentChunk;
 using QuizzArena.DocumentProcessing.Domain.Enums;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Web;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence;
-using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.Repositories;
 using Shared.Contracts;
 
 namespace QuizzArena.DocumentProcessing;
@@ -20,7 +18,7 @@ public static class DependencyInjection
         services.AddControllers()
             .AddApplicationPart(typeof(IDocumentProcessingInfrastructureMarker).Assembly);
 
-            services.AddScoped<IUploadSourceUseCase, UploadSourceUseCase>();
+        services.AddScoped<IUploadSourceUseCase, UploadSourceUseCase>();
 
         #region BDD
         var connectionString = configuration.GetConnectionString("DefaultConnection");

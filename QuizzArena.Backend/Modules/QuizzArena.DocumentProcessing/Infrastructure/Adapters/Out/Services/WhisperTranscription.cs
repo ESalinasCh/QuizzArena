@@ -1,12 +1,9 @@
-﻿using QuizzArena.DocumentProcessing.Application.Ports.Out;
+﻿namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Services;
 
-namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Services
+public class WhisperTranscription
 {
-    public class WhisperTranscription : IWhisperTranscriptionRepository
+    public static async Task<string> Transcribe()
     {
-        public async Task<string> Transcribe()
-        {
-            return "Transcribed text from Whisper API (Not implemented yet)";
-        }
+        return "Transcribed text from Whisper API (Not implemented yet)";
     }
 }

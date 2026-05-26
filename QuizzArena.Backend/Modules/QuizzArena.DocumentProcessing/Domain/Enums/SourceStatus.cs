@@ -1,6 +1,6 @@
 ﻿namespace QuizzArena.DocumentProcessing.Domain.Enums;
 
-internal enum SourceStatus
+public enum SourceStatus
 {
     Pending = 0,
     Processing = 1,

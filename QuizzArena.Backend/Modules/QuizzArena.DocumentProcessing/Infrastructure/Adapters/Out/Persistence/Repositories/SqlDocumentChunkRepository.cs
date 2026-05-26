@@ -5,7 +5,7 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.
 
 internal class SqlDocumentChunkRepository : IDocumentChunkRepository
 {
-    public async Task<DocumentChunk> Create(Guid id)
+    public static async Task<DocumentChunk> Create(Guid id)
     {
         return new DocumentChunk();
     }

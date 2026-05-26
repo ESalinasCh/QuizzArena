@@ -1,15 +1,12 @@
-﻿using QuizzArena.DocumentProcessing.Application.DTOs.DocumentChunk;
-using QuizzArena.DocumentProcessing.Application.Ports.In;
-using QuizzArena.DocumentProcessing.Application.Ports.Out;
+﻿using QuizzArena.DocumentProcessing.Application.Ports.In;
 
-namespace QuizzArena.DocumentProcessing.Application.DTOs.ClassSource
+namespace QuizzArena.DocumentProcessing.Application.DTOs.ClassSource;
+
+public class UploadSourceUseCase : IUploadSourceUseCase
 {
-    public class UploadSourceUseCase : IUploadSourceUseCase
+    public async Task<UploadClassSourceResponseDto> Execute(UploadClassSourceRequestDto dto)
     {
-        public async Task<UploadClassSourceResponseDto> Execute(UploadClassSourceRequestDto dto)
-        {
-            return new UploadClassSourceResponseDto();
-        }
+        return new UploadClassSourceResponseDto();
     }
 }
 
