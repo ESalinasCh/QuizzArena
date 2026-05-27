@@ -4,7 +4,7 @@ using QuizzArena.DocumentProcessing.Domain.Enums;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence;
 
-internal class DocumentProcessingDbContext : DbContext
+public class DocumentProcessingDbContext : DbContext
 {
     public DocumentProcessingDbContext(
         DbContextOptions<DocumentProcessingDbContext> options)

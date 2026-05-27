@@ -4,14 +4,25 @@ namespace QuizzArena.DocumentProcessing.Application.DTOs.ClassSource;
 
 public class UploadClassSourceResponseDto
 {
-    public SourceType SourceType;
+    public Guid Id { get; set; }
 
-    public SourceStatus Status = SourceStatus.Pending;
+    public SourceType SourceType { get; set; }
+
+    public SourceStatus Status { get; set; }
+
     public string Name { get; set; } = string.Empty;
+
     public string? TranscriptUrl { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-    public bool Deleted { get; set; } = false;
+
+    public string? FileUrl { get; set; }
+
+    public bool Deleted { get; set; }
+
+    public DateTimeOffset CreatedAt { get; set; }
+
+    public DateTimeOffset UpdatedAt { get; set; }
+
     public Guid CourseId { get; set; }
+
     public Guid UserId { get; set; }
 }
