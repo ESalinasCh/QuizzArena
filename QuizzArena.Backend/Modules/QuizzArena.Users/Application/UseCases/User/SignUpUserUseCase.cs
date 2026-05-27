@@ -4,7 +4,7 @@ using QuizzArena.Users.Application.Ports.Out;
 
 namespace QuizzArena.Users.Application.UseCases.User;
 
-public class SignUpUserUseCase(IUserRepository repository) : ISignUpUserUseCase
+internal class SignUpUserUseCase(IUserRepository repository) : ISignUpUserUseCase
 {
     public async Task<SignUpResponseDto> Execute(SignUpRequestDto dto)
     {

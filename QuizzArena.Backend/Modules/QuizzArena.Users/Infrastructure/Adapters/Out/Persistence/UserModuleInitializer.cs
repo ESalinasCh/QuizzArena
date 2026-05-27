@@ -7,11 +7,11 @@ namespace QuizzArena.Users.Infrastructure.Adapters.Out.Persistence;
 
 internal class UserModuleInitializer : IModuleInitializer
 {
-    public async void Initialize(IServiceProvider serviceProvider)
+    public async Task Initialize(IServiceProvider serviceProvider)
     {
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<UserDbContext>();
-        context.Database.Migrate();
+        await context.Database.MigrateAsync();
         await SeedRunner.SeedAsync(context);
     }
 }

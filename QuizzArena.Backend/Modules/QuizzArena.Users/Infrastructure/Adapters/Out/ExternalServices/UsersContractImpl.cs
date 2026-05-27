@@ -3,7 +3,7 @@ using Shared.Contracts;
 
 namespace QuizzArena.Users.Infrastructure.Adapters.Out.ExternalServices;
 
-public class UsersContractImpl(IUserRepository _userRepository) : IUsersContract
+internal class UsersContractImpl(IUserRepository _userRepository) : IUsersContract
 {
     public async Task<bool> IsProfessor(Guid userId)
     {

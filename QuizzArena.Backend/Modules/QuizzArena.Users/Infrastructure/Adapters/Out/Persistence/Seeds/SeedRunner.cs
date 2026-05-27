@@ -2,7 +2,7 @@
 
 internal class SeedRunner
 {
-    public static async Task SeedAsync(UserDbContext context)
+    internal static async Task SeedAsync(UserDbContext context)
     {
         await UserSeeder.SeedAsync(context);
         await CourseSeeder.SeedAsync(context);

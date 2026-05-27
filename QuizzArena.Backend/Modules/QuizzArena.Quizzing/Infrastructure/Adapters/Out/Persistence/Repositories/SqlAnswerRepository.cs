@@ -3,7 +3,7 @@ using QuizzArena.Quizzing.Domain.Entities;
 
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Repositories;
 
-public class SqlAnswerRepository : IAnswerRepository
+internal class SqlAnswerRepository : IAnswerRepository
 {
     public async Task<Answer> SetAnswer(Guid id)
     {

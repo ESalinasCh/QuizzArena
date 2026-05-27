@@ -3,7 +3,7 @@ using QuizzArena.Quizzing.Domain.Entities;
 
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Repositories;
 
-public class SqlQuizAttemptRepository : IQuizAttemptRepository
+internal class SqlQuizAttemptRepository : IQuizAttemptRepository
 {
     public async Task<QuizAttempt> End()
     {
