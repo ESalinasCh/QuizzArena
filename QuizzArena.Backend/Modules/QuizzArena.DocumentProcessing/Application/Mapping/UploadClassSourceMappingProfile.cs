@@ -54,7 +54,7 @@ public class UploadClassSourceMappingProfile : Profile
             .ForMember(
                 dest => dest.DocumentChunks,
                 opt => opt.Ignore()
-            ); 
+            );
 
         CreateMap<ClassSource, UploadClassSourceResponseDto>()
             .ForMember(

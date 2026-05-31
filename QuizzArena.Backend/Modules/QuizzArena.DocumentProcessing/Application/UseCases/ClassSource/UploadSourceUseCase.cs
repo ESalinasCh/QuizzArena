@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using FluentValidation;
-using Microsoft.AspNetCore.Http.HttpResults;
 using QuizzArena.DocumentProcessing.Application.DTOs.ClassSource;
 using QuizzArena.DocumentProcessing.Application.Ports.In;
 using QuizzArena.DocumentProcessing.Application.Ports.Out;
@@ -30,7 +29,7 @@ public class UploadSourceUseCase(
 
         string fileUrl = await blobRepository.UploadFileAsync(stream, blobPath, "quiz-sources");
 
-        classSource.FileUrl = fileUrl; 
+        classSource.FileUrl = fileUrl;
 
 
         ClassSource createdClass = await classSourceRepository.Create(classSource);

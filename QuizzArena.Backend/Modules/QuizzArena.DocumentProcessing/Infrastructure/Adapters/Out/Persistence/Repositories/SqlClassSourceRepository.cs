@@ -1,6 +1,4 @@
-﻿
-using System.Security.AccessControl;
-using QuizzArena.DocumentProcessing.Application.Ports.Out;
+﻿using QuizzArena.DocumentProcessing.Application.Ports.Out;
 using QuizzArena.DocumentProcessing.Domain.Entities;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.Repositories;
