@@ -13,6 +13,7 @@ namespace QuizzArena.DocumentProcessing.Application.UseCases;
 public class UploadSourceUseCase(
     UploadClassSourceRequestValidator uploadValidator,
     IMapper mapper,
+    IBlobRepository blobRepository,
     IClassSourceRepository classSourceRepository) : IUploadSourceUseCase
 {
     public async Task<UploadClassSourceResponseDto> Execute(UploadClassSourceRequestDto dto)
@@ -20,20 +21,22 @@ public class UploadSourceUseCase(
         await uploadValidator.ValidateAndThrowAsync(dto);
         ClassSource classSource = mapper.Map<ClassSource>(dto);
 
-        //metodo para identificar type
         classSource.Type = SourceTypeResolver.Resolve(dto.File.FileName);
 
-        //subir al blob y get fileurl para despues :)
-        // agregarlo a base de datos
+
+        using var stream = dto.File.OpenReadStream();
+
+        string blobPath = $"class_{classSource.Id}/{classSource.Type}{Path.GetExtension(dto.File.FileName)}";
+
+        string fileUrl = await blobRepository.UploadFileAsync(stream, blobPath, "quiz-sources");
+
+        classSource.FileUrl = fileUrl; 
+
+
         ClassSource createdClass = await classSourceRepository.Create(classSource);
 
         var createdClaseRespose = mapper.Map<UploadClassSourceResponseDto>(createdClass);
-        // syncronizar base de datos
-        // devolver respuesta created y el objeto
         return createdClaseRespose;
     }
 }
 
-// Port In -> UseCase
-// Port Out -> Out Adapters
-// In adapters (controlladores)

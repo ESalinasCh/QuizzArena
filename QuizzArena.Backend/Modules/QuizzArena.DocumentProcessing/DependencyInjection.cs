@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Azure.Storage.Blobs;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
@@ -10,6 +11,7 @@ using QuizzArena.DocumentProcessing.Domain.Enums;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Web;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.Repositories;
+using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Services;
 using Shared.Contracts;
 
 namespace QuizzArena.DocumentProcessing;
@@ -26,6 +28,15 @@ public static class DependencyInjection
         services.AddScoped<IClassSourceRepository, SqlClassSourceRepository>();
 
         services.AddAutoMapper(cfg => { }, typeof(DependencyInjection).Assembly);
+
+
+        services.AddScoped<IBlobRepository, BlobRepository>();
+        services.AddSingleton(provider =>
+        {
+            var storageConnectionString = configuration.GetConnectionString("AzureBlobStorage");
+            return new BlobServiceClient(storageConnectionString);
+        });
+
 
         #region BDD
         var connectionString = configuration.GetConnectionString("DefaultConnection");
