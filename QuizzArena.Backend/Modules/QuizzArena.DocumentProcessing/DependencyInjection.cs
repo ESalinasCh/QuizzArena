@@ -30,7 +30,6 @@ public static class DependencyInjection
         services.AddScoped<IUploadSourceUseCase, UploadSourceUseCase>();
         services.AddScoped<UploadClassSourceRequestValidator>();
         services.AddScoped<IClassSourceRepository, SqlClassSourceRepository>();
-        //services.AddScoped<ITranscriptionService, WhisperTranscription>();
 
         services.AddAutoMapper(cfg => { }, typeof(DependencyInjection).Assembly);
 
@@ -47,7 +46,7 @@ public static class DependencyInjection
         {
             var whisperUrl = configuration["WhisperSettings:BaseUrl"] ?? "http://localhost:9000/";
             client.BaseAddress = new Uri(whisperUrl);
-            client.Timeout = TimeSpan.FromMinutes(60); // 1 hora máximo para audios muy pesados
+            client.Timeout = TimeSpan.FromMinutes(60);
         });
 
 

@@ -25,7 +25,6 @@ public class UploadClassSourceRequestValidator : AbstractValidator<UploadClassSo
             .NotEmpty()
             ;
 
-        //depende de como vayamos a consumir el user id se tiene que cambiar
         RuleFor(x => x.UserId)
             .NotEmpty();
 
