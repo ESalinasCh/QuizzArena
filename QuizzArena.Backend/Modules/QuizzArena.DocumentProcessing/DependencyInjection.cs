@@ -1,4 +1,5 @@
 ﻿using Azure.Storage.Blobs;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,11 +9,14 @@ using QuizzArena.DocumentProcessing.Application.Ports.Out;
 using QuizzArena.DocumentProcessing.Application.UseCases;
 using QuizzArena.DocumentProcessing.Application.Validators;
 using QuizzArena.DocumentProcessing.Domain.Enums;
+using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Consumers;
+using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Sagas;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Web;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.Repositories;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Services;
 using Shared.Contracts;
+using static QuizzArena.DocumentProcessing.Application.Ports.Out.IDocumentChunkRepository;
 
 namespace QuizzArena.DocumentProcessing;
 
@@ -26,6 +30,7 @@ public static class DependencyInjection
         services.AddScoped<IUploadSourceUseCase, UploadSourceUseCase>();
         services.AddScoped<UploadClassSourceRequestValidator>();
         services.AddScoped<IClassSourceRepository, SqlClassSourceRepository>();
+        //services.AddScoped<ITranscriptionService, WhisperTranscription>();
 
         services.AddAutoMapper(cfg => { }, typeof(DependencyInjection).Assembly);
 
@@ -35,6 +40,35 @@ public static class DependencyInjection
         {
             var storageConnectionString = configuration.GetConnectionString("AzureBlobStorage");
             return new BlobServiceClient(storageConnectionString);
+        });
+
+
+        services.AddHttpClient<ITranscriptionService, WhisperTranscription>(client =>
+        {
+            var whisperUrl = configuration["WhisperSettings:BaseUrl"] ?? "http://localhost:9000/";
+            client.BaseAddress = new Uri(whisperUrl);
+            client.Timeout = TimeSpan.FromMinutes(60); // 1 hora máximo para audios muy pesados
+        });
+
+
+        services.AddMassTransit(x =>
+        {
+
+            x.AddSagaStateMachine<IngestionSaga, IngestionSagaState>()
+                .InMemoryRepository();
+
+            x.AddConsumer<TranscriptionRequestConsumer>();
+
+            x.UsingRabbitMq((context, cfg) =>
+            {
+                cfg.Host("localhost", "/", h =>
+                {
+                    h.Username("guest");
+                    h.Password("guest");
+                });
+
+                cfg.ConfigureEndpoints(context);
+            });
         });
 
 

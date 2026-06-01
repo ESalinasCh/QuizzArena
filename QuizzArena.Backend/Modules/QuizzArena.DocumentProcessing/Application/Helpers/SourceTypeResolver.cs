@@ -1,6 +1,6 @@
 ﻿using QuizzArena.DocumentProcessing.Domain.Enums;
 
-namespace QuizzArena.DocumentProcessing.Application.Services;
+namespace QuizzArena.DocumentProcessing.Application.Helpers;
 
 public static class SourceTypeResolver
 {

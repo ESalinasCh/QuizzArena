@@ -1,4 +1,5 @@
-﻿using Azure.Storage.Blobs;
+﻿using System.Text;
+using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using QuizzArena.DocumentProcessing.Application.Ports.Out;
 
@@ -14,6 +15,18 @@ public class BlobRepository(BlobServiceClient blobServiceClient) : IBlobReposito
 
         var blobClient = containerClient.GetBlobClient(fileName);
         await blobClient.UploadAsync(fileStream, overwrite: true);
+
+        return blobClient.Uri.AbsoluteUri;
+    }
+
+    public async Task<string> UploadTextAsync(string text, string fileName, string containerName)
+    {
+        var containerClient = blobServiceClient.GetBlobContainerClient(containerName.ToLower());
+
+        await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
+
+        var blobClient = containerClient.GetBlobClient(fileName);
+        await blobClient.UploadAsync(new MemoryStream(Encoding.UTF8.GetBytes(text)), overwrite: true);
 
         return blobClient.Uri.AbsoluteUri;
     }

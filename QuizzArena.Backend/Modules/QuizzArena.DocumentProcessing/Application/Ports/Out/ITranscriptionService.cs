@@ -2,8 +2,8 @@
 
 public interface IDocumentChunkRepository
 {
-    public interface IWhisperTranscriptionRepository
+    public interface ITranscriptionService
     {
-        Task<string> Transcribe();
+        Task<string> TranscribeAudioAsync(string fileUrl);
     }
 }

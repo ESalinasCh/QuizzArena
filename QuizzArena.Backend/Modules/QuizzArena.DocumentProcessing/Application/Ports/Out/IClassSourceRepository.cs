@@ -4,5 +4,7 @@ namespace QuizzArena.DocumentProcessing.Application.Ports.Out;
 
 public interface IClassSourceRepository
 {
-    public Task<ClassSource> Create(ClassSource classSource);
+    public Task<ClassSource?> GetByIdAsync(Guid classSourceId);
+    public Task<ClassSource> CreateAsync(ClassSource classSource);
+    public Task<ClassSource> UpdateAsync(ClassSource classSource);
 }

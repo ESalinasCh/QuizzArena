@@ -21,6 +21,15 @@ services:
       timeout: 5s
       retries: 5
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: quizarena_rabbitmq
+    hostname: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    restart: unless-stopped
+
   ollama:
     image: ollama/ollama:latest
     container_name: quizarena_ollama
