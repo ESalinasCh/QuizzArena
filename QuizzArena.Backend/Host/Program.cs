@@ -14,7 +14,6 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // Adding Controllers
         builder.Services.AddControllers()
         .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
@@ -29,17 +28,16 @@ public class Program
         builder.Services.AddUsersModule(builder.Configuration);
         builder.Services.AddQuizzingModule(builder.Configuration);
         builder.Services.AddDocumentProcessingModule(builder.Configuration);
-        //swagger
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
-        // Adding Controllers
+
         builder.Services.AddControllers()
         .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
         builder.Services.Configure<FormOptions>(options =>
             {
                 options.MultipartHeadersLengthLimit = int.MaxValue;
-                options.MultipartBodyLengthLimit = long.MaxValue; // Sin límite
+                options.MultipartBodyLengthLimit = long.MaxValue;
                 options.ValueLengthLimit = int.MaxValue;
             });
 
