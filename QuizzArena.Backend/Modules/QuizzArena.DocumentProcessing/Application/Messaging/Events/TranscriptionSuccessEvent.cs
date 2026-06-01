@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace QuizzArena.DocumentProcessing.Application.Messaging.Events;
+﻿namespace QuizzArena.DocumentProcessing.Application.Messaging.Events;
 
 public class TranscriptionSuccessEvent
 {

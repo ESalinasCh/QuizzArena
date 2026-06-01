@@ -43,7 +43,7 @@ public class IngestionSaga : MassTransitStateMachine<IngestionSagaState>
                     ctx.Saga.ClassSourceId = ctx.Message.ClassSourceId.ToString();
                     ctx.Saga.IngestionIdKey = ctx.Message.ClassSourceId.ToString();
                 })
-                .Publish( ctx => new TranscriptionRequestCommand
+                .Publish(ctx => new TranscriptionRequestCommand
                 {
                     ClassSourceId = ctx.Message.ClassSourceId,
                     FileUrl = ctx.Message.FileUrl

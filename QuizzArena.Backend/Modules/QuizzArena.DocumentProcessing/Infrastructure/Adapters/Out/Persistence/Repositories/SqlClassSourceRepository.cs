@@ -19,7 +19,8 @@ public class SqlClassSourceRepository(DocumentProcessingDbContext context) : ICl
         return await context.ClassSource.FindAsync(classSourceId);
     }
 
-    public async Task<ClassSource> UpdateAsync(ClassSource classSource){
+    public async Task<ClassSource> UpdateAsync(ClassSource classSource)
+    {
         context.ClassSource.Update(classSource);
         await context.SaveChangesAsync();
         return classSource;
