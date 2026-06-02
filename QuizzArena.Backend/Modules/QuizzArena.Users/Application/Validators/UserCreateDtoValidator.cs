@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using FluentValidation;
+﻿using FluentValidation;
 using QuizzArena.Users.Application.DTOs.User;
 
 namespace QuizzArena.Users.Application.Validators;
