@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using QuizzArena.Users.Application.DTOs.User;
 using QuizzArena.Users.Application.Ports.In;
 
@@ -11,7 +12,6 @@ public class UserController(
     ILogInUserUseCase loginUseCase
 ) : ControllerBase
 {
-
     // Placeholders Endpoints
 
     [HttpPost]

@@ -5,6 +5,7 @@ using Npgsql;
 using QuizzArena.Users.Application.Ports.In;
 using QuizzArena.Users.Application.Ports.Out;
 using QuizzArena.Users.Application.UseCases.User;
+using QuizzArena.Users.Application.Validators;
 using QuizzArena.Users.Domain.Enums;
 using QuizzArena.Users.Infrastructure.Adapters.In.Web;
 using QuizzArena.Users.Infrastructure.Adapters.Out.ExternalServices;
@@ -21,10 +22,17 @@ public static class DependencyInjection
         services.AddControllers()
             .AddApplicationPart(typeof(IUsersInfrastructureMaker).Assembly);
 
+        services.AddScoped<UserCreateDtoValidator>();
+        services.AddAutoMapper(cfg => { }, typeof(DependencyInjection).Assembly);
+
         services.AddScoped<ISignUpUserUseCase, SignUpUserUseCase>();
         services.AddScoped<ILogInUserUseCase, LogInUserUseCase>();
         services.AddScoped<IUserRepository, SqlUserRepository>();
         services.AddScoped<IUsersContract, UsersContractImpl>();
+
+        // Use Cases
+        services.AddScoped<UserUseCase>();
+        services.AddScoped<IUserUseCase>(sp => sp.GetRequiredService<UserUseCase>());
 
         #region BDD
         var connectionString = configuration.GetConnectionString("DefaultConnection");
