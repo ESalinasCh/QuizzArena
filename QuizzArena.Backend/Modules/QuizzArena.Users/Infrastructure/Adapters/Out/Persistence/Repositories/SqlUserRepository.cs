@@ -8,7 +8,6 @@ internal class SqlUserRepository(UserDbContext context) : IUserRepository
 {
     public async Task<User> GetById(Guid id)
     {
-        //throw new NotImplementedException();
         return new User();
     }
     public async Task<bool> ExistsAsync(string providerId)

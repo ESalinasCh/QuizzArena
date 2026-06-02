@@ -18,11 +18,11 @@ internal class UserUseCase(
         return await repository.ExistsAsync(providerId);
     }
 
-    public async Task<UserBaseDto> Register(CreateUserDto dto)
+    public async Task<UserDto> Register(CreateUserDto dto)
     {
         await createValidator.ValidateAndThrowAsync(dto);
         Domain.Entities.User user = mapper.Map<Domain.Entities.User>(dto);
         await repository.Register(user);
-        return mapper.Map<UserBaseDto>(user);
+        return mapper.Map<UserDto>(user);
     }
 }

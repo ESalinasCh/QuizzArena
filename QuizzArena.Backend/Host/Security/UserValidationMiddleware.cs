@@ -37,7 +37,7 @@ public class UserValidationMiddleware
             if (!exists)
             {
                 CreateUserDto userToCreate = context.User.ToCreateUserDto();
-                UserBaseDto newUser = await userUseCase.Register(userToCreate);
+                UserDto newUser = await userUseCase.Register(userToCreate);
                 Console.WriteLine(newUser);
             }
         }

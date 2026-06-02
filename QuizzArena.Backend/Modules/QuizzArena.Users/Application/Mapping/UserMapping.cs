@@ -8,7 +8,7 @@ internal class UserMapping : Profile
 {
     public UserMapping()
     {
-        CreateMap<User, UserBaseDto>().ReverseMap();
+        CreateMap<User, UserDto>().ReverseMap();
         CreateMap<User, CreateUserDto>().ReverseMap();
     }
 }
