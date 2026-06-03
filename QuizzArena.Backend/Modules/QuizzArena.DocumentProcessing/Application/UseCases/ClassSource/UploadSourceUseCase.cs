@@ -14,7 +14,7 @@ namespace QuizzArena.DocumentProcessing.Application.UseCases;
 public class UploadSourceUseCase(
     UploadClassSourceRequestValidator uploadValidator,
     IMapper mapper,
-    IBlobRepository blobRepository,
+    IStorageServiceRepository storageServiceRepository,
     IClassSourceRepository classSourceRepository,
     IPublishEndpoint publishEnpoint
 ) : IUploadSourceUseCase
@@ -22,29 +22,22 @@ public class UploadSourceUseCase(
     public async Task<UploadClassSourceResponseDto> Execute(UploadClassSourceRequestDto dto)
     {
         await uploadValidator.ValidateAndThrowAsync(dto);
-        ClassSource classSource = mapper.Map<ClassSource>(dto);
 
+        ClassSource classSource = mapper.Map<ClassSource>(dto);
         classSource.Type = SourceTypeResolver.Resolve(dto.File.FileName);
 
-
         using var stream = dto.File.OpenReadStream();
-
         string blobPath = $"class_{classSource.Id}/{classSource.Type}{Path.GetExtension(dto.File.FileName)}";
-
-        string fileUrl = await blobRepository.UploadFileAsync(stream, blobPath, "quiz-sources");
-
+        string fileUrl = await storageServiceRepository.UploadFileAsync(stream, blobPath, "quiz-sources");
         classSource.FileUrl = fileUrl;
 
-
         ClassSource createdClass = await classSourceRepository.CreateAsync(classSource);
-
 
         await publishEnpoint.Publish(new TranscriptionRequestEvent
         {
             ClassSourceId = createdClass.Id,
             FileUrl = createdClass.FileUrl!
         });
-
 
         var createdClaseRespose = mapper.Map<UploadClassSourceResponseDto>(createdClass);
         return createdClaseRespose;

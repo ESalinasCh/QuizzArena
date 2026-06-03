@@ -5,7 +5,7 @@ using QuizzArena.DocumentProcessing.Application.Ports.Out;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Services;
 
-public class BlobRepository(BlobServiceClient blobServiceClient) : IBlobRepository
+public class BlobRepository(BlobServiceClient blobServiceClient) : IStorageServiceRepository
 {
     public async Task<string> UploadFileAsync(Stream fileStream, string fileName, string containerName)
     {

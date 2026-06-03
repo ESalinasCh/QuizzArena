@@ -2,9 +2,9 @@
 
 namespace QuizzArena.DocumentProcessing.Application.Helpers;
 
-public static class SourceTypeResolver
+internal static class SourceTypeResolver
 {
-    public static SourceType Resolve(string fileName)
+    internal static SourceType Resolve(string fileName)
     {
         string extension =
             Path.GetExtension(fileName);

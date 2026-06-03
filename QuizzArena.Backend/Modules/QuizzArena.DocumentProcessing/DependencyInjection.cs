@@ -24,8 +24,7 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddDocumentProcessingModule(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddControllers()
-            .AddApplicationPart(typeof(IDocumentProcessingInfrastructureMarker).Assembly);
+        services.AddControllers().AddApplicationPart(typeof(IDocumentProcessingInfrastructureMarker).Assembly);
 
         services.AddScoped<IUploadSourceUseCase, UploadSourceUseCase>();
         services.AddScoped<UploadClassSourceRequestValidator>();
@@ -33,14 +32,12 @@ public static class DependencyInjection
 
         services.AddAutoMapper(cfg => { }, typeof(DependencyInjection).Assembly);
 
-
-        services.AddScoped<IBlobRepository, BlobRepository>();
+        services.AddScoped<IStorageServiceRepository, BlobRepository>();
         services.AddSingleton(provider =>
         {
             var storageConnectionString = configuration.GetConnectionString("AzureBlobStorage");
             return new BlobServiceClient(storageConnectionString);
         });
-
 
         services.AddHttpClient<ITranscriptionService, WhisperTranscription>(client =>
         {
@@ -49,10 +46,8 @@ public static class DependencyInjection
             client.Timeout = TimeSpan.FromMinutes(60);
         });
 
-
         services.AddMassTransit(x =>
         {
-
             x.AddSagaStateMachine<IngestionSaga, IngestionSagaState>()
                 .InMemoryRepository();
 
@@ -69,7 +64,6 @@ public static class DependencyInjection
                 cfg.ConfigureEndpoints(context);
             });
         });
-
 
         #region BDD
         var connectionString = configuration.GetConnectionString("DefaultConnection");

@@ -8,7 +8,7 @@ using static QuizzArena.DocumentProcessing.Application.Ports.Out.IDocumentChunkR
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Consumers;
 
 public class TranscriptionRequestConsumer(
-    IBlobRepository blobRepository,
+    IStorageServiceRepository storageServiceRepository,
     ITranscriptionService transcriptionService,
     IClassSourceRepository classSourceRepository
 ) : IConsumer<TranscriptionRequestCommand>
@@ -22,7 +22,7 @@ public class TranscriptionRequestConsumer(
             string transcribedText = await transcriptionService.TranscribeAudioAsync(command.FileUrl);
 
             string blobPath = $"class_{command.ClassSourceId}/transcription.txt";
-            string transcriptUrl = await blobRepository.UploadTextAsync(transcribedText, blobPath, "quiz-sources");
+            string transcriptUrl = await storageServiceRepository.UploadTextAsync(transcribedText, blobPath, "quiz-sources");
 
             ClassSource? classSource = await classSourceRepository.GetByIdAsync(command.ClassSourceId);
             if (classSource != null)
@@ -37,7 +37,7 @@ public class TranscriptionRequestConsumer(
                 TranscriptUrl = transcriptUrl
             });
         }
-        catch (Exception ex)
+        catch (HttpRequestException ex)
         {
             await context.Publish<TranscriptionFailedEvent>(new TranscriptionFailedEvent
             {

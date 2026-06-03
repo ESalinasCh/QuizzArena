@@ -7,12 +7,17 @@ namespace QuizzArena.DocumentProcessing.Application.Validators;
 public class UploadClassSourceRequestValidator : AbstractValidator<UploadClassSourceRequestDto>
 {
 
+    private const string Mp3Extension = ".mp3";
+    private const string Mp4Extension = ".mp4";
+    private const string WavExtension = ".wav";
+
     private static readonly string[] _allowedExtensions =
-[
-        ".mp3",
-        ".mp4",
-        ".wav"
-];
+    [
+        Mp3Extension,
+        Mp4Extension,
+        WavExtension
+    ];
+
     public UploadClassSourceRequestValidator()
     {
         RuleFor(x => x.Name)
