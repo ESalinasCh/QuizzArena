@@ -3,9 +3,9 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Host.Security;
 
-public static class AuthenticationMiddleware
+public static class JwtAuthenticationExtensions
 {
-    public static IServiceCollection AddAuthenticationConfiguration(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment env)
+    public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>

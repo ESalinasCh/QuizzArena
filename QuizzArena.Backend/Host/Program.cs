@@ -22,7 +22,7 @@ public class Program
             options.AssumeDefaultVersionWhenUnspecified = true;
         }).AddMvc();
 
-        builder.Services.AddAuthenticationConfiguration(builder.Configuration, builder.Environment);
+        builder.Services.AddJwtAuthentication(builder.Configuration);
 
         builder.Services.AddUsersModule(builder.Configuration);
         builder.Services.AddQuizzingModule(builder.Configuration);
