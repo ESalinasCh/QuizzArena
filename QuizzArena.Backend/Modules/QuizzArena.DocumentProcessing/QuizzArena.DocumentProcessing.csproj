@@ -12,7 +12,10 @@
 
 	<ItemGroup>
 	  <PackageReference Include="AutoMapper" Version="16.1.1" />
+	  <PackageReference Include="Azure.Storage.Blobs" Version="12.28.0" />
 	  <PackageReference Include="FluentValidation" Version="12.1.1" />
+	  <PackageReference Include="MassTransit" Version="8.3.7" />
+	  <PackageReference Include="MassTransit.RabbitMQ" Version="8.3.7" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.8">
 	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	    <PrivateAssets>all</PrivateAssets>

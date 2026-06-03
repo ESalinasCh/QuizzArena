@@ -2,7 +2,7 @@
 
 namespace QuizzArena.DocumentProcessing.Domain.Entities;
 
-internal class ProcessingJob
+public class ProcessingJob
 {
     public Guid Id { get; set; }
     public JobStatus Status { get; set; } = JobStatus.Pending;
