@@ -1,6 +1,5 @@
 ﻿using System.Text.Json.Serialization;
 using Host.Security;
-﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http.Features;
 using QuizzArena.DocumentProcessing;
 using QuizzArena.Quizzing;
