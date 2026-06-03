@@ -11,7 +11,6 @@ public class UserController(
     ILogInUserUseCase loginUseCase
 ) : ControllerBase
 {
-
     // Placeholders Endpoints
 
     [HttpPost]

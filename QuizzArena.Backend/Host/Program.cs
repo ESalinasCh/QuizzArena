@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Host.Security;
 using QuizzArena.DocumentProcessing;
 using QuizzArena.Quizzing;
 using QuizzArena.Users;
@@ -21,6 +22,8 @@ public class Program
             options.AssumeDefaultVersionWhenUnspecified = true;
         }).AddMvc();
 
+        builder.Services.AddJwtAuthentication(builder.Configuration);
+
         builder.Services.AddUsersModule(builder.Configuration);
         builder.Services.AddQuizzingModule(builder.Configuration);
         builder.Services.AddDocumentProcessingModule(builder.Configuration);
@@ -34,6 +37,10 @@ public class Program
         }
 
         app.UseHttpsRedirection();
+
+        app.UseAuthentication();
+
+        app.UseMiddleware<UserValidationMiddleware>();
 
         app.UseAuthorization();
 
