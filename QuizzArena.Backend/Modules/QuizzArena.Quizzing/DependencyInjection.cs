@@ -29,7 +29,6 @@ public static class DependencyInjection
         services.AddScoped<ISetAnswerUseCase, SetAnswerUseCase>();
         services.AddScoped<IAnswerRepository, SqlAnswerRepository>();
 
-        services.AddScoped<ICreateQuizUseCase, CreateQuizUseCase>();
         services.AddScoped<IUpdateQuizUseCase, UpdateQuizUseCase>();
         services.AddScoped<IDeleteQuizUseCase, DeleteQuizUseCase>();
         services.AddScoped<IQuizRepository, SqlQuizRepository>();
