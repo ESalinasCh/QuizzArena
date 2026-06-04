@@ -30,4 +30,11 @@
 	  <ProjectReference Include="..\..\Shared\Shared.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Application\Ports\In\" />
+	  <Folder Include="Application\Ports\Out\" />
+	  <Folder Include="Application\UseCases\" />
+	  <Folder Include="Infrastructure\Adapters\Out\Persistence\Repositories\" />
+	</ItemGroup>
+
 </Project>

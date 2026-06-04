@@ -2,19 +2,9 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
-using QuizzArena.Quizzing.Application.Ports.In.Answer;
-using QuizzArena.Quizzing.Application.Ports.In.Question;
-using QuizzArena.Quizzing.Application.Ports.In.Quiz;
-using QuizzArena.Quizzing.Application.Ports.In.QuizAttempt;
-using QuizzArena.Quizzing.Application.Ports.Out;
-using QuizzArena.Quizzing.Application.UseCases.Answer;
-using QuizzArena.Quizzing.Application.UseCases.Question;
-using QuizzArena.Quizzing.Application.UseCases.Quiz;
-using QuizzArena.Quizzing.Application.UseCases.QuizAttempt;
 using QuizzArena.Quizzing.Domain.Enums;
 using QuizzArena.Quizzing.Infrastructure.Adapters.In.Web;
 using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence;
-using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Repositories;
 using Shared.Contracts;
 
 namespace QuizzArena.Quizzing;
@@ -26,21 +16,6 @@ public static class DependencyInjection
         services.AddControllers()
             .AddApplicationPart(typeof(IQuizzingInfrastructureMarker).Assembly);
 
-        services.AddScoped<ISetAnswerUseCase, SetAnswerUseCase>();
-        services.AddScoped<IAnswerRepository, SqlAnswerRepository>();
-
-        services.AddScoped<IUpdateQuizUseCase, UpdateQuizUseCase>();
-        services.AddScoped<IDeleteQuizUseCase, DeleteQuizUseCase>();
-        services.AddScoped<IQuizRepository, SqlQuizRepository>();
-
-        services.AddScoped<ICreateQuestionUseCase, CreateQuestionUseCase>();
-        services.AddScoped<IUpdateQuestionUseCase, UpdateQuestionUseCase>();
-        services.AddScoped<IDeleteQuestionUseCase, DeleteQuestionUseCase>();
-        services.AddScoped<IQuestionRepository, SqlQuestionRepository>();
-
-        services.AddScoped<IStartQuizAttemptUseCase, StartQuizAttemptUseCase>();
-        services.AddScoped<IEndQuizAttemptUseCase, EndQuizAttemptUseCase>();
-        services.AddScoped<IQuizAttemptRepository, SqlQuizAttemptRepository>();
 
         #region BDD
         var connectionString = configuration.GetConnectionString("DefaultConnection");
