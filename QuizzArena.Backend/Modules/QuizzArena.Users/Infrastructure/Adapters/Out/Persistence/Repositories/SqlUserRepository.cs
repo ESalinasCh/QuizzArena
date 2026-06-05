@@ -6,10 +6,6 @@ namespace QuizzArena.Users.Infrastructure.Adapters.Out.Persistence.Repositories;
 
 internal class SqlUserRepository(UserDbContext context) : IUserRepository
 {
-    public async Task<User> GetById(Guid id)
-    {
-        return new User();
-    }
     public async Task<bool> ExistsAsync(string providerId)
     {
         return await context.Users.AnyAsync(user => user.ProviderId == providerId);
@@ -19,11 +15,5 @@ internal class SqlUserRepository(UserDbContext context) : IUserRepository
     {
         context.Users.Add(user);
         await context.SaveChangesAsync();
-    }
-
-    public async Task Delete(Guid id)
-    {
-        //throw new NotImplementedException();
-        return;
     }
 }

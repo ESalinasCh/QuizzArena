@@ -8,9 +8,7 @@ public class SqlClassSourceRepository(DocumentProcessingDbContext context) : ICl
     public async Task<ClassSource> CreateAsync(ClassSource classSource)
     {
         context.ClassSource.Add(classSource);
-
         await context.SaveChangesAsync();
-
         return classSource;
     }
 
