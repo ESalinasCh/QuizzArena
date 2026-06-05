@@ -54,9 +54,9 @@ public class Program
 
         app.UseAuthentication();
 
-        app.UseMiddleware<UserValidationMiddleware>();
-
         app.UseAuthorization();
+
+        app.UseMiddleware<UserValidationMiddleware>();
 
         app.MapControllers();
 

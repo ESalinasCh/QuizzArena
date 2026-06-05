@@ -14,20 +14,12 @@ public static class ClaimUserExtensions
 
     public static UserRole GetClaimRole(this ClaimsPrincipal user)
     {
-        string? realmAccess = user.GetClaim("realm_access");
-
-        if (string.IsNullOrWhiteSpace(realmAccess))
+        foreach (UserRole role in Enum.GetValues<UserRole>())
         {
-            throw new InvalidOperationException("realm_access claim not found");
-        }
-        JsonDocument json = JsonDocument.Parse(realmAccess);
-        JsonElement.ArrayEnumerator roles = json.RootElement.GetProperty("roles").EnumerateArray();
-        foreach (JsonElement roleElement in roles)
-        {
-            string? role = roleElement.GetString();
-            if (Enum.TryParse<UserRole>(role, ignoreCase: true, out var parsedRole))
+            string roleName = role.ToString().ToLowerInvariant();
+            if (user.IsInRole(roleName))
             {
-                return parsedRole;
+                return role;
             }
         }
         throw new InvalidOperationException("No valid role found");
