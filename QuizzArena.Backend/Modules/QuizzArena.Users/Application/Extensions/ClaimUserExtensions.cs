@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using System.Text.Json;
 using QuizzArena.Users.Application.DTOs.User;
 using QuizzArena.Users.Domain.Enums;
 
