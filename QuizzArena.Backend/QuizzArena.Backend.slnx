@@ -3,9 +3,12 @@
     <Project Path="Host/Host.csproj" />
   </Folder>
   <Folder Name="/Modules/">
+    <Project Path="Modules/QuizzArena.DocumentProcessing/QuizzArena.DocumentProcessing.csproj" />
     <Project Path="Modules/QuizzArena.Quizzing/QuizzArena.Quizzing.csproj" />
     <Project Path="Modules/QuizzArena.Users/QuizzArena.Users.csproj" />
-    <Project Path="Modules/QuizzArena.DocumentProcessing/QuizzArena.DocumentProcessing.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="QuizzArena.DocumentProcessing.Tests/QuizzArena.DocumentProcessing.Tests.csproj" Id="d7ebb274-8728-41af-833e-45959e8c14ca" />
   </Folder>
   <Project Path="Shared/Shared.csproj" />
 </Solution>
