@@ -8,7 +8,7 @@ public class Question
     public string Content { get; set; } = string.Empty;
     public string Justification { get; set; } = string.Empty;
     public QuestionStatus Status { get; set; } = QuestionStatus.Draft;
-    public bool WasModified { get; set; }
+    public QuestionOrigin Origin { get; set; } = QuestionOrigin.AiGenerated;
     public QuestionType Type { get; set; }
     public bool Deleted { get; set; }
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;

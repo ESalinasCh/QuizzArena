@@ -49,6 +49,9 @@ public static class DependencyInjection
         dataSourceBuilder.MapEnum<QuestionType>($"{QuizzingConstants.Schema}.question_type");
         dataSourceBuilder.MapEnum<QuizAttemptStatus>($"{QuizzingConstants.Schema}.quiz_attempt_status");
         dataSourceBuilder.MapEnum<QuizStatus>($"{QuizzingConstants.Schema}.quiz_status");
+        dataSourceBuilder.MapEnum<QuizOrigin>($"{QuizzingConstants.Schema}.quiz_origin");
+        dataSourceBuilder.MapEnum<QuestionOrigin>($"{QuizzingConstants.Schema}.question_origin");
+
 
         var dataSource = dataSourceBuilder.Build();
 
@@ -79,6 +82,14 @@ public static class DependencyInjection
                             );
                         o.MapEnum<QuizStatus>(
                             "quiz_status",
+                            QuizzingConstants.Schema
+                            );
+                        o.MapEnum<QuizOrigin>(
+                            "quiz_origin",
+                            QuizzingConstants.Schema
+                            );
+                        o.MapEnum<QuestionOrigin>(
+                            "question_origin",
                             QuizzingConstants.Schema
                             );
                     }

@@ -20,7 +20,6 @@ internal class QuestionSeeder
             Content = "What is 2+2?",
             Justification = "The sum of 2 and 2 is 4.",
             Status = QuestionStatus.Verified,
-            WasModified = false,
             Type = QuestionType.SingleChoice,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
