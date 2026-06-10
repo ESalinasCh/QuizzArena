@@ -16,9 +16,9 @@ QuizzArena is a single-deployable modular monolith with solid dependency managem
 | 2 | Dependencies | ✅ Compliant | Pinned NuGet refs, centralized props, local tool manifest |
 | 3 | Config | ❌ Non-compliant | Secrets committed; RabbitMQ/Whisper endpoints hard-coded |
 | 4 | Backing services | 🟡 Partial | Treated as attached resources, but several not config-bound |
-| 5 | Build, release, run | 🟡 Partial | CI builds/tests; no app Dockerfile, no release stage |
+| 5 | Build, release, run | ✅ Compliant | CI publishes artifact + Docker image to GHCR |
 | 6 | Processes | ❌ Non-compliant | In-memory saga repository holds state |
-| 7 | Port binding | 🟡 Partial | Relies on dev `launchSettings`; no prod port config |
+| 7 | Port binding | ✅ Compliant | Kestrel in container binds 8080 via `ASPNETCORE_HTTP_PORTS` |
 | 8 | Concurrency | 🟡 Partial | MassTransit consumers in-process, not independently scalable |
 | 9 | Disposability | ❌ Non-compliant | No graceful shutdown; `async void` initializer |
 | 10 | Dev/prod parity | 🟡 Partial | Dev and prod settings near-identical; migrations dev-only |
@@ -75,17 +75,16 @@ Backing services should be attached resources, swappable via config.
 Recommendations:
 - Bind RabbitMQ and Whisper endpoints to configuration so each resource can be swapped purely through environment changes.
 
-## V. Build, Release, Run — 🟡 Partial
+## V. Build, Release, Run — ✅ Compliant
 
-These three stages should be strictly separated.
+These three stages are now strictly separated.
 
-- CI (`.github/workflows/build.yml`) cleanly restores, builds, verifies formatting (`dotnet format --verify-no-changes`), and runs tests. The build stage is solid.
-- There is no Dockerfile for the `Host` app — only `docker-compose.yml` for backing services. The application itself is not containerized, so there is no immutable release artifact and no clean separation between release and run.
-- `scripts/init.sql` only enables the pgvector extension as Postgres init.
+- **Build:** CI restores, compiles, verifies formatting (`dotnet format --verify-no-changes`), and runs tests. A `dotnet publish` step produces a Release artifact uploaded to GitHub Actions.
+- **Release:** The `docker` job builds an immutable image from the repo and pushes it to GitHub Container Registry (`ghcr.io`) tagged with the branch name, short SHA, and `latest` on the default branch. The `docker` job only runs on `push` (not PRs), so pull requests validate without publishing.
+- **Run:** The image is self-contained (`aspnet:10.0` runtime, non-root user, port 8080). The same image is promoted across environments by changing environment variables — no rebuilds.
+- `scripts/init.sql` runs as a Postgres init script for the pgvector extension.
 
-Recommendations:
-- Add a Dockerfile for the `Host` app to produce an immutable release image; promote the same image across environments using config.
-- Add a publish/release stage to CI so the run stage consumes a built artifact rather than source.
+Previously: CI only built and tested; there was no Dockerfile for the app, no publish step, and no Docker image stage.
 
 ## VI. Processes — ❌ Non-compliant
 
@@ -99,13 +98,14 @@ Recommendations:
 
 ## VII. Port Binding — 🟡 Partial
 
-The app should export services via port binding and be self-contained.
+## VII. Port Binding — ✅ Compliant
 
-- `Host/Program.cs` uses the default `WebApplication` host and `app.Run()` with no explicit URL/port binding.
-- Ports come from `Host/Properties/launchSettings.json` (http `5245`, https `64387`), which is a development-only file. There is no `ASPNETCORE_URLS` or Kestrel configuration for production.
+The app is self-contained and exports its service via port binding.
 
-Recommendations:
-- Configure the listening port via `ASPNETCORE_URLS` (environment) for production rather than relying on `launchSettings.json`.
+- The Docker container sets `ASPNETCORE_HTTP_PORTS=8080` (in `docker-compose.yml`), so Kestrel binds port 8080 through an environment variable rather than a dev-only file.
+- `Host/Properties/launchSettings.json` still defines ports `5245`/`64387` for local development (`dotnet run`), which is appropriate — `launchSettings.json` is dev tooling only and is not shipped in the image.
+
+Previously: the app relied on `launchSettings.json` for port config with no production override.
 
 ## VIII. Concurrency — 🟡 Partial
 
@@ -166,9 +166,15 @@ Recommendations:
 
 ## Priority Recommendations
 
-1. Remove committed secrets from `appsettings*.json` and bind config (DB, RabbitMQ, Whisper, Keycloak) from environment variables. (Factor III)
-2. Replace the in-memory saga repository with a durable, shared store. (Factors VI, VIII)
-3. Add structured logging and replace `Console.WriteLine` with `ILogger`. (Factor XI)
-4. Add a Dockerfile and a release stage; configure port binding via `ASPNETCORE_URLS`. (Factors V, VII)
-5. Make initializers awaitable and add graceful shutdown with cancellation handling. (Factor IX)
-6. Decouple migrations/seeding from web startup and apply them consistently across environments. (Factors X, XII)
+Resolved since the initial assessment:
+- ✅ Added a Dockerfile (multi-stage, non-root) and wired the app into `docker-compose.yml` with all backing services config-driven. (Factors V, VII)
+- ✅ CI now publishes a `dotnet publish` artifact and builds/pushes a Docker image to GHCR on every push to `main`/`develop`. (Factor V)
+- ✅ Port binding via `ASPNETCORE_HTTP_PORTS=8080` set in the container environment. (Factor VII)
+- ✅ RabbitMQ host/credentials read from `IConfiguration` (`RabbitMq:Host`, `RabbitMq:Username`, `RabbitMq:Password`). (Factors III, IV)
+
+Remaining:
+1. Remove committed secrets from `appsettings*.json`; bind all config (DB, Whisper, Keycloak) from environment variables. (Factor III)
+2. Replace the in-memory saga repository with a durable store (EF Core/Postgres or Redis). (Factors VI, VIII)
+3. Add structured logging (Serilog) and replace `Console.WriteLine` with `ILogger<T>`. (Factor XI)
+4. Make initializers awaitable (`async Task`); honor cancellation tokens in consumers; add graceful shutdown hooks. (Factor IX)
+5. Decouple migrations/seeding from web startup; run them as a pre-deploy job applied consistently across environments. (Factors X, XII)
