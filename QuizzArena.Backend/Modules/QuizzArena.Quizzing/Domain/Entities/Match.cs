@@ -12,6 +12,11 @@ internal class Match
     public MatchMode Mode { get; set; }
     public int TimeMinutes { get; set; }
 
+    public int? QuestionsAmount { get; set; }
+    public int AttemptsAmount { get; set; } = 1;
+    public bool ShuffleQuestion { get; set; }
+    public bool ShuffleOptions { get; set; }
+
     public bool Deleted { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }

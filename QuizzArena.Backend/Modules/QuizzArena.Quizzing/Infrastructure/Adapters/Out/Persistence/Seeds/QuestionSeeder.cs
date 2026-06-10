@@ -19,7 +19,6 @@ internal class QuestionSeeder
             Id = QuizzingConstants.QuestionId,
             Content = "What is 2+2?",
             Status = QuestionStatus.Verified,
-            WasModified = false,
             Type = QuestionType.SingleChoice,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow

@@ -8,6 +8,8 @@ public class Quiz
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public QuizStatus Status { get; set; } = QuizStatus.draft;
+    public QuizOrigin Origin { get; set; } = QuizOrigin.AiGenerated;
+
     public bool Deleted { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
