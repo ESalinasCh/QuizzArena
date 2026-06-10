@@ -55,10 +55,15 @@ public static class DependencyInjection
 
             x.UsingRabbitMq((context, cfg) =>
             {
-                cfg.Host("localhost", "/", h =>
+                var rabbitHost = configuration["RabbitMq:Host"] ?? "localhost";
+                var rabbitVirtualHost = configuration["RabbitMq:VirtualHost"] ?? "/";
+                var rabbitUsername = configuration["RabbitMq:Username"] ?? "guest";
+                var rabbitPassword = configuration["RabbitMq:Password"] ?? "guest";
+
+                cfg.Host(rabbitHost, rabbitVirtualHost, h =>
                 {
-                    h.Username("guest");
-                    h.Password("guest");
+                    h.Username(rabbitUsername);
+                    h.Password(rabbitPassword);
                 });
 
                 cfg.ConfigureEndpoints(context);
