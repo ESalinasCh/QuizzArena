@@ -10,6 +10,8 @@
 		<PackageReference Include="Asp.Versioning.Mvc" Version="10.0.0" />
 		<PackageReference Include="AutoMapper" Version="16.1.1" />
 		<PackageReference Include="FluentValidation" Version="12.1.1" />
+		<PackageReference Include="MassTransit" Version="9.1.2" />
+		<PackageReference Include="MassTransit.RabbitMQ" Version="9.1.2" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.8" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.8">
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -28,13 +30,6 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\..\Shared\Shared.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Application\Ports\In\" />
-	  <Folder Include="Application\Ports\Out\" />
-	  <Folder Include="Application\UseCases\" />
-	  <Folder Include="Infrastructure\Adapters\Out\Persistence\Repositories\" />
 	</ItemGroup>
 
 </Project>

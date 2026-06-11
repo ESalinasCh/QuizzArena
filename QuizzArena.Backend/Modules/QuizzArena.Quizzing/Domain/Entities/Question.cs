@@ -10,8 +10,8 @@ public class Question
     public bool WasModified { get; set; }
     public QuestionType Type { get; set; }
     public bool Deleted { get; set; }
-    public DateTimeOffset CreatedAt { get; set; }
-    public DateTimeOffset UpdatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
     public DateTimeOffset? DeletedAt { get; set; }
 
     public Guid? ProcessingJobId { get; set; }
