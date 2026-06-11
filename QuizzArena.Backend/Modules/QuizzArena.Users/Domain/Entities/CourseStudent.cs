@@ -1,6 +1,6 @@
 ﻿namespace QuizzArena.Users.Domain.Entities;
 
-internal class CourseStudent
+public class CourseStudent
 {
     public Guid Id { get; set; }
     public Guid StudentId { get; set; }
