@@ -1,4 +1,3 @@
-﻿
 using AutoMapper;
 using FluentValidation;
 using QuizzArena.Quizzing.Application.DTOs.SubmitAnswers;
