@@ -14,4 +14,12 @@ internal class SqlCourseQueriesRepository(UserDbContext context) : ICourseQuerie
 
         return courses;
     }
+    public async Task<List<Course>> GetCoursesByIds(List<Guid> coursesIds)
+    {
+        List<Course> courses = await context.Courses.Where(x=>
+            coursesIds.Contains(x.Id)
+       ).ToListAsync();
+
+        return courses;
+    }
 }
