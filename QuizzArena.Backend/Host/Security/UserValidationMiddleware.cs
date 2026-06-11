@@ -16,32 +16,41 @@ public class UserValidationMiddleware
 
     public async Task InvokeAsync(HttpContext context, IUserUseCase userUseCase)
     {
-        Endpoint? endpoint = context.GetEndpoint();
-        bool hasAuthorize = endpoint?.Metadata.GetMetadata<IAuthorizeData>() != null;
-        if (!hasAuthorize)
+        try
         {
-            await _next(context);
-            return;
-        }
-
-        AuthorizeAttribute? authorize = endpoint?.Metadata.GetMetadata<AuthorizeAttribute>();
-        if (authorize is not null && context.User.Identity?.IsAuthenticated == true)
-        {
-            string? sub = context.User.FindFirst("sub")?.Value;
-            if (sub is null)
+            Endpoint? endpoint = context.GetEndpoint();
+            bool hasAuthorize = endpoint?.Metadata.GetMetadata<IAuthorizeData>() != null;
+            if (!hasAuthorize)
             {
-                context.Response.StatusCode = 401;
+                await _next(context);
                 return;
             }
-            bool exists = await userUseCase.ExistsAsync(sub);
-            if (!exists)
-            {
-                CreateUserDto userToCreate = context.User.ToCreateUserDto();
-                UserDto newUser = await userUseCase.Register(userToCreate);
-                Console.WriteLine(newUser);
-            }
-        }
 
-        await _next(context);
+            AuthorizeAttribute? authorize = endpoint?.Metadata.GetMetadata<AuthorizeAttribute>();
+            if (authorize is not null && context.User.Identity?.IsAuthenticated == true)
+            {
+                string? sub = context.User.FindFirst("sub")?.Value;
+                if (sub is null)
+                {
+                    context.Response.StatusCode = 401;
+                    return;
+                }
+                bool exists = await userUseCase.ExistsAsync(sub);
+                if (!exists)
+                {
+                    CreateUserDto userToCreate = context.User.ToCreateUserDto();
+                    UserDto newUser = await userUseCase.Register(userToCreate);
+                    Console.WriteLine(newUser);
+                }
+            }
+
+            await _next(context);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in UserValidationMiddleware: {ex.Message}");
+            context.Response.StatusCode = 500;
+            return;
+        }
     }
 }

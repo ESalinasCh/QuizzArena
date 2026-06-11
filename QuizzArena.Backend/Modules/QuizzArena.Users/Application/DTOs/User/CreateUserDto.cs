@@ -2,4 +2,5 @@
 
 public class CreateUserDto : BaseUserDto
 {
+    public Guid Id { get; set; }
 }
