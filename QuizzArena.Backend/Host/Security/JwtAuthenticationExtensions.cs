@@ -20,6 +20,7 @@ public static class JwtAuthenticationExtensions
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
+                    RoleClaimType = "roles"
                 };
             });
         services.AddAuthorization();

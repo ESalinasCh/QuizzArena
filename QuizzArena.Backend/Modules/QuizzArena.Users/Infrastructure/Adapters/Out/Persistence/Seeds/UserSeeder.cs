@@ -25,7 +25,7 @@ internal class UserSeeder
             Email = "teacher@test.com",
             Role = UserRole.Teacher,
             ExternalProvider = "Keycloak",
-            ProviderId = UserConstants.ProviderTeacherId.ToString(),
+            ProviderId = UserConstants.TeacherId.ToString(),
             CreatedAt = DateTime.UtcNow
         };
 
@@ -40,7 +40,7 @@ internal class UserSeeder
             Email = "user@test.com",
             Role = UserRole.Student,
             ExternalProvider = "Keycloak",
-            ProviderId = UserConstants.ProviderStudentId.ToString(),
+            ProviderId = UserConstants.StudentId.ToString(),
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };

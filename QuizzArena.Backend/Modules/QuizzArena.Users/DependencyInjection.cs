@@ -28,6 +28,9 @@ public static class DependencyInjection
 
         services.AddScoped<UserUseCase>();
         services.AddScoped<IUserUseCase>(sp => sp.GetRequiredService<UserUseCase>());
+        services.AddHttpContextAccessor();
+
+        services.AddScoped<ICurrentUser, CurrentUserUseCase>();
 
         #region BDD
         var connectionString = configuration.GetConnectionString("DefaultConnection");
