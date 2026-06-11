@@ -7,6 +7,7 @@ using QuizzArena.Users.Application.Ports.Out;
 using QuizzArena.Users.Application.UseCases.User;
 using QuizzArena.Users.Application.Validators;
 using QuizzArena.Users.Domain.Enums;
+using QuizzArena.Users.Infrastructure.Adapters.In.ExternalServices;
 using QuizzArena.Users.Infrastructure.Adapters.In.Web;
 using QuizzArena.Users.Infrastructure.Adapters.Out.Persistence;
 using QuizzArena.Users.Infrastructure.Adapters.Out.Persistence.Repositories;
@@ -25,6 +26,9 @@ public static class DependencyInjection
         services.AddAutoMapper(cfg => { }, typeof(DependencyInjection).Assembly);
 
         services.AddScoped<IUserRepository, SqlUserRepository>();
+        services.AddScoped<IUserQueriesRepository, SqlUserQueriesRepository>();
+        services.AddScoped<ICourseQueriesRepository, SqlCourseQueriesRepository>();
+        services.AddScoped<ICourseContract, CourseContractImpl>();
 
         services.AddScoped<UserUseCase>();
         services.AddScoped<IUserUseCase>(sp => sp.GetRequiredService<UserUseCase>());
