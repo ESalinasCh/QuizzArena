@@ -43,18 +43,18 @@ internal class GenerateQuizConsumer(
             }
 
             await context.Publish(new QuizGenerationCompletedEvent
-                {
-                    ClassSourceId = context.Message.ClassSourceId
-                });
+            {
+                ClassSourceId = context.Message.ClassSourceId
+            });
         }
         catch (Exception ex)
         {
             await context.Publish(new QuizGenerationFailedEvent
-                {
-                    ClassSourceId = context.Message.ClassSourceId,
+            {
+                ClassSourceId = context.Message.ClassSourceId,
 
-                    Reason = ex.Message
-                });
+                Reason = ex.Message
+            });
 
             throw;
         }

@@ -14,6 +14,6 @@ internal class SqlQuizRepository(QuizzingDbContext context) : IQuizRepository
     {
         context.Quizzes.Add(quiz);
         await context.SaveChangesAsync();
-        return quiz;    
+        return quiz;
     }
 }
