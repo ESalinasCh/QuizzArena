@@ -10,13 +10,15 @@ internal class CourseContractImpl(
     IUserQueriesRepository userQuerysRepository
 ) : ICourseContract
 {
-    public async Task<List<CourseSummaryDTO>> GetCoursesByStudent(Guid studentId){
+    public async Task<List<CourseSummaryDTO>> GetCoursesByStudent(Guid studentId)
+    {
 
         List<Course> courses = await courseQuerysRepository.GetCoursesByUserId(studentId);
         List<Guid> teacherIds = courses.Select(x => x.TeacherId).ToList();
-        List<User> users = await  userQuerysRepository.GetByIds(teacherIds);
+        List<User> users = await userQuerysRepository.GetByIds(teacherIds);
 
-        List<CourseSummaryDTO> courseSummaries = courses.Select(x => {
+        List<CourseSummaryDTO> courseSummaries = courses.Select(x =>
+        {
             User user = users.First(y => y.Id == x.TeacherId);
             return new CourseSummaryDTO()
             {
