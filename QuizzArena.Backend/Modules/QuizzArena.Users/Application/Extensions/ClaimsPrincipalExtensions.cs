@@ -14,7 +14,7 @@ public static class ClaimsPrincipalExtensions
     {
         return user.GetClaim(ClaimTypes.Sub);
     }
-    
+
     public static UserRole GetClaimRole(this ClaimsPrincipal user)
     {
         foreach (UserRole role in Enum.GetValues<UserRole>())

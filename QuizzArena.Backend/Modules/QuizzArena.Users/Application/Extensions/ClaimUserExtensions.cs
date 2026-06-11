@@ -1,6 +1,5 @@
 ﻿using System.Security.Claims;
 using QuizzArena.Users.Application.DTOs.User;
-using QuizzArena.Users.Domain.Enums;
 
 namespace QuizzArena.Users.Application.Extensions;
 
