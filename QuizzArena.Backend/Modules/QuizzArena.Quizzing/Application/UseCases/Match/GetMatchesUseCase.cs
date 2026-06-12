@@ -19,7 +19,8 @@ public class GetMatchesUseCase(
         List<CourseSummaryDTO> courses = await courseImpl.GetCoursesByStudent(Guid.Parse(userId));
         List<Match> matches = await matchRepository.GetMatchesAsync(courses.Select(c => c.Id).ToList(), query);
 
-        List<MatchResponseDto> matchesDtos = matches.Select(m => {
+        List<MatchResponseDto> matchesDtos = matches.Select(m =>
+        {
             CourseSummaryDTO course = courses.First(c => c.Id == m.CourseId);
             return new MatchResponseDto()
             {
