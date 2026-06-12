@@ -4,7 +4,7 @@ using QuizzArena.Quizzing.Domain.Enums;
 
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence;
 
-internal class QuizzingDbContext : DbContext
+public class QuizzingDbContext : DbContext
 {
     public QuizzingDbContext(DbContextOptions<QuizzingDbContext> options) : base(options)
     {
