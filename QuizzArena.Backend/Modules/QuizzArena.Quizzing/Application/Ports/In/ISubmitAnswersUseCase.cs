@@ -5,5 +5,5 @@ namespace QuizzArena.Quizzing.Application.Ports.In;
 
 public interface ISubmitAnswersUseCase
 {
-    public Task<SubmitAnswersResponseDto> Execute(SubmitAnswersRequestDto dto);
+    public Task<SubmitAnswersResponseDto> Execute(Guid matchAttemptId, SubmitAnswersRequestDto dto);
 }

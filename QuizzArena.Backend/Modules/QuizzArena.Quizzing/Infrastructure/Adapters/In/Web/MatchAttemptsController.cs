@@ -12,9 +12,11 @@ public class MatchAttemptsController(
 ) : ControllerBase
 {
     [HttpPost]
-    public async Task<ActionResult<SubmitAnswersResponseDto>> SubmitAnswers(SubmitAnswersRequestDto dto)
+    public async Task<ActionResult<SubmitAnswersResponseDto>> SubmitAnswers(
+        [FromRoute(Name = "attempt-id")] Guid matchAttemptId,
+        [FromBody] SubmitAnswersRequestDto dto)
     {
-        SubmitAnswersResponseDto response = await submitAnswersUseCase.Execute(dto);
+        SubmitAnswersResponseDto response = await submitAnswersUseCase.Execute(matchAttemptId, dto);
         return Ok(response);
     }
 }
