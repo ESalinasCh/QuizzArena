@@ -39,4 +39,3 @@ internal class SqlMatchAttemptRepository(QuizzingDbContext context) : IMatchAtte
         return matchAttempt;
     }
 }
-
