@@ -2,9 +2,13 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
+using QuizzArena.Quizzing.Application.Ports.In;
+using QuizzArena.Quizzing.Application.Ports.Out;
+using QuizzArena.Quizzing.Application.UseCases;
 using QuizzArena.Quizzing.Domain.Enums;
 using QuizzArena.Quizzing.Infrastructure.Adapters.In.Web;
 using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence;
+using QuizzArena.Users.Infrastructure.Adapters.Out.Persistence.Repositories;
 using Shared.Contracts;
 
 namespace QuizzArena.Quizzing;
@@ -16,6 +20,10 @@ public static class DependencyInjection
         services.AddControllers()
             .AddApplicationPart(typeof(IQuizzingInfrastructureMarker).Assembly);
 
+        services.AddAutoMapper(cfg => { }, typeof(DependencyInjection).Assembly);
+
+        services.AddScoped<IGetMatchesUseCase, GetMatchesUseCase>();
+        services.AddScoped<IMatchRepository, SqlMatchRepository>();
 
         #region BDD
         var connectionString = configuration.GetConnectionString("DefaultConnection");
