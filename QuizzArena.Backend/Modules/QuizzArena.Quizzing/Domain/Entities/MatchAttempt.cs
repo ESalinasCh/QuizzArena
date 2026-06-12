@@ -5,7 +5,7 @@ namespace QuizzArena.Quizzing.Domain.Entities;
 public class MatchAttempt
 {
     public Guid Id { get; set; }
-    public DateTimeOffset StartDateTime { get; set; } 
+    public DateTimeOffset StartDateTime { get; set; }
     public DateTimeOffset? EndDateTime { get; set; }
     public DateTimeOffset JoinedAt { get; set; }
     public string Nickname { get; set; } = string.Empty;
