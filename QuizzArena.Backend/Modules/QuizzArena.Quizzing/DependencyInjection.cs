@@ -12,6 +12,11 @@ using QuizzArena.Quizzing.Domain.Enums;
 using QuizzArena.Quizzing.Infrastructure.Adapters.In.Web;
 using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence;
 using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Repositories;
+using QuizzArena.Quizzing.Application.UseCases;
+using QuizzArena.Quizzing.Domain.Enums;
+using QuizzArena.Quizzing.Infrastructure.Adapters.In.Web;
+using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence;
+using QuizzArena.Users.Infrastructure.Adapters.Out.Persistence.Repositories;
 using Shared.Contracts;
 
 namespace QuizzArena.Quizzing;
@@ -28,7 +33,6 @@ public static class DependencyInjection
         services.AddScoped<CreateQuestionsDtoValidator>();
         services.AddScoped<CreateOptionDtoValidator>();
         services.AddScoped<CreateOptionsDtoValidator>();
-        services.AddAutoMapper(cfg => { }, typeof(DependencyInjection).Assembly);
 
         services.AddScoped<ICreateQuizUseCase, CreateQuizUseCase>();
         services.AddScoped<ICreateQuestionsUseCase, CreateQuestionsUseCase>();
@@ -37,6 +41,10 @@ public static class DependencyInjection
         services.AddScoped<IQuestionRepository, SqlQuestionRepository>();
         services.AddScoped<IOptionRepository, SqlOptionRepository>();
         services.AddScoped<IQuizQuestionRepository, SqlQuizQuestionRepository>();
+        services.AddAutoMapper(cfg => { }, typeof(DependencyInjection).Assembly);
+
+        services.AddScoped<IGetMatchesUseCase, GetMatchesUseCase>();
+        services.AddScoped<IMatchRepository, SqlMatchRepository>();
 
         #region BDD
         var connectionString = configuration.GetConnectionString("DefaultConnection");
