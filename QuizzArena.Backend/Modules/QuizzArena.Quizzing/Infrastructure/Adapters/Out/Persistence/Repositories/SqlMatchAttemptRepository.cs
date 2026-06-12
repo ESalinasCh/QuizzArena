@@ -1,5 +1,3 @@
-﻿using Microsoft.EntityFrameworkCore;
-using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using Microsoft.EntityFrameworkCore;
 using QuizzArena.Quizzing.Application.Ports.Out;
 using QuizzArena.Quizzing.Domain.Entities;
@@ -41,3 +39,4 @@ internal class SqlMatchAttemptRepository(QuizzingDbContext context) : IMatchAtte
         return matchAttempt;
     }
 }
+
