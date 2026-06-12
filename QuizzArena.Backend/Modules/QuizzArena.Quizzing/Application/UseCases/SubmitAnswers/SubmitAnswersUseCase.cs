@@ -70,9 +70,9 @@ public class SubmitAnswersUseCase(
             CorrectCount = correctCount,
             IncorrectCount = incorrectCount,
             TotalQuestions = totalQuestions,
-Questions =
+            Questions =
             {
-                
+
             }
         };
 

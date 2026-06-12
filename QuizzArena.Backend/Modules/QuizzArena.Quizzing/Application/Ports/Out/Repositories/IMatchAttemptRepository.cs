@@ -1,4 +1,4 @@
-using QuizzArena.Quizzing.Domain.Entities;
+﻿using QuizzArena.Quizzing.Domain.Entities;
 
 namespace QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 
