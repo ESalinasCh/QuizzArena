@@ -1,0 +1,32 @@
+{
+  "Title": "Math Quiz",
+  "Description": "Generated quiz",
+  "Questions": [
+    {
+      "Content": "What is 2 + 2?",
+      "Type": "MultipleChoice",
+      "Options": [
+        {
+          "Description": "3",
+          "Position": 1,
+          "isCorrect": false
+        },
+        {
+          "Description": "4",
+          "Position": 2,
+          "IsCorrect": true
+        },
+        {
+          "Description": "5",
+          "Position": 3,
+          "IsCorrect": false
+        },
+        {
+          "Description": "Pato",
+          "Position": 4,
+          "IsCorrect": false
+        }
+      ]
+    }
+  ]
+}

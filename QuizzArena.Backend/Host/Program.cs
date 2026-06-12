@@ -1,8 +1,11 @@
 ﻿using System.Text.Json.Serialization;
 using Host.Security;
+using MassTransit;
 using Microsoft.AspNetCore.Http.Features;
 using QuizzArena.DocumentProcessing;
+using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Messaging.Configuration;
 using QuizzArena.Quizzing;
+using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Messaging.Configuration;
 using QuizzArena.Users;
 
 namespace Host;
@@ -39,6 +42,28 @@ public class Program
                 options.MultipartBodyLengthLimit = long.MaxValue;
                 options.ValueLengthLimit = int.MaxValue;
             });
+
+        builder.Services.AddMassTransit(x =>
+        {
+            DocumentProcessingMassTransit.AddConsumers(x);
+
+            QuizzingMassTransit.AddConsumers(x);
+
+            x.UsingRabbitMq((context, cfg) =>
+            {
+                cfg.Host(
+                    "localhost",
+                    "/",
+                    h =>
+                    {
+                        h.Username("guest");
+                        h.Password("guest");
+                    });
+
+                cfg.ConfigureEndpoints(
+                    context);
+            });
+        });
 
         WebApplication app = builder.Build();
 
