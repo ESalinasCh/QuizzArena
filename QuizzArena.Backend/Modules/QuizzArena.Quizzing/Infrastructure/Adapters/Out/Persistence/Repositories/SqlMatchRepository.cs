@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using QuizzArena.Quizzing.Application.DTOs;
+using QuizzArena.Quizzing.Application.DTOs.Match;
 using QuizzArena.Quizzing.Application.Ports.Out;
 using QuizzArena.Quizzing.Domain.Entities;
 using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence;
@@ -8,9 +8,19 @@ namespace QuizzArena.Users.Infrastructure.Adapters.Out.Persistence.Repositories;
 
 internal class SqlMatchRepository(QuizzingDbContext context) : IMatchRepository
 {
-    public async Task<List<Match>> GetMatchesAsync(List<Guid> courseIds, MatchQueryParametersDto query)
+    public async Task<Match?> GetMatchByIdAsync(Guid matchId)
+    {
+        return await context.Matches.FindAsync(matchId);
+    }
+
+    public async Task<List<Match>> GetMatchesAsync(List<Guid> courseIds, MatchQueryParametersDto? query = null)
     {
         IQueryable<Match> q = context.Matches.Where(m => courseIds.Contains(m.CourseId));
+
+        if (query == null)
+        {
+            return await q.ToListAsync();
+        }
 
         if (query.Code != null)
         {
@@ -37,7 +47,6 @@ internal class SqlMatchRepository(QuizzingDbContext context) : IMatchRepository
             q = q.Where(m => m.QuizId == query.QuizId);
         }
 
-        List<Match> matches = await q.ToListAsync();
-        return matches;
+        return await q.ToListAsync();
     }
 }

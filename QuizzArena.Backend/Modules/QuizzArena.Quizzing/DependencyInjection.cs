@@ -8,6 +8,7 @@ using QuizzArena.Quizzing.Application.UseCases;
 using QuizzArena.Quizzing.Domain.Enums;
 using QuizzArena.Quizzing.Infrastructure.Adapters.In.Web;
 using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence;
+using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Repositories;
 using QuizzArena.Users.Infrastructure.Adapters.Out.Persistence.Repositories;
 using Shared.Contracts;
 
@@ -23,7 +24,12 @@ public static class DependencyInjection
         services.AddAutoMapper(cfg => { }, typeof(DependencyInjection).Assembly);
 
         services.AddScoped<IGetMatchesUseCase, GetMatchesUseCase>();
+        services.AddScoped<IStartAttemptUseCase, StartAttemptUseCase>();
+
         services.AddScoped<IMatchRepository, SqlMatchRepository>();
+        services.AddScoped<IQuizRepository, SqlQuizRepository>();
+        services.AddScoped<IMatchAttemptRepository, SqlMatchAttemptRepository>();
+        services.AddScoped<IQuizQuestionRepository, SqlQuizQuestionRepository>();
 
         #region BDD
         var connectionString = configuration.GetConnectionString("DefaultConnection");
