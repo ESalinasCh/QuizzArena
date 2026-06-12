@@ -5,4 +5,6 @@ namespace QuizzArena.Quizzing.Application.Ports.Out;
 public interface IQuizQuestionRepository
 {
     public Task CreateMultipleAsync(IEnumerable<QuizQuestion> questions);
+
+    Task<List<Question>> GetQuestionsByQuizIdAsync(Guid QuizId);
 }

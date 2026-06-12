@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using QuizzArena.Quizzing.Application.DTOs;
+using QuizzArena.Quizzing.Application.DTOs.Match;
 using QuizzArena.Quizzing.Application.Ports.In;
 
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.In.Web;
 
 [ApiController]
-[Route("api/v{version:apiVersion}/matches")]
+[Route("api/v{version:apiVersion}/users/me/matches")]
 public class MatchController(
     IGetMatchesUseCase getMatchesUseCase
 ) : ControllerBase

@@ -1,4 +1,4 @@
-﻿namespace QuizzArena.Quizzing.Application.DTOs;
+﻿namespace QuizzArena.Quizzing.Application.DTOs.Match;
 
 public record MatchResponseDto
 {
