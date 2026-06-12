@@ -1,4 +1,3 @@
-﻿
 using QuizzArena.Quizzing.Domain.Entities;
 
 namespace QuizzArena.Quizzing.Application.Ports.Out;
