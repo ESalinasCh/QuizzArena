@@ -14,7 +14,6 @@ public class SubmitAnswersResponseDto
 public record QuestionResultDto
 (
     Guid Id,
-    int Number,
     string Text,
     Guid SelectedOptionId,
     Guid CorrectOptionId,

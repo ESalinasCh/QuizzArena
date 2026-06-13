@@ -6,15 +6,15 @@ using QuizzArena.Quizzing.Application.Ports.In;
 using QuizzArena.Quizzing.Application.Ports.Out;
 using QuizzArena.Quizzing.Application.Validators;
 using QuizzArena.Quizzing.Domain.Entities;
-using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Repositories;
 
 namespace QuizzArena.Quizzing.Application.UseCases.SubmitAnswers;
 
 public class SubmitAnswersUseCase(
     SubmitAnswersRequestValidator submitAnswersValidator,
-    SqlOptionRepository optionRepository,
+    IOptionRepository optionRepository,
     IMatchAttemptRepository matchAttemptRepository,
-    IMapper mapper
+    IMapper mapper,
+    IQuestionRepository questionRepository
 ) : ISubmitAnswersUseCase
 {
     public async Task<SubmitAnswersResponseDto> Execute(Guid matchAttemptId, SubmitAnswersRequestDto dto)
@@ -50,7 +50,8 @@ public class SubmitAnswersUseCase(
             }
         }
 
-        int score = correctCount / totalQuestions * 100;
+        // Multiply before dividing to avoid integer-division truncating to 0
+        int score = totalQuestions == 0 ? 0 : correctCount * 100 / totalQuestions;
 
         // Update MatchAttempt with Answers[]
         MatchAttempt matchAttempt = await matchAttemptRepository.GetByIdAsync(matchAttemptId)
@@ -62,6 +63,29 @@ public class SubmitAnswersUseCase(
 
         await matchAttemptRepository.UpdateAsync(matchAttempt);
 
+        // Get questions with their options (need options to know the correct one)
+        List<Guid> questionsIds = answers.Select(a => a.QuestionId).Distinct().ToList();
+        List<Question> questions = await questionRepository.GetByIdsWithOptionsAsync(questionsIds);
+        Dictionary<Guid, Question> questionsById = questions.ToDictionary(question => question.Id);
+
+        // One result per answer: question text + selected vs correct option
+        List<QuestionResultDto> questionResultDtos = answers.Select(answer =>
+        {
+            Question question = questionsById.GetValueOrDefault(answer.QuestionId)
+                ?? throw new InvalidOperationException($"Question {answer.QuestionId} not found.");
+
+            Option correctOption = question.Options.FirstOrDefault(option => option.IsCorrect)
+                ?? throw new InvalidOperationException($"Question {question.Id} has no correct option.");
+
+            return new QuestionResultDto(
+                question.Id,
+                question.Content,
+                answer.OptionId,
+                correctOption.Id,
+                answer.IsCorrect
+            );
+        }).ToList();
+
         // Build response object
         SubmitAnswersResponseDto response = new SubmitAnswersResponseDto
         {
@@ -70,16 +94,10 @@ public class SubmitAnswersUseCase(
             CorrectCount = correctCount,
             IncorrectCount = incorrectCount,
             TotalQuestions = totalQuestions,
-            Questions =
-            {
-
-            }
+            Questions = questionResultDtos
         };
 
-
         // Send response object
-
-        // TODO
-        throw new NotImplementedException();
+        return response;
     }
 }
