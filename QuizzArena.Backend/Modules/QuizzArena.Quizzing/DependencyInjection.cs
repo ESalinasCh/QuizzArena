@@ -57,6 +57,11 @@ public static class DependencyInjection
 
         services.AddScoped<MatchAttemptFiltersValidator>();
 
+        #region Repositories
+        services.AddScoped<IOptionRepository, SqlOptionRepository>();
+        services.AddScoped<IMatchAttemptRepository, SqlMatchAttemptRepository>();
+        services.AddScoped<IQuestionRepository, SqlQuestionRepository>();
+        #endregion
 
         #region BDD
         var connectionString = configuration.GetConnectionString("DefaultConnection");
