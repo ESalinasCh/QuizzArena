@@ -12,10 +12,9 @@ public class SubmitAnswersResponseDto
 
 public record QuestionResultDto
 (
-	Guid Id,
-	int Number,
-	string Text,
-	Guid SelectedOptionId,
-	Guid CorrectOptionId,
-	bool IsCorrect
+    Guid Id,
+    string Text,
+    Guid SelectedOptionId,
+    Guid CorrectOptionId,
+    bool IsCorrect
 );
