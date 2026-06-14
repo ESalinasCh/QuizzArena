@@ -6,6 +6,7 @@ using QuizzArena.Quizzing.Application.Ports.In;
 using QuizzArena.Quizzing.Application.Ports.Out;
 using QuizzArena.Quizzing.Application.Validators;
 using QuizzArena.Quizzing.Domain.Entities;
+using Shared.Contracts;
 
 namespace QuizzArena.Quizzing.Application.UseCases.SubmitAnswers;
 
@@ -14,11 +15,27 @@ public class SubmitAnswersUseCase(
     IOptionRepository optionRepository,
     IMatchAttemptRepository matchAttemptRepository,
     IMapper mapper,
-    IQuestionRepository questionRepository
+    IQuestionRepository questionRepository,
+    ICurrentUser currentUser
 ) : ISubmitAnswersUseCase
 {
     public async Task<SubmitAnswersResponseDto> Execute(Guid matchAttemptId, SubmitAnswersRequestDto dto)
     {
+
+        // Check current user refers to the corresponding student
+        if (!Guid.TryParse(currentUser.UserId, out Guid userId))
+        {
+            throw new UnauthorizedAccessException("Invalid user identity.");
+        }
+
+        MatchAttempt matchAttempt = await matchAttemptRepository.GetByIdAsync(matchAttemptId)
+            ?? throw new InvalidOperationException($"MatchAttempt {matchAttemptId} not found.");
+
+        if (matchAttempt.UserId != userId)
+        {
+            throw new UnauthorizedAccessException("User doesn't belong to this match attempt.");
+        }
+
         // Validate incoming object
         await submitAnswersValidator.ValidateAndThrowAsync(dto);
 
@@ -53,13 +70,10 @@ public class SubmitAnswersUseCase(
         // Multiply before dividing to avoid integer-division truncating to 0
         int score = totalQuestions == 0 ? 0 : correctCount * 100 / totalQuestions;
 
-        // Update MatchAttempt with Answers[]
-        MatchAttempt matchAttempt = await matchAttemptRepository.GetByIdAsync(matchAttemptId)
-            ?? throw new InvalidOperationException($"MatchAttempt {matchAttemptId} not found.");
-
+        // Update MatchAttempt with Answers[] and score
         matchAttempt.Answers = answers;
-
         matchAttempt.Score = score;
+        matchAttempt.Status = Domain.Enums.QuizAttemptStatus.Completed;
 
         await matchAttemptRepository.UpdateAsync(matchAttempt);
 

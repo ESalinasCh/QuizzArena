@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QuizzArena.Quizzing.Application.DTOs.SubmitAnswers;
 using QuizzArena.Quizzing.Application.Ports.In;
@@ -6,6 +7,7 @@ using QuizzArena.Quizzing.Application.Ports.In;
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.In.Web;
 
 [ApiController]
+[Authorize(Roles = "student")]
 [Route("api/v{version:apiVersion}/match-attempts/{attempt-id}/submit")]
 public class MatchAttemptsController(
     ISubmitAnswersUseCase submitAnswersUseCase
