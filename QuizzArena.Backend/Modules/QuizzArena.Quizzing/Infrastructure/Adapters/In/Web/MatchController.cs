@@ -6,6 +6,7 @@ using QuizzArena.Quizzing.Application.Ports.In;
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.In.Web;
 
 [ApiController]
+[Authorize(Roles = "student")]
 [Route("api/v{version:apiVersion}/users/me/matches")]
 public class MatchController(
     IGetMatchesUseCase getMatchesUseCase

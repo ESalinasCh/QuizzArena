@@ -5,6 +5,7 @@ using Npgsql;
 using QuizzArena.Quizzing.Application.Ports.In;
 using QuizzArena.Quizzing.Application.Ports.Out;
 using QuizzArena.Quizzing.Application.UseCases;
+using QuizzArena.Quizzing.Application.Validators;
 using QuizzArena.Quizzing.Domain.Enums;
 using QuizzArena.Quizzing.Infrastructure.Adapters.In.Web;
 using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence;
@@ -30,6 +31,8 @@ public static class DependencyInjection
         services.AddScoped<IQuizRepository, SqlQuizRepository>();
         services.AddScoped<IMatchAttemptRepository, SqlMatchAttemptRepository>();
         services.AddScoped<IQuizQuestionRepository, SqlQuizQuestionRepository>();
+
+        services.AddScoped<MatchQueryParametersValidator>();
 
         #region BDD
         var connectionString = configuration.GetConnectionString("DefaultConnection");
