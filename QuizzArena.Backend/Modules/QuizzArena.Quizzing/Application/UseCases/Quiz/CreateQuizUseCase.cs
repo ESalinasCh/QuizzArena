@@ -8,7 +8,7 @@ using QuizzArena.Quizzing.Application.Validators.Quiz;
 
 namespace QuizzArena.Quizzing.Application.UseCases.Quiz;
 
-internal class CreateQuizUseCase(
+public class CreateQuizUseCase(
     IQuizRepository repository,
     IMapper mapper,
     CreateQuizDtoValidator createValidator,

@@ -2,7 +2,7 @@
 
 namespace QuizzArena.Quizzing.Application.Ports.In;
 
-internal interface ICreateOptionsUseCase
+public interface ICreateOptionsUseCase
 {
     Task Execute(IEnumerable<CreateOptionDto> dtos);
 }

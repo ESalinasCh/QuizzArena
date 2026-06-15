@@ -2,7 +2,7 @@
 
 namespace QuizzArena.Quizzing.Application.Ports.Out;
 
-internal interface IOptionRepository
+public interface IOptionRepository
 {
     public Task CreateMultipleAsync(IEnumerable<Option> options);
 }

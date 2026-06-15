@@ -2,7 +2,7 @@
 
 namespace QuizzArena.Quizzing.Application.Ports.Out;
 
-internal interface IQuizRepository
+public interface IQuizRepository
 {
     public Task<Quiz?> GetByIdAsync(Guid classSourceId);
     public Task<Quiz> CreateAsync(Quiz quiz);

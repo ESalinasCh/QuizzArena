@@ -8,7 +8,7 @@ using QuizzArena.Quizzing.Domain.Entities;
 
 namespace QuizzArena.Quizzing.Application.UseCases.Quiz;
 
-internal class CreateQuestionsUseCase(
+public class CreateQuestionsUseCase(
     IQuestionRepository questionRepository,
     IQuizQuestionRepository quizQuestionRepository,
     IMapper mapper,

@@ -8,7 +8,7 @@ using QuizzArena.Quizzing.Domain.Entities;
 
 namespace QuizzArena.Quizzing.Application.UseCases.Quiz;
 
-internal class CreateOptionsUseCase(
+public class CreateOptionsUseCase(
     IOptionRepository repository,
     IMapper mapper,
     CreateOptionsDtoValidator createValidator
