@@ -37,7 +37,7 @@ public static class DependencyInjection
         services.AddScoped<IQuestionRepository, SqlQuestionRepository>();
         services.AddScoped<IOptionRepository, SqlOptionRepository>();
         services.AddScoped<IQuizQuestionRepository, SqlQuizQuestionRepository>();
-        
+
         #region BDD
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
