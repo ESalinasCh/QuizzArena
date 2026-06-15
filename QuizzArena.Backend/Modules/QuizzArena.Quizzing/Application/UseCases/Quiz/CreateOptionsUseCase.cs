@@ -17,11 +17,11 @@ internal class CreateOptionsUseCase(
     public async Task Execute(IEnumerable<CreateOptionDto> dtos)
     {
         await createValidator.ValidateAndThrowAsync(dtos);
-        IEnumerable<Option> options = dtos.Select(dto =>
+        List<Option> options = [..dtos.Select(dto =>
         {
             Option option = mapper.Map<Option>(dto);
             return option;
-        });
+        })];
 
         await repository.CreateMultipleAsync(options);
     }

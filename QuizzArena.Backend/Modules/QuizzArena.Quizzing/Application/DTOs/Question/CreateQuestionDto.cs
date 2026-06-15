@@ -5,5 +5,7 @@ namespace QuizzArena.Quizzing.Application.DTOs.Question;
 public class CreateQuestionDto : BaseQuestionDto
 {
     public Guid Id { get; set; } = Guid.NewGuid();
-    public IEnumerable<CreateOptionDto> Options { get; set; } = [];
+    public int Position { get; set; }
+    public int ValueScore { get; set; }
+    public List<CreateOptionDto> Options { get; set; } = [];
 }

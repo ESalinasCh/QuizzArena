@@ -4,5 +4,5 @@ namespace QuizzArena.Quizzing.Application.Ports.In;
 
 public interface ICreateQuizUseCase
 {
-    Task<QuizDto> Execute(CreateQuizDto dto, Guid classSourceId);
+    Task Execute(CreateQuizDto dto, Guid classSourceId);
 }

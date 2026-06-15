@@ -4,6 +4,6 @@ namespace QuizzArena.Quizzing.Application.Ports.In;
 
 internal interface ICreateQuestionsUseCase
 {
-    Task Execute(IEnumerable<CreateQuestionDto> dtos, Guid classSourceId);
+    Task Execute(IEnumerable<CreateQuestionDto> dtos, Guid classSourceId, Guid quizId);
 }
 

@@ -19,18 +19,11 @@ public class GenerateQuizConsumer(
             if (environment.IsDevelopment())
             {
                 string path = Path.Combine(AppContext.BaseDirectory, "MockData", "quiz.json");
-                Console.WriteLine(path);
-
                 string json = await File.ReadAllTextAsync(path);
-                Console.WriteLine($"json: {json}");
-
                 CreateQuizDto? quiz = JsonSerializer.Deserialize<CreateQuizDto>(json);
-
-                Console.WriteLine($"Description: {quiz?.Description}");
-                Console.WriteLine($"Options: {quiz?.Questions}");
                 if (quiz is not null)
                 {
-                    //await CreateQuizUseCase.Execute(quiz, context.Message.ClassSourceId);
+                    await CreateQuizUseCase.Execute(quiz, context.Message.ClassSourceId);
                     Console.WriteLine("Mock quiz loaded successfully.");
                 }
                 else

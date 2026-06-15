@@ -9,22 +9,33 @@ using QuizzArena.Quizzing.Domain.Entities;
 namespace QuizzArena.Quizzing.Application.UseCases.Quiz;
 
 internal class CreateQuestionsUseCase(
-    IQuestionRepository repository,
+    IQuestionRepository questionRepository,
+    IQuizQuestionRepository quizQuestionRepository,
     IMapper mapper,
     CreateQuestionsDtoValidator createValidator
 ) : ICreateQuestionsUseCase
 {
-    public async Task Execute(IEnumerable<CreateQuestionDto> dtos, Guid classSourceId)
+    public async Task Execute(IEnumerable<CreateQuestionDto> dtos, Guid classSourceId, Guid quizId)
     {
         await createValidator.ValidateAndThrowAsync(dtos);
+        List<Question> questions = [];
+        List<QuizQuestion> quizQuestions = [];
 
-        IEnumerable<Question> questions = dtos.Select(dto =>
+        foreach (CreateQuestionDto dto in dtos)
         {
             Question question = mapper.Map<Question>(dto);
             question.ProcessingJobId = classSourceId;
-            return question;
-        });
+            questions.Add(question);
+            quizQuestions.Add(new QuizQuestion
+            {
+                QuizId = quizId,
+                QuestionId = question.Id,
+                Position = dto.Position,
+                ValueScore = dto.ValueScore
+            });
+        }
 
-        await repository.CreateMultipleAsync(questions);
+        await questionRepository.CreateMultipleAsync(questions);
+        await quizQuestionRepository.CreateMultipleAsync(quizQuestions);
     }
 }

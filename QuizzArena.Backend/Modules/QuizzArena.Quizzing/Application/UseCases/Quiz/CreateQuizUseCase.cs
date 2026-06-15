@@ -1,5 +1,4 @@
-﻿
-using AutoMapper;
+﻿using AutoMapper;
 using FluentValidation;
 using QuizzArena.Quizzing.Application.DTOs.Option;
 using QuizzArena.Quizzing.Application.DTOs.Question;
@@ -18,26 +17,19 @@ internal class CreateQuizUseCase(
     ICreateOptionsUseCase createOptionsUseCase
 ) : ICreateQuizUseCase
 {
-    public async Task<QuizDto> Execute(CreateQuizDto dto, Guid classSourceId)
+    public async Task Execute(CreateQuizDto dto, Guid classSourceId)
     {
         await createValidator.ValidateAndThrowAsync(dto);
         Domain.Entities.Quiz quiz = mapper.Map<Domain.Entities.Quiz>(dto);
-        await repository.CreateAsync(quiz);
+        Domain.Entities.Quiz newQuiz = await repository.CreateAsync(quiz);
 
-        List<CreateQuestionDto> questions = [];
-        List<CreateOptionDto> options = [];
-
-        foreach (CreateQuestionDto question in dto.QuizQuestions)
+        foreach (CreateQuestionDto question in dto.Questions)
         {
-            foreach (CreateOptionDto option in question.Options)
-            {
-                option.QuestionId = question.Id;
-                options.Add(option);
-            }
-            questions.Add(question);
+            question.Options.ForEach(option =>
+                option.QuestionId = question.Id);
         }
-        await createQuestionsUseCase.Execute(questions, quiz.Id);
-        await createOptionsUseCase.Execute(options);
-        return mapper.Map<QuizDto>(quiz);
+
+        await createQuestionsUseCase.Execute(dto.Questions, classSourceId, newQuiz.Id);
+        await createOptionsUseCase.Execute(dto.Questions.SelectMany(q => q.Options));
     }
 }
