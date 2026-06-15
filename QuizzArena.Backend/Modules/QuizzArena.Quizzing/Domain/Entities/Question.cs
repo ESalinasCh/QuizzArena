@@ -6,6 +6,7 @@ public class Question
 {
     public Guid Id { get; set; }
     public string Content { get; set; } = string.Empty;
+    public string Justification { get; set; } = string.Empty;
     public QuestionStatus Status { get; set; } = QuestionStatus.Draft;
     public bool WasModified { get; set; }
     public QuestionType Type { get; set; }

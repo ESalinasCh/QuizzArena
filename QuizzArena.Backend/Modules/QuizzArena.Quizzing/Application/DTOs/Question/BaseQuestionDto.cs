@@ -6,6 +6,7 @@ namespace QuizzArena.Quizzing.Application.DTOs.Question;
 public class BaseQuestionDto
 {
     public string Content { get; set; } = string.Empty;
+    public string Justification { get; set; } = string.Empty;
     public QuestionStatus Status { get; set; } = QuestionStatus.Draft;
 
     [JsonConverter(typeof(JsonStringEnumConverter))]

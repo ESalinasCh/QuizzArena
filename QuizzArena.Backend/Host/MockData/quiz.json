@@ -5,7 +5,7 @@
     {
       "Content": "What is 2 + 2?",
       "Type": "MultipleChoice",
-      "Justification": "2 + 2 = 4",
+      "Justification": "The sum of 2 and 2 is 4.",
       "Position": 1,
       "ValueScore": 10,
       "Options": [
