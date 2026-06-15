@@ -87,7 +87,7 @@ public class CreateQuizUseCaseTests
         await _createQuizUseCase.Execute(dto, classSourceId);
 
         // Assert
-        _mockMapper.Verify(m => m.Map<Quiz>(dto),Times.Once);
+        _mockMapper.Verify(m => m.Map<Quiz>(dto), Times.Once);
 
         _mockQuizRepository.Verify(
             r => r.CreateAsync(It.Is<Quiz>(q => q.Title == dto.Title)),

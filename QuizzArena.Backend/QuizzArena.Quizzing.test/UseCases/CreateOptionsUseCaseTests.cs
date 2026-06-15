@@ -87,7 +87,7 @@ public class CreateOptionsUseCaseTests
         await _createOptionsUseCase.Execute(dtos);
 
         // Assert
-        _mockMapper.Verify(m => m.Map<Option>(It.IsAny<CreateOptionDto>()),Times.Exactly(dtos.Count));
+        _mockMapper.Verify(m => m.Map<Option>(It.IsAny<CreateOptionDto>()), Times.Exactly(dtos.Count));
 
         _mockOptionRepository.Verify(
             r => r.CreateMultipleAsync(It.Is<List<Option>>(options =>

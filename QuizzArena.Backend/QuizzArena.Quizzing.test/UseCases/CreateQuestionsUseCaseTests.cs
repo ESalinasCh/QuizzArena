@@ -47,7 +47,7 @@ public class CreateQuestionsUseCaseTests
         Guid classSourceId = Guid.NewGuid();
         Guid quizId = Guid.NewGuid();
 
-        List <CreateQuestionDto> dtos =
+        List<CreateQuestionDto> dtos =
         [
             new CreateQuestionDto
             {
