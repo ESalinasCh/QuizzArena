@@ -142,7 +142,7 @@ public class StartAttemptUseCaseTests
         _mockMatchRepository.Setup(m => m.GetMatchByIdAsync(It.IsAny<Guid>())).ReturnsAsync(match);
         _mockMatchAttemptRepository.Setup(r => r.GetMatchAttemptCountByMatchIdAsync(match.Id)).ReturnsAsync(0);
         _mockMatchAttemptRepository.Setup(r => r.HasActiveAttemptByMatchIdAsync(match.Id, Guid.Parse(userId))).ReturnsAsync(false);
-        _mockQuizRepository.Setup(q => q.GetQuizByIdAsync(match.QuizId)).ReturnsAsync((Quiz?)null);
+        _mockQuizRepository.Setup(q => q.GetByIdAsync(match.QuizId)).ReturnsAsync((Quiz?)null);
 
         var request = new StartAttemptRequestDto { MatchId = match.Id };
 
@@ -164,7 +164,7 @@ public class StartAttemptUseCaseTests
         _mockMatchRepository.Setup(m => m.GetMatchByIdAsync(It.IsAny<Guid>())).ReturnsAsync(match);
         _mockMatchAttemptRepository.Setup(r => r.GetMatchAttemptCountByMatchIdAsync(match.Id)).ReturnsAsync(0);
         _mockMatchAttemptRepository.Setup(r => r.HasActiveAttemptByMatchIdAsync(match.Id, Guid.Parse(userId))).ReturnsAsync(false);
-        _mockQuizRepository.Setup(q => q.GetQuizByIdAsync(match.QuizId)).ReturnsAsync(new Quiz { Id = match.QuizId });
+        _mockQuizRepository.Setup(q => q.GetByIdAsync(match.QuizId)).ReturnsAsync(new Quiz { Id = match.QuizId });
         _mockQuizQuestionRepository.Setup(q => q.GetQuestionsByQuizIdAsync(match.QuizId)).ReturnsAsync(new List<Question>());
 
         var request = new StartAttemptRequestDto { MatchId = match.Id };
@@ -192,7 +192,7 @@ public class StartAttemptUseCaseTests
         _mockMatchAttemptRepository.Setup(r => r.HasActiveAttemptByMatchIdAsync(match.Id, userGuid)).ReturnsAsync(false);
 
         var quiz = new Quiz { Id = match.QuizId };
-        _mockQuizRepository.Setup(q => q.GetQuizByIdAsync(match.QuizId)).ReturnsAsync(quiz);
+        _mockQuizRepository.Setup(q => q.GetByIdAsync(match.QuizId)).ReturnsAsync(quiz);
 
         var question1 = new Question
         {
@@ -243,7 +243,7 @@ public class StartAttemptUseCaseTests
         _mockMatchAttemptRepository.Setup(r => r.HasActiveAttemptByMatchIdAsync(match.Id, userGuid)).ReturnsAsync(false);
 
         var quiz = new Quiz { Id = match.QuizId };
-        _mockQuizRepository.Setup(q => q.GetQuizByIdAsync(match.QuizId)).ReturnsAsync(quiz);
+        _mockQuizRepository.Setup(q => q.GetByIdAsync(match.QuizId)).ReturnsAsync(quiz);
 
         var questions = new List<Question> {
             new Question { Id = Guid.NewGuid(), Content = "Q1", Options = new List<Option> { new Option { Id = Guid.NewGuid(), Description = "A" } } },
@@ -281,7 +281,7 @@ public class StartAttemptUseCaseTests
         _mockMatchAttemptRepository.Setup(r => r.HasActiveAttemptByMatchIdAsync(match.Id, userGuid)).ReturnsAsync(false);
 
         var quiz = new Quiz { Id = match.QuizId };
-        _mockQuizRepository.Setup(q => q.GetQuizByIdAsync(match.QuizId)).ReturnsAsync(quiz);
+        _mockQuizRepository.Setup(q => q.GetByIdAsync(match.QuizId)).ReturnsAsync(quiz);
 
         var q1Id = Guid.NewGuid();
         var q2Id = Guid.NewGuid();
@@ -348,7 +348,7 @@ public class StartAttemptUseCaseTests
         _mockMatchAttemptRepository.Setup(r => r.HasActiveAttemptByMatchIdAsync(match.Id, userGuid)).ReturnsAsync(false);
 
         var quiz = new Quiz { Id = match.QuizId };
-        _mockQuizRepository.Setup(q => q.GetQuizByIdAsync(match.QuizId)).ReturnsAsync(quiz);
+        _mockQuizRepository.Setup(q => q.GetByIdAsync(match.QuizId)).ReturnsAsync(quiz);
 
         var q1Id = Guid.NewGuid();
         var optAId = Guid.NewGuid();
@@ -421,7 +421,7 @@ public class StartAttemptUseCaseTests
         _mockMatchAttemptRepository.Setup(r => r.HasActiveAttemptByMatchIdAsync(match.Id, userGuid)).ReturnsAsync(false);
 
         var quiz = new Quiz { Id = match.QuizId };
-        _mockQuizRepository.Setup(q => q.GetQuizByIdAsync(match.QuizId)).ReturnsAsync(quiz);
+        _mockQuizRepository.Setup(q => q.GetByIdAsync(match.QuizId)).ReturnsAsync(quiz);
 
         var q1Id = Guid.NewGuid();
         var q2Id = Guid.NewGuid();

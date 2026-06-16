@@ -6,7 +6,7 @@ using QuizzArena.Quizzing.Application.Ports.Out;
 using QuizzArena.Quizzing.Application.Validators.Option;
 using QuizzArena.Quizzing.Domain.Entities;
 
-namespace QuizzArena.Quizzing.Application.UseCases.Quiz;
+namespace QuizzArena.Quizzing.Application.UseCases.QuizUseCases;
 
 public class CreateOptionsUseCase(
     IOptionRepository repository,

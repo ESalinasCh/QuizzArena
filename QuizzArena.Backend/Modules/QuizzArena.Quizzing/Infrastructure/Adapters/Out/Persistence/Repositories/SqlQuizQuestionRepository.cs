@@ -1,4 +1,4 @@
-﻿﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Domain.Entities;
 

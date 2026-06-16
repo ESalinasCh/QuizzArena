@@ -2,6 +2,8 @@
 using QuizzArena.Quizzing.Application.Filters;
 using QuizzArena.Quizzing.Application.Validators.FiltersValidators;
 
+namespace QuizzArena.Quizzing.Tests.Validators;
+
 public class MatchAttemptFiltersValidatorTests
 {
     private readonly MatchAttemptFiltersValidator _validator = new();

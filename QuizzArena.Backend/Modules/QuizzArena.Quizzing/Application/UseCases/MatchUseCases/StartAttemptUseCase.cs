@@ -49,7 +49,7 @@ public class StartAttemptUseCase(
             throw new Exception("User already have an active attempt for this match.");
         }
 
-        Quiz? quiz = await quizRepository.GetQuizByIdAsync(match.QuizId) ?? throw new Exception("No quiz and questions were found for this match.");
+        Quiz? quiz = await quizRepository.GetByIdAsync(match.QuizId) ?? throw new Exception("No quiz and questions were found for this match.");
         List<Question> questions = await quizQuestionRepository.GetQuestionsByQuizIdAsync(quiz.Id);
         if (questions.Count == 0)
         {

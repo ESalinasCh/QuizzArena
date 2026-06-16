@@ -2,11 +2,11 @@
 using Moq;
 using QuizzArena.Quizzing.Application.DTOs.Option;
 using QuizzArena.Quizzing.Application.Ports.Out;
-using QuizzArena.Quizzing.Application.UseCases.Quiz;
+using QuizzArena.Quizzing.Application.UseCases.QuizUseCases;
 using QuizzArena.Quizzing.Application.Validators.Option;
 using QuizzArena.Quizzing.Domain.Entities;
 
-namespace QuizzArena.Quizzing.test.UseCases;
+namespace QuizzArena.Quizzing.Tests.UseCases;
 
 public class CreateOptionsUseCaseTests
 {

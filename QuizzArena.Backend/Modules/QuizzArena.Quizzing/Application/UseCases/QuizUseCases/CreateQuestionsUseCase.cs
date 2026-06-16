@@ -3,10 +3,11 @@ using FluentValidation;
 using QuizzArena.Quizzing.Application.DTOs.Question;
 using QuizzArena.Quizzing.Application.Ports.In;
 using QuizzArena.Quizzing.Application.Ports.Out;
+using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Application.Validators.Question;
 using QuizzArena.Quizzing.Domain.Entities;
 
-namespace QuizzArena.Quizzing.Application.UseCases.Quiz;
+namespace QuizzArena.Quizzing.Application.UseCases.QuizUseCases;
 
 public class CreateQuestionsUseCase(
     IQuestionRepository questionRepository,

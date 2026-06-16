@@ -6,6 +6,4 @@ public interface IQuizRepository
 {
     public Task<Quiz?> GetByIdAsync(Guid classSourceId);
     public Task<Quiz> CreateAsync(Quiz quiz);
-
-    Task<Quiz?> GetQuizByIdAsync(Guid quizId);
 }

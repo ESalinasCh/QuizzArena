@@ -3,13 +3,13 @@ using Moq;
 using QuizzArena.Quizzing.Application.DTOs.Option;
 using QuizzArena.Quizzing.Application.DTOs.Quiz;
 using QuizzArena.Quizzing.Application.Ports.In;
-using QuizzArena.Quizzing.Application.Ports.Out;
-using QuizzArena.Quizzing.Application.UseCases.Quiz;
+using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
+using QuizzArena.Quizzing.Application.UseCases.QuizUseCases;
 using QuizzArena.Quizzing.Application.Validators.Quiz;
 using QuizzArena.Quizzing.Domain.Entities;
 using QuizzArena.Quizzing.Domain.Enums;
 
-namespace QuizzArena.Quizzing.test.UseCases;
+namespace QuizzArena.Quizzing.Tests.UseCases;
 
 public class CreateQuizUseCaseTests
 {

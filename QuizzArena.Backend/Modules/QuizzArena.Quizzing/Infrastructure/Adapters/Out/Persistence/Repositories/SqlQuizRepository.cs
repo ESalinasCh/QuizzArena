@@ -16,10 +16,4 @@ internal class SqlQuizRepository(QuizzingDbContext context) : IQuizRepository
         await context.SaveChangesAsync();
         return quiz;
     }
-    
-    public async Task<Quiz?> GetQuizByIdAsync(Guid quizId)
-    {
-        Quiz? quiz = await context.Quizzes.FindAsync(quizId);
-        return quiz;
-    }
 }

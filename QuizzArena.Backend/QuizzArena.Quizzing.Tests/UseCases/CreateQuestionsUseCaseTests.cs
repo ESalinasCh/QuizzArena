@@ -2,12 +2,13 @@
 using Moq;
 using QuizzArena.Quizzing.Application.DTOs.Question;
 using QuizzArena.Quizzing.Application.Ports.Out;
-using QuizzArena.Quizzing.Application.UseCases.Quiz;
+using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
+using QuizzArena.Quizzing.Application.UseCases.QuizUseCases;
 using QuizzArena.Quizzing.Application.Validators.Question;
 using QuizzArena.Quizzing.Domain.Entities;
 using QuizzArena.Quizzing.Domain.Enums;
 
-namespace QuizzArena.Quizzing.test.UseCases;
+namespace QuizzArena.Quizzing.Tests.UseCases;
 
 public class CreateQuestionsUseCaseTests
 {
@@ -79,7 +80,6 @@ public class CreateQuestionsUseCaseTests
                 Justification = "The sum of 2 and 2 is 4.",
                 ProcessingJobId = classSourceId,
                 Status = QuestionStatus.Draft,
-                WasModified = false,
                 Deleted = false,
                 CreatedAt = DateTimeOffset.UtcNow,
                 UpdatedAt = DateTimeOffset.UtcNow
@@ -92,7 +92,6 @@ public class CreateQuestionsUseCaseTests
                 Justification = "The capital of France is Paris.",
                 ProcessingJobId = classSourceId,
                 Status = QuestionStatus.Draft,
-                WasModified = false,
                 Deleted = false,
                 CreatedAt = DateTimeOffset.UtcNow,
                 UpdatedAt = DateTimeOffset.UtcNow
