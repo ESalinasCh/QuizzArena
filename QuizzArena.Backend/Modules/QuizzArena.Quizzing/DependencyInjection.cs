@@ -6,6 +6,7 @@ using Npgsql;
 using QuizzArena.Quizzing.Application.DTOs.Match;
 using QuizzArena.Quizzing.Application.Ports.In;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
+using QuizzArena.Quizzing.Application.UseCases.MatchUseCases;
 using QuizzArena.Quizzing.Application.Validators.FiltersValidators;
 using QuizzArena.Quizzing.Domain.Enums;
 using QuizzArena.Quizzing.Infrastructure.Adapters.In.Web;
@@ -13,7 +14,6 @@ using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence;
 using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Repositories;
 using QuizzArena.Users.Infrastructure.Adapters.Out.Persistence.Repositories;
 using Shared.Contracts;
-using QuizzArena.Quizzing.Application.UseCases.MatchUseCases;
 
 namespace QuizzArena.Quizzing;
 

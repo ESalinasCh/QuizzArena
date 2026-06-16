@@ -9,12 +9,7 @@ public class GetMatchAttemptDetail(IMatchRepository matchRepository, IQuestionQu
 {
     public async Task<GetMatchAttemptDetailDTO> Execute(Guid matchAttemptId)
     {
-        MatchAttempt? matchAttempt = await matchRepository.GetMatchAttemptsDetailById(matchAttemptId);
-
-        if(matchAttempt == null)
-        {
-            throw new InvalidOperationException(); 
-        }
+        MatchAttempt? matchAttempt = await matchRepository.GetMatchAttemptsDetailById(matchAttemptId) ?? throw new InvalidOperationException();
         List<Question> questions = await questionQueriesRepository.GetQuestionsByIds(matchAttempt.MatchAttemptQuestions.Select(x => x.QuestionId).ToList());
         var answersDictionary = matchAttempt.Answers.ToDictionary(x => x.QuestionId);
 

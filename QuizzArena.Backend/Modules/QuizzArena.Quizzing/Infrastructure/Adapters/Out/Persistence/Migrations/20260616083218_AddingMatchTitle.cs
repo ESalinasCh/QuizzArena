@@ -2,29 +2,28 @@
 
 #nullable disable
 
-namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
+namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations;
+
+/// <inheritdoc />
+public partial class AddingMatchTitle : Migration
 {
     /// <inheritdoc />
-    public partial class AddingMatchTitle : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.AddColumn<string>(
-                name: "Title",
-                schema: "quizzing",
-                table: "match",
-                type: "text",
-                nullable: true);
-        }
+        migrationBuilder.AddColumn<string>(
+            name: "Title",
+            schema: "quizzing",
+            table: "match",
+            type: "text",
+            nullable: true);
+    }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropColumn(
-                name: "Title",
-                schema: "quizzing",
-                table: "match");
-        }
+    /// <inheritdoc />
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.DropColumn(
+            name: "Title",
+            schema: "quizzing",
+            table: "match");
     }
 }

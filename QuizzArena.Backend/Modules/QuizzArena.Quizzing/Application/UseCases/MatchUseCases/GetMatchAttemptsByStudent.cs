@@ -16,7 +16,7 @@ public class GetMatchAttemptsByStudent(
     MatchAttemptFiltersValidator filtersValidator
     ) : IGetMatchAttemptsByStudent
 {
-    public async Task<List<GetMatchAttemptDTO>> Execute( MatchAttemptFilters filters)
+    public async Task<List<GetMatchAttemptDTO>> Execute(MatchAttemptFilters filters)
     {
         Guid studentId = Guid.Parse(currentUser.UserId);
         await filtersValidator.ValidateAndThrowAsync(filters);
