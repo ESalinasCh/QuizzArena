@@ -12,7 +12,7 @@ public class SubmitAnswersMappingProfile : Profile
         CreateMap<SubmitAnswerBody, Answer>()
             .ForMember(
                 dest => dest.Id,
-                opt => opt.MapFrom(_ => Guid.NewGuid())
+                opt => opt.Ignore()
             )
 
             .ForMember(
