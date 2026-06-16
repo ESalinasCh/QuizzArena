@@ -8,7 +8,7 @@ using QuizzArena.Quizzing.Application.Ports.In;
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Web;
 
 [ApiController]
-[Route("api/v{version:apiVersion}/match")]
+[Route("api/v{version:apiVersion}/matches")]
 public class MatchController(
      IGetMatchesUseCase getMatchesUseCase,
     IGetMatchAttemptsByStudent getMatchAttemptsByStudent,

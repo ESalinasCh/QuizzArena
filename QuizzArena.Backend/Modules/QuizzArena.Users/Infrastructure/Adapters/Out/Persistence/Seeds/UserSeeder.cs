@@ -7,9 +7,33 @@ internal class UserSeeder
 {
     public static async Task SeedAsync(UserDbContext context)
     {
-        // Only add users that are already on Keycloak
         var users = new[]
         {
+            new User 
+            {
+                Id = UserConstants.TeacherId,
+                UserName = "teacher01",
+                FirstName = "Samuel",
+                LastName = "Teacher",
+                Email = "teacher@test.com",
+                Role = UserRole.Teacher,
+                ExternalProvider = "Keycloak",
+                ProviderId = UserConstants.TeacherId.ToString(),
+                CreatedAt = DateTime.UtcNow
+            },
+            new User 
+            {
+                Id = UserConstants.StudentId,
+                UserName = "student01",
+                FirstName = "Juan",
+                LastName = "Student",
+                Email = "user@test.com",
+                Role = UserRole.Student,
+                ExternalProvider = "Keycloak",
+                ProviderId = UserConstants.StudentId.ToString(),
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
             new User
             {
                 Id = Guid.Parse("d7f65af9-57a1-4b5b-9685-815770faea7d"),

@@ -104,7 +104,7 @@ public class GetMatchesUseCaseTests
         _mockCourseImpl.Setup(c => c.GetCoursesByStudent(Guid.Parse(userId))).ReturnsAsync(courses);
         var matches = new List<Domain.Entities.Match>
         {
-            new Domain.Entities.Match { Id = Guid.NewGuid(), CourseId = courses[0].Id}
+            new Domain.Entities.Match { Id = Guid.NewGuid(), Title = "My Match", CourseId = courses[0].Id}
         };
         _mockMatchRepository.Setup(m => m.GetMatchesAsync(
             It.IsAny<List<Guid>>(),
@@ -118,7 +118,7 @@ public class GetMatchesUseCaseTests
         // Assert
         Assert.NotNull(result);
         Assert.Single(result);
-        Assert.Equal("aaaa", result[0].Title);
+        Assert.Equal("My Match", result[0].Title);
         Assert.Equal("Electricity", result[0].CourseName);
     }
 
