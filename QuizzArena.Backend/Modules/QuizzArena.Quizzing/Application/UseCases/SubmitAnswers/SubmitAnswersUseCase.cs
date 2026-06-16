@@ -3,6 +3,7 @@ using FluentValidation;
 using QuizzArena.Quizzing.Application.DTOs.SubmitAnswers;
 using QuizzArena.Quizzing.Application.Ports.In;
 using QuizzArena.Quizzing.Application.Ports.Out;
+using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Application.Validators;
 using QuizzArena.Quizzing.Domain.Entities;
 using Shared.Contracts;

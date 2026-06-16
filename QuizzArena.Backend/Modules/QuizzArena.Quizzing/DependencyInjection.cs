@@ -9,7 +9,6 @@ using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Application.UseCases.MatchUseCases;
 using QuizzArena.Quizzing.Application.Validators.FiltersValidators;
 using QuizzArena.Quizzing.Application.Ports.Out;
-using QuizzArena.Quizzing.Application.UseCases;
 using QuizzArena.Quizzing.Application.UseCases.SubmitAnswers;
 using QuizzArena.Quizzing.Application.Validators;
 using QuizzArena.Quizzing.Domain.Enums;
