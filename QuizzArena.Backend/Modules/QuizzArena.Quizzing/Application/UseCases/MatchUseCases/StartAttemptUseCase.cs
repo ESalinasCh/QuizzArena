@@ -84,7 +84,7 @@ public class StartAttemptUseCase(
             UserId = userId,
             StartDateTime = DateTimeOffset.UtcNow,
             JoinedAt = DateTimeOffset.UtcNow,
-            Nickname = "Your Nickname", // Remplazar
+            Nickname = "",
             Score = 0,
             MatchAttemptQuestions = questions.Select(q => new MatchAttemptQuestion
             {
