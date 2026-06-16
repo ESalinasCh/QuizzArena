@@ -1,16 +1,15 @@
 ﻿
+using FluentValidation;
 using Moq;
 using QuizzArena.Quizzing.Application.DTOs;
 using QuizzArena.Quizzing.Application.Filters;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
+using QuizzArena.Quizzing.Application.UseCases.MatchUseCases;
 using QuizzArena.Quizzing.Application.Validators.FiltersValidators;
 using QuizzArena.Quizzing.Domain.Entities;
 using QuizzArena.Quizzing.Domain.Enums;
-using QuizzArena.Quizzing.Application.UseCases.MatchUseCases;
-
 using Shared.Contracts;
 using Shared.Contracts.DTOs;
-using FluentValidation;
 
 
 namespace QuizzArena.Quizzing.Tests.UseCases;
@@ -18,7 +17,7 @@ namespace QuizzArena.Quizzing.Tests.UseCases;
 public class GetMatchAttemptByStudentCaseTests
 {
     private readonly Mock<ICurrentUser> _mockCurrentUser;
-    private readonly Mock<IMatchQueriesRepository > _mockMatchRepository;
+    private readonly Mock<IMatchQueriesRepository> _mockMatchRepository;
     private readonly Mock<ICourseContract> _mockCourseContract;
 
     private readonly GetMatchAttemptsByStudent _useCase;

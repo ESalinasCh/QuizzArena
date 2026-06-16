@@ -2,9 +2,9 @@
 using QuizzArena.Quizzing.Application.DTOs.Match;
 using QuizzArena.Quizzing.Application.Ports.In;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
+using QuizzArena.Quizzing.Domain.Entities;
 using Shared.Contracts;
 using Shared.Contracts.DTOs;
-using QuizzArena.Quizzing.Domain.Entities;
 
 namespace QuizzArena.Quizzing.Application.UseCases.MatchUseCases;
 
