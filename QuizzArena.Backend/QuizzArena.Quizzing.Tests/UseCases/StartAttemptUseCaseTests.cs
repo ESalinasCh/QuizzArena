@@ -194,10 +194,15 @@ public class StartAttemptUseCaseTests
         var quiz = new Quiz { Id = match.QuizId };
         _mockQuizRepository.Setup(q => q.GetQuizByIdAsync(match.QuizId)).ReturnsAsync(quiz);
 
-        var question1 = new Question { Id = Guid.NewGuid(), Content = "Q1", Options = new List<Option> {
+        var question1 = new Question
+        {
+            Id = Guid.NewGuid(),
+            Content = "Q1",
+            Options = new List<Option> {
             new Option { Id = Guid.NewGuid(), Description = "A" },
             new Option { Id = Guid.NewGuid(), Description = "B" }
-        } };
+        }
+        };
 
         _mockQuizQuestionRepository.Setup(q => q.GetQuestionsByQuizIdAsync(quiz.Id)).ReturnsAsync(new List<Question> { question1 });
 
