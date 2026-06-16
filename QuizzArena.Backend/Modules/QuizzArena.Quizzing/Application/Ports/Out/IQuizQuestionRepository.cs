@@ -2,7 +2,7 @@
 
 namespace QuizzArena.Quizzing.Application.Ports.Out;
 
-internal interface IQuizQuestionRepository
+public interface IQuizQuestionRepository
 {
     Task<List<Question>> GetQuestionsByQuizIdAsync(Guid QuizId);
 }

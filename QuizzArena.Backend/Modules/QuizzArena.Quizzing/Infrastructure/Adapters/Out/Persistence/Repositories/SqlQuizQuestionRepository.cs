@@ -13,7 +13,9 @@ internal class SqlQuizQuestionRepository(QuizzingDbContext context) : IQuizQuest
             .Join(context.Questions,
                 qq => qq.QuestionId,
                 q => q.Id,
-                (qq, q) => q)
+                (qq, q) => new { qq, q })
+            .OrderBy(x => x.qq.Position)
+            .Select(x => x.q)
             .Include(q => q.Options)
             .ToListAsync();
 
