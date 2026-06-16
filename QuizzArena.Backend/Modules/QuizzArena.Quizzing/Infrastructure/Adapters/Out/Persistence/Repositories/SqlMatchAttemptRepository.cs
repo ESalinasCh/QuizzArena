@@ -27,4 +27,15 @@ internal class SqlMatchAttemptRepository(QuizzingDbContext context) : IMatchAtte
             ma.Status == QuizAttemptStatus.InProgress
         );
     }
+    public async Task<MatchAttempt?> GetByIdAsync(Guid matchAttemptId)
+    {
+        return await context.MatchAttempts.FindAsync(matchAttemptId);
+    }
+
+    public async Task<MatchAttempt> UpdateAsync(MatchAttempt matchAttempt)
+    {
+        context.MatchAttempts.Update(matchAttempt);
+        await context.SaveChangesAsync();
+        return matchAttempt;
+    }
 }

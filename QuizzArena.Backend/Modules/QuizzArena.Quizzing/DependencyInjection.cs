@@ -10,15 +10,17 @@ using QuizzArena.Quizzing.Application.UseCases.Quiz;
 using QuizzArena.Quizzing.Application.Validators.Option;
 using QuizzArena.Quizzing.Application.Validators.Question;
 using QuizzArena.Quizzing.Application.Validators.Quiz;
+using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
+using QuizzArena.Quizzing.Application.UseCases.MatchUseCases;
+using QuizzArena.Quizzing.Application.UseCases.SubmitAnswers;
+using QuizzArena.Quizzing.Application.Validators;
+using QuizzArena.Quizzing.Application.Validators.FiltersValidators;
 using QuizzArena.Quizzing.Domain.Enums;
 using QuizzArena.Quizzing.Infrastructure.Adapters.In.Web;
 using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence;
 using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Repositories;
-using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
-using QuizzArena.Quizzing.Application.Validators.FiltersValidators;
 using QuizzArena.Users.Infrastructure.Adapters.Out.Persistence.Repositories;
 using Shared.Contracts;
-using QuizzArena.Quizzing.Application.UseCases.MatchUseCases;
 
 namespace QuizzArena.Quizzing;
 
@@ -44,13 +46,23 @@ public static class DependencyInjection
         services.AddScoped<IQuizQuestionRepository, SqlQuizQuestionRepository>();
         services.AddAutoMapper(cfg => { }, typeof(DependencyInjection).Assembly);
 
-        services.AddScoped<IGetMatchesUseCase, GetMatchesUseCase>();
-        services.AddScoped<IStartAttemptUseCase, StartAttemptUseCase>();
-
-        services.AddScoped<IMatchRepository, SqlMatchRepository>();
-        services.AddScoped<IQuizRepository, SqlQuizRepository>();
+        #region Repositories
         services.AddScoped<IMatchAttemptRepository, SqlMatchAttemptRepository>();
         services.AddScoped<IQuizQuestionRepository, SqlQuizQuestionRepository>();
+        services.AddScoped<IMatchRepository, SqlMatchRepository>();
+        services.AddScoped<IQuizRepository, SqlQuizRepository>();
+        #endregion
+
+        #region UseCases
+        services.AddScoped<IGetMatchesUseCase, GetMatchesUseCase>();
+        services.AddScoped<IStartAttemptUseCase, StartAttemptUseCase>();
+        services.AddScoped<ISubmitAnswersUseCase, SubmitAnswersUseCase>();
+        #endregion
+
+        #region Validators
+        services.AddScoped<SubmitAnswersRequestValidator>();
+        services.AddScoped<SubmitAnswerBodyValidator>();
+        #endregion
 
         services.AddScoped<IValidator<MatchQueryParametersDto>, MatchQueryParametersValidator>();
         services.AddScoped<IMatchQueriesRepository, SqlMatchQueriesRepository>();
@@ -61,6 +73,11 @@ public static class DependencyInjection
 
         services.AddScoped<MatchAttemptFiltersValidator>();
 
+        #region Repositories
+        services.AddScoped<IOptionRepository, SqlOptionRepository>();
+        services.AddScoped<IMatchAttemptRepository, SqlMatchAttemptRepository>();
+        services.AddScoped<IQuestionRepository, SqlQuestionRepository>();
+        #endregion
 
         #region BDD
         var connectionString = configuration.GetConnectionString("DefaultConnection");
