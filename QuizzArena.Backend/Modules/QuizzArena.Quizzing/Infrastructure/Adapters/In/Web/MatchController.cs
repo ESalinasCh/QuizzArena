@@ -8,14 +8,14 @@ using QuizzArena.Quizzing.Application.Ports.In;
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Web;
 
 [ApiController]
-[Route("api/v{version:apiVersion}/matches")]
+[Route("api/v{version:apiVersion}")]
 public class MatchController(
-     IGetMatchesUseCase getMatchesUseCase,
+    IGetMatchesUseCase getMatchesUseCase,
     IGetMatchAttemptsByStudent getMatchAttemptsByStudent,
     IGetMatchAttemptDetail getMatchAttemptDetail
 ) : ControllerBase
 {
-    [HttpGet]
+    [HttpGet("users/me/matches")]
     [Authorize(Roles = "student")]
     public async Task<ActionResult<List<MatchResponseDto>>> GetMatches(
         [FromQuery] MatchQueryParametersDto query
@@ -25,16 +25,16 @@ public class MatchController(
         return Ok(matches);
     }
 
-    [HttpGet("me/match-attempts")]
+    [HttpGet("users/me/match-attempts")]
     [Authorize(Roles = "student")]
-
     public async Task<ActionResult<List<GetMatchAttemptDTO>>> GetMyMatchAttempts([FromQuery] MatchAttemptFilters filters)
     {
         var matchAttemptsDto = await getMatchAttemptsByStudent.Execute(filters);
         return Ok(matchAttemptsDto);
     }
-    [HttpGet("{attemptId}")]
 
+    [HttpGet("match-attempts/{attemptId}")]
+    [Authorize(Roles = "student,teacher")]
     public async Task<ActionResult<GetMatchAttemptDetailDTO>> GetMatchAttemptDetail([FromRoute] Guid attemptId)
     {
         var matchAttemptDetail = await getMatchAttemptDetail.Execute(attemptId);
