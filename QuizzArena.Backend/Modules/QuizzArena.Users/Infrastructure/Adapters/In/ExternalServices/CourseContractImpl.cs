@@ -16,11 +16,12 @@ internal class CourseContractImpl(
 
         List<Course> courses = await courseQuerysRepository.GetCoursesByUserId(studentId);
         List<Guid> teacherIds = courses.Select(x => x.TeacherId).ToList();
-        List<User> users = await userQuerysRepository.GetByIds(teacherIds);
+        List<User> teachers = await userQuerysRepository.GetByIds(teacherIds);
 
+        var teachersDictionary = teachers.ToDictionary(x => x.Id);
         List<CourseSummaryDTO> courseSummaries = courses.Select(x =>
         {
-            User user = users.First(y => y.Id == x.TeacherId);
+            User user = teachersDictionary[x.TeacherId];
             return new CourseSummaryDTO()
             {
                 Id = x.Id,

@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using QuizzArena.Quizzing.Application.DTOs.Match;
 
-namespace QuizzArena.Quizzing.Application.Validators;
+namespace QuizzArena.Quizzing.Application.Validators.FiltersValidators;
 
 public class MatchQueryParametersValidator : AbstractValidator<MatchQueryParametersDto>
 {

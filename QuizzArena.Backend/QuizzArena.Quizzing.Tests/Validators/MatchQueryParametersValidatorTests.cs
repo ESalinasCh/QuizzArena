@@ -1,6 +1,6 @@
 ﻿using FluentValidation.TestHelper;
 using QuizzArena.Quizzing.Application.DTOs.Match;
-using QuizzArena.Quizzing.Application.Validators;
+using QuizzArena.Quizzing.Application.Validators.FiltersValidators;
 using QuizzArena.Quizzing.Domain.Enums;
 
 namespace QuizzArena.Quizzing.Tests.Validators;

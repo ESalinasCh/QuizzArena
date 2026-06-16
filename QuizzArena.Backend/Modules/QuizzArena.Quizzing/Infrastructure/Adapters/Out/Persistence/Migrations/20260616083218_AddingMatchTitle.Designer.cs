@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using QuizzArena.Quizzing.Domain.Enums;
@@ -12,9 +13,11 @@ using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence;
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
 {
     [DbContext(typeof(QuizzingDbContext))]
-    partial class QuizzingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260616083218_AddingMatchTitle")]
+    partial class AddingMatchTitle
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -263,11 +266,6 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamptz");
-
-                    b.Property<string>("Justification")
-                        .IsRequired()
-                        .HasMaxLength(600)
-                        .HasColumnType("character varying(600)");
 
                     b.Property<QuestionOrigin>("Origin")
                         .HasColumnType("quizzing.question_origin");
