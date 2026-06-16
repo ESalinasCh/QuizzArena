@@ -1,4 +1,4 @@
-
+﻿
 using AutoMapper;
 using Moq;
 using QuizzArena.Quizzing.Application.DTOs.SubmitAnswers;
@@ -94,5 +94,36 @@ public class SubmitAnswersUseCaseTests
         Assert.Equal(1, result.TotalQuestions);
         Assert.Single(result.Questions);
         Assert.True(result.Questions[0].IsCorrect);
+    }
+
+    [Fact]
+    public async Task SubmitAnswer_InvalidMatchAttemptIdUserNotRegistered_ThrowsError()
+    {
+        // Arrange
+        string userId = Guid.NewGuid().ToString();
+        Guid anotherUserId = Guid.NewGuid();
+        Guid matchAttemptId = Guid.NewGuid();
+        Guid questionId = Guid.NewGuid();
+        Guid optionId = Guid.NewGuid();
+        MatchAttempt matchAttempt = new MatchAttempt
+        {
+            Id = matchAttemptId,
+            UserId = anotherUserId
+        };
+
+        _mockCurrentUser.Setup(user => user.UserId).Returns(userId);
+        _mockMatchAttemptRepository
+            .Setup(repo => repo.GetByIdAsync(matchAttemptId))
+            .ReturnsAsync(matchAttempt);
+
+        var dto = new SubmitAnswersRequestDto
+        {
+            Answers = [new SubmitAnswerBody(questionId, optionId, DateTimeOffset.UtcNow.AddMinutes(-1))]
+        };
+
+        // Act & Assert
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(
+            () => _submitAnswersUseCase.Execute(matchAttemptId, dto)
+        );
     }
 }
