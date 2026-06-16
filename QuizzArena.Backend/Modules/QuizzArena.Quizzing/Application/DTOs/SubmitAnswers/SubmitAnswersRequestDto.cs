@@ -1,4 +1,4 @@
-namespace QuizzArena.Quizzing.Application.DTOs.SubmitAnswers;
+﻿namespace QuizzArena.Quizzing.Application.DTOs.SubmitAnswers;
 
 public class SubmitAnswersRequestDto
 {
@@ -7,7 +7,7 @@ public class SubmitAnswersRequestDto
 
 public record SubmitAnswerBody
 (
-	Guid QuestionId,
-	Guid SelectedOptionId,
-	DateTimeOffset AnsweredAt
+    Guid QuestionId,
+    Guid SelectedOptionId,
+    DateTimeOffset AnsweredAt
 );

@@ -1,4 +1,4 @@
-using FluentValidation;
+﻿using FluentValidation;
 using QuizzArena.Quizzing.Application.DTOs.SubmitAnswers;
 
 namespace QuizzArena.Quizzing.Application.Validators;

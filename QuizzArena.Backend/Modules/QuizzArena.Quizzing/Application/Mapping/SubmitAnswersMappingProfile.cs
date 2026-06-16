@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using QuizzArena.Quizzing.Application.DTOs.SubmitAnswers;
 using QuizzArena.Quizzing.Domain.Entities;
 

@@ -1,4 +1,4 @@
-namespace QuizzArena.Quizzing.Application.DTOs.SubmitAnswers;
+﻿namespace QuizzArena.Quizzing.Application.DTOs.SubmitAnswers;
 
 public class SubmitAnswersResponseDto
 {
