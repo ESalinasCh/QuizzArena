@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
+using QuizzArena.Quizzing.Application.DTOs.Match;
 using QuizzArena.Quizzing.Application.Ports.In;
 using QuizzArena.Quizzing.Application.Ports.Out;
 using QuizzArena.Quizzing.Application.UseCases;
@@ -32,7 +34,7 @@ public static class DependencyInjection
         services.AddScoped<IMatchAttemptRepository, SqlMatchAttemptRepository>();
         services.AddScoped<IQuizQuestionRepository, SqlQuizQuestionRepository>();
 
-        services.AddScoped<MatchQueryParametersValidator>();
+        services.AddScoped<IValidator<MatchQueryParametersDto>, MatchQueryParametersValidator>();
 
         #region BDD
         var connectionString = configuration.GetConnectionString("DefaultConnection");
