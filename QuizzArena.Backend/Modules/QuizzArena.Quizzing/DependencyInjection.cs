@@ -16,6 +16,10 @@ using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence;
 using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Repositories;
 using QuizzArena.Quizzing.Application.UseCases;
 using QuizzArena.Quizzing.Application.Validators;
+using QuizzArena.Quizzing.Application.Ports.In;
+using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
+using QuizzArena.Quizzing.Application.UseCases;
+using QuizzArena.Quizzing.Application.Validators.FiltersValidators;
 using QuizzArena.Quizzing.Domain.Enums;
 using QuizzArena.Quizzing.Infrastructure.Adapters.In.Web;
 using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence;
@@ -56,6 +60,15 @@ public static class DependencyInjection
         services.AddScoped<IQuizQuestionRepository, SqlQuizQuestionRepository>();
 
         services.AddScoped<IValidator<MatchQueryParametersDto>, MatchQueryParametersValidator>();
+        services.AddScoped<IMatchQueriesRepository, SqlMatchQueriesRepository>();
+        services.AddScoped<IGetMatchAttemptsByStudent, GetMatchAttemptsByStudent>();
+
+        services.AddScoped<IMatchRepository, SqlMatchRepository>();
+        services.AddScoped<IGetMatchAttemptDetail, GetMatchAttemptDetail>();
+        services.AddScoped<IQuestionQueriesRepository, SqlQuestionQueriesRepository>();
+
+        services.AddScoped<MatchAttemptFiltersValidator>();
+
 
         #region BDD
         var connectionString = configuration.GetConnectionString("DefaultConnection");

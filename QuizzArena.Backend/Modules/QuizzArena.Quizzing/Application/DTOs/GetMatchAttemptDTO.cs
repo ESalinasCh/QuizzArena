@@ -4,7 +4,7 @@ using QuizzArena.Quizzing.Domain.Enums;
 
 namespace QuizzArena.Quizzing.Application.DTOs;
 
-internal record GetMatchAttemptDTO
+public record GetMatchAttemptDTO
 {
     public Guid Id { get; set; }
     public string? Title { get; set; }
