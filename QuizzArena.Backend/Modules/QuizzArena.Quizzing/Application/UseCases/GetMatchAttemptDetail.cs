@@ -9,12 +9,8 @@ internal class GetMatchAttemptDetail(IMatchRepository matchRepository, IQuestion
 {
     public async Task<GetMatchAttemptDetailDTO> Execute(Guid matchAttemptId)
     {
-        MatchAttempt? matchAttempt = await matchRepository.GetMatchAttemptsDetailById(matchAttemptId);
-        if (matchAttempt == null)
-        {
-            throw new InvalidOperationException(); //TO DO EXCEPTION HANDLERS
-        }
-        List<Question> questions = await questionQueriesRepository.GetQuestionsByIds(matchAttempt.MatchAttemptQuestions.Select(x=> x.QuestionId).ToList());
+        MatchAttempt? matchAttempt = await matchRepository.GetMatchAttemptsDetailById(matchAttemptId) ?? throw new InvalidOperationException();
+        List<Question> questions = await questionQueriesRepository.GetQuestionsByIds(matchAttempt.MatchAttemptQuestions.Select(x => x.QuestionId).ToList());
         var answersDictionary = matchAttempt.Answers.ToDictionary(x => x.QuestionId);
 
         var matchAttemptDetail = new GetMatchAttemptDetailDTO()

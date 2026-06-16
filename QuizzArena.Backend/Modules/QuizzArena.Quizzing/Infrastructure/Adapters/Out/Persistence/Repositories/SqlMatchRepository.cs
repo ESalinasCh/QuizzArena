@@ -51,6 +51,6 @@ internal class SqlMatchRepository(QuizzingDbContext context) : IMatchRepository
     }
     public async Task<MatchAttempt?> GetMatchAttemptsDetailById(Guid matchAttemptId)
     {
-        return await context.MatchAttempts.Include(x=> x.Answers).Include(x=> x.MatchAttemptQuestions).FirstOrDefaultAsync(x=> x.Id == matchAttemptId);
+        return await context.MatchAttempts.Include(x => x.Answers).Include(x => x.MatchAttemptQuestions).FirstOrDefaultAsync(x => x.Id == matchAttemptId);
     }
 }
