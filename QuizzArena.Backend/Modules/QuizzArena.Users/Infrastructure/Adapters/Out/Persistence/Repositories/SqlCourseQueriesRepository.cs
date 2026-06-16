@@ -16,7 +16,7 @@ internal class SqlCourseQueriesRepository(UserDbContext context) : ICourseQuerie
     }
     public async Task<List<Course>> GetCoursesByIds(List<Guid> coursesIds)
     {
-        List<Course> courses = await context.Courses.Where(x=>
+        List<Course> courses = await context.Courses.Where(x =>
             coursesIds.Contains(x.Id)
        ).ToListAsync();
 

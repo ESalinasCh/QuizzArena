@@ -1,19 +1,27 @@
-﻿using System.Text.RegularExpressions;
-using AutoMapper;
+﻿using FluentValidation;
 using QuizzArena.Quizzing.Application.DTOs;
+using QuizzArena.Quizzing.Application.Filters;
+using QuizzArena.Quizzing.Application.Ports.In;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
+using QuizzArena.Quizzing.Application.Validators.FiltersValidators;
 using QuizzArena.Quizzing.Domain.Entities;
 using Shared.Contracts;
 
 namespace QuizzArena.Quizzing.Application.UseCases;
 
-internal class GetMatchAttemptsByStudent(IMatchQueriesRepository matchRepository, ICourseContract courseContract)
+internal class GetMatchAttemptsByStudent(
+    IMatchQueriesRepository matchRepository,
+    ICourseContract courseContract,
+    MatchAttemptFiltersValidator filtersValidator
+    ) : IGetMatchAttemptsByStudent
 {
-    public async Task<List<GetMatchAttemptDTO>> Execute(Guid studentId)
+    public async Task<List<GetMatchAttemptDTO>> Execute(Guid studentId, MatchAttemptFilters filters)
     {
-        List<MatchAttempt> matchAttempts = await matchRepository.GetAttemptsByStudentId(studentId);
+        await filtersValidator.ValidateAndThrowAsync(filters);
+
+        List<MatchAttempt> matchAttempts = await matchRepository.GetAttemptsByStudentId(studentId, filters);
         var matches = await matchRepository.GetMatchesByIds(matchAttempts.Select(x => x.MatchId).Distinct().ToList());
-        var courses = await courseContract.GetCoursesByIds(matches.Select(x=> x.CourseId).Distinct().ToList());
+        var courses = await courseContract.GetCoursesByIds(matches.Select(x => x.CourseId).Distinct().ToList());
 
         var matchesDictionary = matches.ToDictionary(x => x.Id);
         var coursesDictionary = courses.ToDictionary(x => x.Id);

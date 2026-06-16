@@ -1,10 +1,11 @@
-﻿using QuizzArena.Quizzing.Domain.Entities;
+﻿using QuizzArena.Quizzing.Application.Filters;
+using QuizzArena.Quizzing.Domain.Entities;
 
 namespace QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 
 internal interface IMatchQueriesRepository
 {
-    Task<List<Match>> GetMatchesByIds (List<Guid> matchIds);
+    Task<List<Match>> GetMatchesByIds(List<Guid> matchIds);
 
-    Task<List<MatchAttempt>> GetAttemptsByStudentId(Guid studentId );
+    Task<List<MatchAttempt>> GetAttemptsByStudentId(Guid studentId, MatchAttemptFilters filters);
 }
