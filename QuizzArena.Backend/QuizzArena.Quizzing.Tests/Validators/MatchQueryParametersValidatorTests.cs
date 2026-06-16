@@ -4,6 +4,7 @@ using QuizzArena.Quizzing.Application.Validators;
 using QuizzArena.Quizzing.Domain.Enums;
 
 namespace QuizzArena.Quizzing.Tests.Validators;
+
 public class MatchQueryParametersValidatorTests
 {
     private readonly MatchQueryParametersValidator _validator = new();
