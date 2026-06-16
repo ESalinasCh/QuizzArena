@@ -19,6 +19,9 @@ internal sealed class QuestionConfiguration : IEntityTypeConfiguration<Question>
             .HasMaxLength(255)
             .IsRequired();
 
+        builder.Property(x => x.Justification)
+            .HasMaxLength(600);
+
         builder.Property(x => x.Status)
             .IsRequired().HasColumnType($"{QuizzingConstants.Schema}.question_status");
 

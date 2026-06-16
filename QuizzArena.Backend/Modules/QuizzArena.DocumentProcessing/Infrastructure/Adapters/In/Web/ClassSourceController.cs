@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using QuizzArena.DocumentProcessing.Application.DTOs.ClassSource;
 using QuizzArena.DocumentProcessing.Application.Ports.In;
 
@@ -11,6 +12,7 @@ public class ClassSourceController(
 ) : ControllerBase
 {
     [HttpPost]
+    [Authorize(Roles = "teacher")]
     [RequestSizeLimit(500_000_000)]
     [RequestFormLimits(MultipartBodyLengthLimit = 500_000_000)]
     public async Task<ActionResult<UploadClassSourceResponseDto>> UploadClassSource([FromForm] UploadClassSourceRequestDto dto)

@@ -1,0 +1,8 @@
+﻿using QuizzArena.Quizzing.Domain.Entities;
+
+namespace QuizzArena.Quizzing.Application.Ports.Out;
+
+public interface IQuizQuestionRepository
+{
+    public Task CreateMultipleAsync(IEnumerable<QuizQuestion> questions);
+}

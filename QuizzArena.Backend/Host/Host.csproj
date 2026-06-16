@@ -8,6 +8,8 @@
 
 	<ItemGroup>
 		<PackageReference Include="Asp.Versioning.Mvc" Version="10.0.0" />
+		<PackageReference Include="MassTransit" Version="9.1.2" />
+		<PackageReference Include="MassTransit.RabbitMQ" Version="9.1.2" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.8" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.8" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.8">
@@ -27,5 +29,8 @@
 		<ProjectReference Include="..\Modules\QuizzArena.Quizzing\QuizzArena.Quizzing.csproj" />
 		<ProjectReference Include="..\Modules\QuizzArena.Users\QuizzArena.Users.csproj" />
 		<ProjectReference Include="..\Modules\QuizzArena.DocumentProcessing\QuizzArena.DocumentProcessing.csproj" />
+    <None Update="MockData\quiz.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
 	</ItemGroup>
 </Project>

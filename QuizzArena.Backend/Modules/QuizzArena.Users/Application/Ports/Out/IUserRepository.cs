@@ -6,5 +6,4 @@ public interface IUserRepository
 {
     Task<bool> ExistsAsync(string providerId);
     Task Register(User user);
-
 }

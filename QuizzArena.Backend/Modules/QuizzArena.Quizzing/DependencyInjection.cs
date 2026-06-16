@@ -2,9 +2,16 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
+using QuizzArena.Quizzing.Application.Ports.In;
+using QuizzArena.Quizzing.Application.Ports.Out;
+using QuizzArena.Quizzing.Application.UseCases.Quiz;
+using QuizzArena.Quizzing.Application.Validators.Option;
+using QuizzArena.Quizzing.Application.Validators.Question;
+using QuizzArena.Quizzing.Application.Validators.Quiz;
 using QuizzArena.Quizzing.Domain.Enums;
 using QuizzArena.Quizzing.Infrastructure.Adapters.In.Web;
 using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence;
+using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Repositories;
 using Shared.Contracts;
 
 namespace QuizzArena.Quizzing;
@@ -16,6 +23,20 @@ public static class DependencyInjection
         services.AddControllers()
             .AddApplicationPart(typeof(IQuizzingInfrastructureMarker).Assembly);
 
+        services.AddScoped<CreateQuizDtoValidator>();
+        services.AddScoped<CreateQuestionDtoValidator>();
+        services.AddScoped<CreateQuestionsDtoValidator>();
+        services.AddScoped<CreateOptionDtoValidator>();
+        services.AddScoped<CreateOptionsDtoValidator>();
+        services.AddAutoMapper(cfg => { }, typeof(DependencyInjection).Assembly);
+
+        services.AddScoped<ICreateQuizUseCase, CreateQuizUseCase>();
+        services.AddScoped<ICreateQuestionsUseCase, CreateQuestionsUseCase>();
+        services.AddScoped<ICreateOptionsUseCase, CreateOptionsUseCase>();
+        services.AddScoped<IQuizRepository, SqlQuizRepository>();
+        services.AddScoped<IQuestionRepository, SqlQuestionRepository>();
+        services.AddScoped<IOptionRepository, SqlOptionRepository>();
+        services.AddScoped<IQuizQuestionRepository, SqlQuizQuestionRepository>();
 
         #region BDD
         var connectionString = configuration.GetConnectionString("DefaultConnection");

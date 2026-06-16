@@ -1,5 +1,4 @@
 ﻿using Azure.Storage.Blobs;
-using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,8 +8,6 @@ using QuizzArena.DocumentProcessing.Application.Ports.Out;
 using QuizzArena.DocumentProcessing.Application.UseCases;
 using QuizzArena.DocumentProcessing.Application.Validators;
 using QuizzArena.DocumentProcessing.Domain.Enums;
-using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Consumers;
-using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Sagas;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Web;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.Repositories;
@@ -44,25 +41,6 @@ public static class DependencyInjection
             var whisperUrl = configuration["WhisperSettings:BaseUrl"] ?? "http://localhost:9000/";
             client.BaseAddress = new Uri(whisperUrl);
             client.Timeout = TimeSpan.FromMinutes(60);
-        });
-
-        services.AddMassTransit(x =>
-        {
-            x.AddSagaStateMachine<IngestionSaga, IngestionSagaState>()
-                .InMemoryRepository();
-
-            x.AddConsumer<TranscriptionRequestConsumer>();
-
-            x.UsingRabbitMq((context, cfg) =>
-            {
-                cfg.Host("localhost", "/", h =>
-                {
-                    h.Username("guest");
-                    h.Password("guest");
-                });
-
-                cfg.ConfigureEndpoints(context);
-            });
         });
 
         #region BDD

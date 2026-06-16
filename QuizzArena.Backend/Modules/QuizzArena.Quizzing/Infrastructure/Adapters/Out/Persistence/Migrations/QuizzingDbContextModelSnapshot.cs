@@ -184,6 +184,11 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamptz");
 
+                    b.Property<string>("Justification")
+                        .IsRequired()
+                        .HasMaxLength(600)
+                        .HasColumnType("character varying(600)");
+
                     b.Property<Guid?>("ProcessingJobId")
                         .HasColumnType("uuid");
 

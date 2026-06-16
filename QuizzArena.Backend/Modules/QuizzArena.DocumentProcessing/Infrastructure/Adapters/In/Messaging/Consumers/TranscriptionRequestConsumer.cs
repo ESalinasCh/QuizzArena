@@ -3,6 +3,8 @@ using QuizzArena.DocumentProcessing.Application.Messaging.Commands;
 using QuizzArena.DocumentProcessing.Application.Messaging.Events;
 using QuizzArena.DocumentProcessing.Application.Ports.Out;
 using QuizzArena.DocumentProcessing.Domain.Entities;
+using QuizzArena.DocumentProcessing.Domain.Enums;
+using Shared.Messaging.Events;
 using static QuizzArena.DocumentProcessing.Application.Ports.Out.IDocumentChunkRepository;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Consumers;
@@ -28,10 +30,11 @@ public class TranscriptionRequestConsumer(
             if (classSource != null)
             {
                 classSource.TranscriptUrl = transcriptUrl;
+                classSource.Status = SourceStatus.Processing;
                 await classSourceRepository.UpdateAsync(classSource);
             }
 
-            await context.Publish<TranscriptionSuccessEvent>(new TranscriptionSuccessEvent
+            await context.Publish<TranscriptionCompletedEvent>(new TranscriptionCompletedEvent
             {
                 ClassSourceId = command.ClassSourceId,
                 TranscriptUrl = transcriptUrl

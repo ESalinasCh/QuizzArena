@@ -1,0 +1,64 @@
+{
+  "Title": "Math Quiz",
+  "Description": "Generated quiz",
+  "Questions": [
+    {
+      "Content": "What is 2 + 2?",
+      "Type": "MultipleChoice",
+      "Justification": "The sum of 2 and 2 is 4.",
+      "Position": 1,
+      "ValueScore": 10,
+      "Options": [
+        {
+          "Description": "3",
+          "Position": 1,
+          "isCorrect": false
+        },
+        {
+          "Description": "4",
+          "Position": 2,
+          "IsCorrect": true
+        },
+        {
+          "Description": "5",
+          "Position": 3,
+          "IsCorrect": false
+        },
+        {
+          "Description": "Fish",
+          "Position": 4,
+          "IsCorrect": false
+        }
+      ]
+    },
+    {
+      "Content": "¿Cómo se procesa el archivo subido en la propuesta dada?",
+      "Type": "MultipleChoice",
+      "Justification": "Según las palabras del contenido de clase, 'automáticamente cuando uno sube un archivo, cualquiera que sea, él se procesa de manera inmediata con el OCR. No hay que ni siquiera solicitarlo en la UI. Simplemente se hace.', lo que confirma que la opción b es correcta.",
+      "Position": 2,
+      "ValueScore": 10,
+      "Options": [
+        {
+          "Description": "Se realiza un proceso de ingesta automático que inmediatamente aplica el OCR al archivo subido.",
+          "Position": 1,
+          "isCorrect": true
+        },
+        {
+          "Description": "El usuario debe pedir procesamiento a través de una interfaz de usuario (UI) antes del OCR.",
+          "Position": 2,
+          "IsCorrect": false
+        },
+        {
+          "Description": "Se guarda primero en un servidor remoto y luego se solicita el OCR a través de la UI.",
+          "Position": 3,
+          "IsCorrect": false
+        },
+        {
+          "Description": "El archivo es procesado manualmente por un operador antes de aplicar el OCR.",
+          "Position": 4,
+          "IsCorrect": false
+        }
+      ]
+    }
+  ]
+}
