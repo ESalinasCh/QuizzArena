@@ -9,7 +9,7 @@ internal class UserSeeder
     {
         var users = new[]
         {
-            new User 
+            new User
             {
                 Id = UserConstants.TeacherId,
                 UserName = "teacher01",
@@ -21,7 +21,7 @@ internal class UserSeeder
                 ProviderId = UserConstants.TeacherId.ToString(),
                 CreatedAt = DateTime.UtcNow
             },
-            new User 
+            new User
             {
                 Id = UserConstants.StudentId,
                 UserName = "student01",
