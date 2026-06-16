@@ -1,10 +1,8 @@
-﻿using Moq;
-using FluentValidation;
-using FluentValidation.Results;
+﻿using FluentValidation;
+using Moq;
 using QuizzArena.Quizzing.Application.DTOs.Match;
 using QuizzArena.Quizzing.Application.Ports.Out;
 using QuizzArena.Quizzing.Application.UseCases;
-using QuizzArena.Quizzing.Application.Validators;
 using Shared.Contracts;
 using Shared.Contracts.DTOs;
 
