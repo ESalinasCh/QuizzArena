@@ -10,13 +10,14 @@ using Shared.Contracts.DTOs;
 
 namespace QuizzArena.Quizzing.Application.UseCases;
 
-internal class StartAttemptUseCase(
+public class StartAttemptUseCase(
     ICurrentUser currentUser,
     ICourseContract courseImpl,
     IMatchRepository matchRepository,
     IQuizRepository quizRepository,
     IQuizQuestionRepository quizQuestionRepository,
-    IMatchAttemptRepository matchAttemptRepository
+    IMatchAttemptRepository matchAttemptRepository,
+    Random? random = null
 ) : IStartAttemptUseCase
 {
     public async Task<StartAttemptResponseDto> Execute(StartAttemptRequestDto request)
@@ -55,22 +56,22 @@ internal class StartAttemptUseCase(
             throw new Exception("No questions were found for this match");
         }
 
-        var random = new Random();
-        if (match.QuestionsAmount is int amount && questions.Count > match.QuestionsAmount)
+        var _random = random ?? new Random();
+        if (match.QuestionsAmount is int amount && questions.Count > amount)
         {
-            questions = questions.OrderBy(_ => random.Next()).Take(amount).ToList();
+            questions = questions.Take(amount).ToList();
         }
 
         if (match.ShuffleQuestion)
         {
-            questions = questions.OrderBy(_ => random.Next()).ToList();
+            questions = questions.OrderBy(_ => _random.Next()).ToList();
         }
 
         if (match.ShuffleOptions)
         {
             foreach (var question in questions)
             {
-                question.Options = question.Options.OrderBy(_ => random.Next()).ToList();
+                question.Options = question.Options.OrderBy(_ => _random.Next()).ToList();
             }
         }
 

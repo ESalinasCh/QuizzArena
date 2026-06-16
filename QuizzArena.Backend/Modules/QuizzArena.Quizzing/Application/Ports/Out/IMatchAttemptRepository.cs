@@ -2,7 +2,7 @@
 
 namespace QuizzArena.Quizzing.Application.Ports.Out;
 
-internal interface IMatchAttemptRepository
+public interface IMatchAttemptRepository
 {
     Task<MatchAttempt> AddMatchAttemptAsync(MatchAttempt matchAttempt);
 
