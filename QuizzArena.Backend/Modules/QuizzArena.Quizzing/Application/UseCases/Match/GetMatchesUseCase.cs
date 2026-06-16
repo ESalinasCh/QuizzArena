@@ -2,7 +2,6 @@
 using QuizzArena.Quizzing.Application.DTOs.Match;
 using QuizzArena.Quizzing.Application.Ports.In;
 using QuizzArena.Quizzing.Application.Ports.Out;
-using QuizzArena.Quizzing.Application.Validators;
 using QuizzArena.Quizzing.Domain.Entities;
 using Shared.Contracts;
 using Shared.Contracts.DTOs;
@@ -10,7 +9,7 @@ using Shared.Contracts.DTOs;
 namespace QuizzArena.Quizzing.Application.UseCases;
 
 public class GetMatchesUseCase(
-    MatchQueryParametersValidator queryValidator,
+    IValidator<MatchQueryParametersDto> queryValidator,
     ICourseContract courseImpl,
     IMatchRepository matchRepository,
     ICurrentUser currentUser
