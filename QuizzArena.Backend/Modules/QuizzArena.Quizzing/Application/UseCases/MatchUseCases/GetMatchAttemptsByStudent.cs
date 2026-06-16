@@ -7,16 +7,18 @@ using QuizzArena.Quizzing.Application.Validators.FiltersValidators;
 using QuizzArena.Quizzing.Domain.Entities;
 using Shared.Contracts;
 
-namespace QuizzArena.Quizzing.Application.UseCases;
+namespace QuizzArena.Quizzing.Application.UseCases.MatchUseCases;
 
-internal class GetMatchAttemptsByStudent(
+public class GetMatchAttemptsByStudent(
+    ICurrentUser currentUser,
     IMatchQueriesRepository matchRepository,
     ICourseContract courseContract,
     MatchAttemptFiltersValidator filtersValidator
     ) : IGetMatchAttemptsByStudent
 {
-    public async Task<List<GetMatchAttemptDTO>> Execute(Guid studentId, MatchAttemptFilters filters)
+    public async Task<List<GetMatchAttemptDTO>> Execute( MatchAttemptFilters filters)
     {
+        Guid studentId = Guid.Parse(currentUser.UserId);
         await filtersValidator.ValidateAndThrowAsync(filters);
 
         List<MatchAttempt> matchAttempts = await matchRepository.GetAttemptsByStudentId(studentId, filters);
@@ -33,7 +35,7 @@ internal class GetMatchAttemptsByStudent(
             return new GetMatchAttemptDTO()
             {
                 Id = x.Id,
-                Title = "", //missing
+                Title = match.Title,
                 CourseName = course.CourseName,
                 StartedAt = x.StartDateTime,
                 CompletedAt = x.EndDateTime,

@@ -1,6 +1,6 @@
 ﻿using QuizzArena.Quizzing.Domain.Entities;
 
-namespace QuizzArena.Quizzing.Application.Ports.Out;
+namespace QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 
 public interface IMatchAttemptRepository
 {

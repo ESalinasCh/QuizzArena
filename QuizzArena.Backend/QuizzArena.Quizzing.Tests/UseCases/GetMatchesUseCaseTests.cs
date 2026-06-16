@@ -1,8 +1,9 @@
 ﻿using FluentValidation;
 using Moq;
 using QuizzArena.Quizzing.Application.DTOs.Match;
-using QuizzArena.Quizzing.Application.Ports.Out;
+using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Application.UseCases;
+using QuizzArena.Quizzing.Application.UseCases.MatchUseCases;
 using Shared.Contracts;
 using Shared.Contracts.DTOs;
 

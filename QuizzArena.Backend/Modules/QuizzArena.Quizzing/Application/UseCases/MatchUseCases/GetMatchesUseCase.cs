@@ -1,12 +1,12 @@
 ﻿using FluentValidation;
 using QuizzArena.Quizzing.Application.DTOs.Match;
 using QuizzArena.Quizzing.Application.Ports.In;
-using QuizzArena.Quizzing.Application.Ports.Out;
-using QuizzArena.Quizzing.Domain.Entities;
+using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using Shared.Contracts;
 using Shared.Contracts.DTOs;
+using QuizzArena.Quizzing.Domain.Entities;
 
-namespace QuizzArena.Quizzing.Application.UseCases;
+namespace QuizzArena.Quizzing.Application.UseCases.MatchUseCases;
 
 public class GetMatchesUseCase(
     IValidator<MatchQueryParametersDto> queryValidator,
@@ -29,7 +29,7 @@ public class GetMatchesUseCase(
             return new MatchResponseDto()
             {
                 Id = m.Id,
-                Title = "aaaa", // Replace
+                Title = m.Title,
                 CourseName = course.CourseName
             };
         }).ToList();

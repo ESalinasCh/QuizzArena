@@ -5,5 +5,5 @@ namespace QuizzArena.Quizzing.Application.Ports.In;
 
 public interface IGetMatchAttemptsByStudent
 {
-    Task<List<GetMatchAttemptDTO>> Execute(Guid studentId, MatchAttemptFilters filters);
+    Task<List<GetMatchAttemptDTO>> Execute( MatchAttemptFilters filters);
 }

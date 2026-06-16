@@ -6,6 +6,7 @@ public class Match
 {
     public Guid Id { get; set; }
     public string Code { get; set; } = string.Empty;
+    public string? Title { get; set; }
     public MatchStatus Status { get; set; } = MatchStatus.Pending;
     public DateTimeOffset StartedAt { get; set; }
     public DateTimeOffset? FinishedAt { get; set; }

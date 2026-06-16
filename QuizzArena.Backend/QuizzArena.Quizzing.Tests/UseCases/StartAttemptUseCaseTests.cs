@@ -1,8 +1,8 @@
 ﻿using Moq;
 using QuizzArena.Quizzing.Application.DTOs.MatchAttempt;
 using QuizzArena.Quizzing.Application.Ports.In;
-using QuizzArena.Quizzing.Application.Ports.Out;
-using QuizzArena.Quizzing.Application.UseCases;
+using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
+using QuizzArena.Quizzing.Application.UseCases.MatchUseCases;
 using QuizzArena.Quizzing.Domain.Entities;
 using QuizzArena.Quizzing.Domain.Enums;
 using Shared.Contracts;
