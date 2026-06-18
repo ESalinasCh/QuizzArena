@@ -36,6 +36,11 @@ public class SubmitAnswersUseCase(
             throw new UnauthorizedAccessException("User doesn't belong to this match attempt.");
         }
 
+        if (matchAttempt.Status == Domain.Enums.QuizAttemptStatus.Completed)
+        {
+            throw new UnauthorizedAccessException("User already completed this match attempt.");
+        }
+
         // Validate incoming object
         await submitAnswersValidator.ValidateAndThrowAsync(dto);
 
