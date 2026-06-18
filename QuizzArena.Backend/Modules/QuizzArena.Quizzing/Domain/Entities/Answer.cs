@@ -9,5 +9,5 @@ public class Answer
 
     public Guid OptionId { get; set; }
     public Guid QuestionId { get; set; }
-    public Guid QuizAttemptId { get; set; }
+    public Guid MatchAttemptId { get; set; }
 }

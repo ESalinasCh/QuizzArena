@@ -4,11 +4,11 @@ using QuizzArena.Quizzing.Domain.Entities;
 
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Configurations;
 
-internal sealed class QuizAttemptConfiguration : IEntityTypeConfiguration<QuizAttempt>
+internal sealed class QuizAttemptConfiguration : IEntityTypeConfiguration<MatchAttempt>
 {
-    public void Configure(EntityTypeBuilder<QuizAttempt> builder)
+    public void Configure(EntityTypeBuilder<MatchAttempt> builder)
     {
-        builder.ToTable("quiz_attempt", QuizzingConstants.Schema);
+        builder.ToTable("match_attempt", QuizzingConstants.Schema);
 
         builder.HasKey(x => x.Id);
 
@@ -35,6 +35,7 @@ internal sealed class QuizAttemptConfiguration : IEntityTypeConfiguration<QuizAt
             .HasForeignKey(x => x.MatchId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasMany(x => x.Answers).WithOne().HasForeignKey(x => x.QuizAttemptId);
+        builder.HasMany(x => x.Answers).WithOne().HasForeignKey(x => x.MatchAttemptId);
+        builder.HasMany(x => x.MatchAttemptQuestions).WithOne(y => y.MatchAttempt).HasForeignKey(y => y.MatchAttemptId);
     }
 }

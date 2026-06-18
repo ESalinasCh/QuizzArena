@@ -1,10 +1,17 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
+using QuizzArena.Quizzing.Application.DTOs.Match;
 using QuizzArena.Quizzing.Application.Ports.In;
 using QuizzArena.Quizzing.Application.Ports.Out;
-using QuizzArena.Quizzing.Application.UseCases.Quiz;
+using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
+using QuizzArena.Quizzing.Application.UseCases.MatchUseCases;
+using QuizzArena.Quizzing.Application.UseCases.QuizUseCases;
+using QuizzArena.Quizzing.Application.UseCases.SubmitAnswers;
+using QuizzArena.Quizzing.Application.Validators;
+using QuizzArena.Quizzing.Application.Validators.FiltersValidators;
 using QuizzArena.Quizzing.Application.Validators.Option;
 using QuizzArena.Quizzing.Application.Validators.Question;
 using QuizzArena.Quizzing.Application.Validators.Quiz;
@@ -12,6 +19,7 @@ using QuizzArena.Quizzing.Domain.Enums;
 using QuizzArena.Quizzing.Infrastructure.Adapters.In.Web;
 using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence;
 using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Repositories;
+using QuizzArena.Users.Infrastructure.Adapters.Out.Persistence.Repositories;
 using Shared.Contracts;
 
 namespace QuizzArena.Quizzing;
@@ -28,7 +36,6 @@ public static class DependencyInjection
         services.AddScoped<CreateQuestionsDtoValidator>();
         services.AddScoped<CreateOptionDtoValidator>();
         services.AddScoped<CreateOptionsDtoValidator>();
-        services.AddAutoMapper(cfg => { }, typeof(DependencyInjection).Assembly);
 
         services.AddScoped<ICreateQuizUseCase, CreateQuizUseCase>();
         services.AddScoped<ICreateQuestionsUseCase, CreateQuestionsUseCase>();
@@ -37,6 +44,40 @@ public static class DependencyInjection
         services.AddScoped<IQuestionRepository, SqlQuestionRepository>();
         services.AddScoped<IOptionRepository, SqlOptionRepository>();
         services.AddScoped<IQuizQuestionRepository, SqlQuizQuestionRepository>();
+        services.AddAutoMapper(cfg => { }, typeof(DependencyInjection).Assembly);
+
+        #region Repositories
+        services.AddScoped<IMatchAttemptRepository, SqlMatchAttemptRepository>();
+        services.AddScoped<IQuizQuestionRepository, SqlQuizQuestionRepository>();
+        services.AddScoped<IMatchRepository, SqlMatchRepository>();
+        services.AddScoped<IQuizRepository, SqlQuizRepository>();
+        #endregion
+
+        #region UseCases
+        services.AddScoped<IGetMatchesUseCase, GetMatchesUseCase>();
+        services.AddScoped<IStartAttemptUseCase, StartAttemptUseCase>();
+        services.AddScoped<ISubmitAnswersUseCase, SubmitAnswersUseCase>();
+        #endregion
+
+        #region Validators
+        services.AddScoped<SubmitAnswersRequestValidator>();
+        services.AddScoped<SubmitAnswerBodyValidator>();
+        #endregion
+
+        services.AddScoped<IValidator<MatchQueryParametersDto>, MatchQueryParametersValidator>();
+        services.AddScoped<IMatchQueriesRepository, SqlMatchQueriesRepository>();
+        services.AddScoped<IGetMatchAttemptsByStudent, GetMatchAttemptsByStudent>();
+
+        services.AddScoped<IGetMatchAttemptDetail, GetMatchAttemptDetail>();
+        services.AddScoped<IQuestionQueriesRepository, SqlQuestionQueriesRepository>();
+
+        services.AddScoped<MatchAttemptFiltersValidator>();
+
+        #region Repositories
+        services.AddScoped<IOptionRepository, SqlOptionRepository>();
+        services.AddScoped<IMatchAttemptRepository, SqlMatchAttemptRepository>();
+        services.AddScoped<IQuestionRepository, SqlQuestionRepository>();
+        #endregion
 
         #region BDD
         var connectionString = configuration.GetConnectionString("DefaultConnection");
@@ -49,6 +90,9 @@ public static class DependencyInjection
         dataSourceBuilder.MapEnum<QuestionType>($"{QuizzingConstants.Schema}.question_type");
         dataSourceBuilder.MapEnum<QuizAttemptStatus>($"{QuizzingConstants.Schema}.quiz_attempt_status");
         dataSourceBuilder.MapEnum<QuizStatus>($"{QuizzingConstants.Schema}.quiz_status");
+        dataSourceBuilder.MapEnum<QuizOrigin>($"{QuizzingConstants.Schema}.quiz_origin");
+        dataSourceBuilder.MapEnum<QuestionOrigin>($"{QuizzingConstants.Schema}.question_origin");
+
 
         var dataSource = dataSourceBuilder.Build();
 
@@ -79,6 +123,14 @@ public static class DependencyInjection
                             );
                         o.MapEnum<QuizStatus>(
                             "quiz_status",
+                            QuizzingConstants.Schema
+                            );
+                        o.MapEnum<QuizOrigin>(
+                            "quiz_origin",
+                            QuizzingConstants.Schema
+                            );
+                        o.MapEnum<QuestionOrigin>(
+                            "question_origin",
                             QuizzingConstants.Schema
                             );
                     }

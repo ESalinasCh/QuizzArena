@@ -25,6 +25,9 @@ internal sealed class QuizConfiguration : IEntityTypeConfiguration<Quiz>
         builder.Property(x => x.Status)
             .IsRequired().HasColumnType($"{QuizzingConstants.Schema}.quiz_status");
 
+        builder.Property(x => x.Origin).
+           IsRequired().HasColumnType($"{QuizzingConstants.Schema}.quiz_origin");
+
         builder.Property(x => x.Deleted)
             .IsRequired()
             .HasDefaultValue(false); ;

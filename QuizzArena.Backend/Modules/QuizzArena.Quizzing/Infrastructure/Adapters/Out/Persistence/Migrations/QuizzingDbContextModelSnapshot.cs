@@ -23,9 +23,11 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "quizzing", "match_mode", new[] { "single", "multiple" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "quizzing", "match_status", new[] { "pending", "active", "expired" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "quizzing", "question_origin", new[] { "ai_generated", "mixed", "manually_created" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "quizzing", "question_status", new[] { "draft", "verified", "disapproved" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "quizzing", "question_type", new[] { "multiple_choice", "single_choice", "true_false" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "quizzing", "quiz_attempt_status", new[] { "in_progress", "completed", "timeout" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "quizzing", "quiz_origin", new[] { "ai_generated", "manually_created" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "quizzing", "quiz_status", new[] { "draft", "published", "archived" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
@@ -41,13 +43,13 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                     b.Property<bool>("IsCorrect")
                         .HasColumnType("boolean");
 
+                    b.Property<Guid>("MatchAttemptId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("OptionId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("QuestionId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("QuizAttemptId")
                         .HasColumnType("uuid");
 
                     b.Property<int>("TimeMs")
@@ -55,11 +57,11 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("MatchAttemptId");
+
                     b.HasIndex("OptionId");
 
                     b.HasIndex("QuestionId");
-
-                    b.HasIndex("QuizAttemptId");
 
                     b.ToTable("answer", "quizzing");
                 });
@@ -69,6 +71,9 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<int>("AttemptsAmount")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Code")
                         .IsRequired()
@@ -95,8 +100,17 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                     b.Property<MatchMode>("Mode")
                         .HasColumnType("quizzing.match_mode");
 
+                    b.Property<int?>("QuestionsAmount")
+                        .HasColumnType("integer");
+
                     b.Property<Guid>("QuizId")
                         .HasColumnType("uuid");
+
+                    b.Property<bool>("ShuffleOptions")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("ShuffleQuestion")
+                        .HasColumnType("boolean");
 
                     b.Property<DateTimeOffset>("StartedAt")
                         .HasColumnType("timestamptz");
@@ -106,6 +120,9 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
 
                     b.Property<int>("TimeMinutes")
                         .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamptz");
@@ -118,6 +135,69 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                     b.HasIndex("QuizId");
 
                     b.ToTable("match", "quizzing");
+                });
+
+            modelBuilder.Entity("QuizzArena.Quizzing.Domain.Entities.MatchAttempt", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("EndDateTime")
+                        .HasColumnType("timestamptz");
+
+                    b.Property<DateTimeOffset>("JoinedAt")
+                        .HasColumnType("timestamptz");
+
+                    b.Property<Guid>("MatchId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Nickname")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("Score")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("StartDateTime")
+                        .HasColumnType("timestamptz");
+
+                    b.Property<QuizAttemptStatus>("Status")
+                        .HasColumnType("quizzing.quiz_attempt_status");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MatchId");
+
+                    b.ToTable("match_attempt", "quizzing");
+                });
+
+            modelBuilder.Entity("QuizzArena.Quizzing.Domain.Entities.MatchAttemptQuestion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("MatchAttemptId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("QuestionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("ValueScore")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MatchAttemptId");
+
+                    b.HasIndex("QuestionId");
+
+                    b.ToTable("match_attempt_question", "quizzing");
                 });
 
             modelBuilder.Entity("QuizzArena.Quizzing.Domain.Entities.Option", b =>
@@ -189,6 +269,9 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                         .HasMaxLength(600)
                         .HasColumnType("character varying(600)");
 
+                    b.Property<QuestionOrigin>("Origin")
+                        .HasColumnType("quizzing.question_origin");
+
                     b.Property<Guid?>("ProcessingJobId")
                         .HasColumnType("uuid");
 
@@ -200,11 +283,6 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
 
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamptz");
-
-                    b.Property<bool>("WasModified")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
 
                     b.HasKey("Id");
 
@@ -239,6 +317,9 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
+                    b.Property<QuizOrigin>("Origin")
+                        .HasColumnType("quizzing.quiz_origin");
+
                     b.Property<QuizStatus>("Status")
                         .HasColumnType("quizzing.quiz_status");
 
@@ -253,45 +334,6 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("quiz", "quizzing");
-                });
-
-            modelBuilder.Entity("QuizzArena.Quizzing.Domain.Entities.QuizAttempt", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTimeOffset?>("EndDateTime")
-                        .HasColumnType("timestamptz");
-
-                    b.Property<DateTimeOffset>("JoinedAt")
-                        .HasColumnType("timestamptz");
-
-                    b.Property<Guid>("MatchId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Nickname")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<int>("Score")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTimeOffset>("StartDateTime")
-                        .HasColumnType("timestamptz");
-
-                    b.Property<QuizAttemptStatus>("Status")
-                        .HasColumnType("quizzing.quiz_attempt_status");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MatchId");
-
-                    b.ToTable("quiz_attempt", "quizzing");
                 });
 
             modelBuilder.Entity("QuizzArena.Quizzing.Domain.Entities.QuizQuestion", b =>
@@ -341,6 +383,12 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
 
             modelBuilder.Entity("QuizzArena.Quizzing.Domain.Entities.Answer", b =>
                 {
+                    b.HasOne("QuizzArena.Quizzing.Domain.Entities.MatchAttempt", null)
+                        .WithMany("Answers")
+                        .HasForeignKey("MatchAttemptId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("QuizzArena.Quizzing.Domain.Entities.Option", null)
                         .WithMany()
                         .HasForeignKey("OptionId")
@@ -351,12 +399,6 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("QuizzArena.Quizzing.Domain.Entities.QuizAttempt", null)
-                        .WithMany("Answers")
-                        .HasForeignKey("QuizAttemptId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -369,21 +411,40 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("QuizzArena.Quizzing.Domain.Entities.MatchAttempt", b =>
+                {
+                    b.HasOne("QuizzArena.Quizzing.Domain.Entities.Match", null)
+                        .WithMany()
+                        .HasForeignKey("MatchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("QuizzArena.Quizzing.Domain.Entities.MatchAttemptQuestion", b =>
+                {
+                    b.HasOne("QuizzArena.Quizzing.Domain.Entities.MatchAttempt", "MatchAttempt")
+                        .WithMany("MatchAttemptQuestions")
+                        .HasForeignKey("MatchAttemptId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QuizzArena.Quizzing.Domain.Entities.Question", "Question")
+                        .WithMany()
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MatchAttempt");
+
+                    b.Navigation("Question");
+                });
+
             modelBuilder.Entity("QuizzArena.Quizzing.Domain.Entities.Option", b =>
                 {
                     b.HasOne("QuizzArena.Quizzing.Domain.Entities.Question", null)
                         .WithMany("Options")
                         .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("QuizzArena.Quizzing.Domain.Entities.QuizAttempt", b =>
-                {
-                    b.HasOne("QuizzArena.Quizzing.Domain.Entities.Match", null)
-                        .WithMany()
-                        .HasForeignKey("MatchId")
-                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -402,6 +463,13 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("QuizzArena.Quizzing.Domain.Entities.MatchAttempt", b =>
+                {
+                    b.Navigation("Answers");
+
+                    b.Navigation("MatchAttemptQuestions");
+                });
+
             modelBuilder.Entity("QuizzArena.Quizzing.Domain.Entities.Question", b =>
                 {
                     b.Navigation("Options");
@@ -410,11 +478,6 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
             modelBuilder.Entity("QuizzArena.Quizzing.Domain.Entities.Quiz", b =>
                 {
                     b.Navigation("QuizQuestions");
-                });
-
-            modelBuilder.Entity("QuizzArena.Quizzing.Domain.Entities.QuizAttempt", b =>
-                {
-                    b.Navigation("Answers");
                 });
 #pragma warning restore 612, 618
         }

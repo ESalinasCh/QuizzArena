@@ -28,9 +28,8 @@ internal sealed class QuestionConfiguration : IEntityTypeConfiguration<Question>
         builder.Property(x => x.Type)
             .IsRequired().HasColumnType($"{QuizzingConstants.Schema}.question_type");
 
-        builder.Property(x => x.WasModified)
-            .IsRequired().
-            HasDefaultValue(false);
+        builder.Property(x => x.Origin).
+             IsRequired().HasColumnType($"{QuizzingConstants.Schema}.question_origin");
 
         builder.Property(x => x.Deleted)
             .IsRequired()

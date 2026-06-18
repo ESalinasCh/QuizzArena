@@ -2,7 +2,7 @@
 
 namespace QuizzArena.Quizzing.Domain.Entities;
 
-public class QuizAttempt
+public class MatchAttempt
 {
     public Guid Id { get; set; }
     public DateTimeOffset StartDateTime { get; set; }
@@ -16,5 +16,7 @@ public class QuizAttempt
     public Guid MatchId { get; set; }
 
     public ICollection<Answer> Answers { get; set; } = [];
+    public ICollection<MatchAttemptQuestion> MatchAttemptQuestions { get; set; } = [];
+
 }
 
