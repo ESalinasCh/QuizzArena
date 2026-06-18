@@ -1,1 +1,60 @@
+# ── Project-specific ────────────────────────────────────────
 QuizArena_Proyecto_Base.md
+
+# ── .NET build output ────────────────────────────────────────
+**/[Bb]in/
+**/[Oo]bj/
+**/[Pp]ublish/
+**/[Oo]ut/
+**/*.user
+**/*.suo
+**/*.userosscache
+**/*.sln.docstates
+
+# ── NuGet ────────────────────────────────────────────────────
+*.nupkg
+*.snupkg
+**/[Pp]ackages/
+!**/[Pp]ackages/build/
+nuget.config
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# ── Test results ─────────────────────────────────────────────
+**/TestResults/
+**/coverage/
+**/[Cc]overage*/
+*.trx
+*.coverage
+*.coveragexml
+lcov.info
+
+# ── Secrets & environment ────────────────────────────────────
+.env
+.env.*
+!.env.example
+**/secrets.json
+**/appsettings.Local.json
+**/appsettings.*.Local.json
+
+# ── Docker ───────────────────────────────────────────────────
+docker-compose.override.yml
+
+# ── IDE / editors ────────────────────────────────────────────
+.vs/
+.vscode/
+**/.vs/
+**/.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── OS ───────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ── Logs ─────────────────────────────────────────────────────
+*.log

@@ -1,0 +1,21 @@
+﻿using QuizzArena.Quizzing.Domain.Enums;
+
+namespace QuizzArena.Quizzing.Domain.Entities;
+
+public class Question
+{
+    public Guid Id { get; set; }
+    public string Content { get; set; } = string.Empty;
+    public string Justification { get; set; } = string.Empty;
+    public QuestionStatus Status { get; set; } = QuestionStatus.Draft;
+    public QuestionOrigin Origin { get; set; } = QuestionOrigin.AiGenerated;
+    public QuestionType Type { get; set; }
+    public bool Deleted { get; set; }
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset? DeletedAt { get; set; }
+
+    public Guid? ProcessingJobId { get; set; }
+
+    public ICollection<Option> Options { get; set; } = [];
+}

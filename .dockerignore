@@ -1,0 +1,25 @@
+# Build artifacts
+**/bin/
+**/obj/
+**/out/
+**/publish/
+
+# VCS / IDE / tooling
+.git/
+.github/
+.husky/
+.vs/
+.vscode/
+.idea/
+**/*.user
+
+# Docs and local files
+docs/
+**/*.md
+**/.env
+**/.env.*
+!**/.env.example
+
+# Docker
+Dockerfile
+.dockerignore
