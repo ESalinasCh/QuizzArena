@@ -3,6 +3,33 @@
 #   Bajo rendimiento (8GB RAM):    docker compose --profile low up -d
 
 services:
+  backend:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: quizarena_backend
+    environment:
+      # Run in Development so EF Core migrations are applied on startup and Swagger is served.
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      # Backing services resolved by their compose service names.
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
+      ConnectionStrings__AzureBlobStorage: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMA==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;"
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Username: guest
+      RabbitMq__Password: guest
+      WhisperSettings__BaseUrl: "http://whisper:9000/"
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      azurite:
+        condition: service_started
+    restart: unless-stopped
+
   postgres:
     image: pgvector/pgvector:pg17
     container_name: quizarena_db
@@ -28,6 +55,11 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
 
   ollama:
@@ -64,6 +96,10 @@ services:
       ASR_ENGINE: openai_whisper
     ports:
       - "9000:9000"
+    networks:
+      default:
+        aliases:
+          - whisper
     restart: unless-stopped
 
   whisper-low:
@@ -74,6 +110,10 @@ services:
       ASR_ENGINE: openai_whisper
     ports:
       - "9000:9000"
+    networks:
+      default:
+        aliases:
+          - whisper
     restart: unless-stopped
 
 volumes:
