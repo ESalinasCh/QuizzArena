@@ -98,7 +98,7 @@ public class StartAttemptUseCase(
 
         StartAttemptResponseDto AttemptQuestions = new StartAttemptResponseDto()
         {
-            MatchId = matchAttemptId,
+            MatchId = match.Id,
             MatchAttemptId = addedMatchAttempt.Id,
             Questions = questions.Select(q => new StartAttemptQuestionResponseDto()
             {
