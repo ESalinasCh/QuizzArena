@@ -58,6 +58,18 @@ build:
 restart:
     {{ compose }} restart backend
 
+# ── Setup ──────────────────────────────────────────────────────────────────────
+
+# Register git hooks — run once after cloning the repo
+# Optionally also installs Husky.Net (dotnet husky) if dotnet is available.
+install-hooks:
+    git config core.hooksPath .husky
+    chmod +x .husky/commit-msg .husky/pre-commit .husky/pre-push
+    @echo "✔  git hooks registered (core.hooksPath = .husky)"
+    cd {{ backend }} && dotnet tool restore && dotnet husky install \
+        && echo "✔  Husky.Net installed" \
+        || echo "⚠  dotnet not available — hooks work without it, Husky.Net integration skipped"
+
 # ── Dev helpers ────────────────────────────────────────────────────────────────
 
 # Open Swagger UI in the default browser
