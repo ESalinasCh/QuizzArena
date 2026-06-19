@@ -14,6 +14,12 @@
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningsAsErrors>nullable,CA2208,CA1816,CA1063</WarningsAsErrors>
 
+    <!-- Generate XML docs so IDE0005 (remove unnecessary usings) can run at build
+         time when EnforceCodeStyleInBuild=true. CS1591 is suppressed globally
+         because not all public members carry XML documentation comments yet. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+
     <!-- Deterministic builds -->
     <Deterministic>true</Deterministic>
     <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
