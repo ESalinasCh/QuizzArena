@@ -1,22 +1,86 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-## husky task runner examples -------------------
-## Note : for local installation use 'dotnet' prefix. e.g. 'dotnet husky'
+# ── Pre-commit quality gate ───────────────────────────────────────────────────
+# Runs every verification defined in the justfile and blocks the commit if any
+# check fails, printing a clear report of what went wrong.
+#
+# Checks (in order):
+#   1. Formatting / code style  (just lint)
+#   2. Roslyn static analysis   (just analyze)
+#   3. Unit tests               (just test)
+#   4. Staged secret scan       (just scan-secrets-staged)
+#   5. NuGet vulnerability audit(just audit)
+#
+# Force-skip (strongly discouraged): git commit --no-verify
+# ─────────────────────────────────────────────────────────────────────────────
 
-## run all tasks
-#husky run
+# Always run from the repository root so just can resolve paths correctly.
+cd "$(git rev-parse --show-toplevel)" || exit 1
 
-### run all tasks with group: 'group-name'
-#husky run --group group-name
+# ANSI colours — fall back gracefully if the terminal doesn't support them.
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+RESET='\033[0m'
 
-## run task with name: 'task-name'
-#husky run --name task-name
+DIVIDER="══════════════════════════════════════════════════════════════"
 
-## pass hook arguments to task
-#husky run --args "$1" "$2"
+# ── Dependency guard ─────────────────────────────────────────────────────────
+if ! command -v just > /dev/null 2>&1; then
+    printf "${YELLOW}⚠  'just' not found — quality checks skipped.${RESET}\n"
+    printf "   Install: https://just.systems/man/en/packages.html\n"
+    printf "   Or via devbox: devbox add just\n\n"
+    exit 0
+fi
 
-## or put your custom commands -------------------
-#echo 'Husky.Net is awesome!'
+# ── Runner ───────────────────────────────────────────────────────────────────
 
-dotnet format QuizzArena.Backend/QuizzArena.Backend.slnx
+FAILED_CHECKS=""
+FAILED_COUNT=0
+PASSED_COUNT=0
+
+run_check() {
+    label="$1"
+    task="$2"
+    printf "  ${CYAN}%-34s${RESET}" "${label}"
+    output=$(just "${task}" 2>&1)
+    status=$?
+    if [ ${status} -eq 0 ]; then
+        printf "${GREEN}✔  passed${RESET}\n"
+        PASSED_COUNT=$((PASSED_COUNT + 1))
+    else
+        printf "${RED}✘  failed${RESET}\n"
+        # Indent task output so it reads as detail under the failing check.
+        printf "%s\n" "${output}" | sed 's/^/       │ /'
+        printf "       └─\n"
+        FAILED_CHECKS="${FAILED_CHECKS}\n    • ${label}  (just ${task})"
+        FAILED_COUNT=$((FAILED_COUNT + 1))
+    fi
+}
+
+printf "\n${BOLD}Pre-commit checks${RESET}\n"
+printf "${DIVIDER}\n"
+
+run_check "Formatting / code style"   "lint"
+run_check "Roslyn static analysis"    "analyze"
+run_check "Unit tests"                "test"
+run_check "Staged secret scan"        "scan-secrets-staged"
+run_check "NuGet vulnerability audit" "audit"
+
+printf "${DIVIDER}\n"
+
+TOTAL=$((PASSED_COUNT + FAILED_COUNT))
+
+if [ ${FAILED_COUNT} -gt 0 ]; then
+    printf "\n${RED}${BOLD}✘  ${FAILED_COUNT}/${TOTAL} checks failed — commit blocked.${RESET}\n"
+    printf "${FAILED_CHECKS}\n"
+    printf "\n${BOLD}Fix the issues above, stage your fixes, and retry.${RESET}\n"
+    printf "${YELLOW}To bypass (strongly discouraged): git commit --no-verify${RESET}\n\n"
+    exit 1
+fi
+
+printf "\n${GREEN}${BOLD}✔  ${PASSED_COUNT}/${TOTAL} checks passed — proceeding with commit.${RESET}\n\n"
+exit 0
