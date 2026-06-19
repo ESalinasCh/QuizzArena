@@ -66,8 +66,9 @@ install-hooks:
     git config core.hooksPath .husky
     chmod +x .husky/commit-msg .husky/pre-commit .husky/pre-push
     @echo "✔  git hooks registered (core.hooksPath = .husky)"
-    cd {{ backend }} && dotnet tool restore && dotnet husky install \
-        && echo "✔  Husky.Net installed" \
+    dotnet tool restore \
+        && dotnet husky install \
+        && echo "✔  Husky.Net installed (husky.sh generated)" \
         || echo "⚠  dotnet not available — hooks work without it, Husky.Net integration skipped"
 
 # ── Dev helpers ────────────────────────────────────────────────────────────────
