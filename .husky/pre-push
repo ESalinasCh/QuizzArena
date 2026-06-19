@@ -8,8 +8,8 @@ _husky="$(dirname "$0")/_/husky.sh"
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ── Pre-push gate (thorough checks) ──────────────────────────────────────────
-# Runs heavier checks before code reaches the remote. These are intentionally
-# kept out of pre-commit to avoid slowing down the local commit loop.
+# Runs heavier checks before code reaches the remote. Output streams in
+# real-time so every diagnostic is visible as it happens.
 #
 # Checks:
 #   1. Roslyn static analysis      (just analyze)
@@ -29,6 +29,7 @@ CYAN='\033[0;36m'
 BOLD='\033[1m'
 RESET='\033[0m'
 
+SEP="────────────────────────────────────────────────────"
 DIVIDER="════════════════════════════════════════════════════"
 
 if ! command -v just > /dev/null 2>&1; then
@@ -44,17 +45,21 @@ PASSED_COUNT=0
 run_check() {
     label="$1"
     task="$2"
-    printf "  ${CYAN}%-34s${RESET}" "${label}"
-    output=$(just "${task}" 2>&1)
+
+    printf "\n${CYAN}${BOLD}▶ ${label}${RESET}\n"
+    printf "${SEP}\n"
+
+    # Stream output directly — no capturing, diagnostics print as they happen.
+    just "${task}"
     status=$?
+
+    printf "${SEP}\n"
     if [ ${status} -eq 0 ]; then
-        printf "${GREEN}✔  passed${RESET}\n"
+        printf "${GREEN}✔  ${label} passed${RESET}\n"
         PASSED_COUNT=$((PASSED_COUNT + 1))
     else
-        printf "${RED}✘  failed${RESET}\n"
-        printf "%s\n" "${output}" | sed 's/^/       │ /'
-        printf "       └─\n"
-        FAILED_CHECKS="${FAILED_CHECKS}\n    • ${label}  (just ${task})"
+        printf "${RED}✘  ${label} failed (exit ${status})${RESET}\n"
+        FAILED_CHECKS="${FAILED_CHECKS}\n    • ${label}  →  just ${task}"
         FAILED_COUNT=$((FAILED_COUNT + 1))
     fi
 }
@@ -67,7 +72,7 @@ run_check "Unit tests"                "test"
 run_check "Full git history secrets"  "scan-secrets"
 run_check "NuGet vulnerability audit" "audit"
 
-printf "${DIVIDER}\n"
+printf "\n${DIVIDER}\n"
 
 TOTAL=$((PASSED_COUNT + FAILED_COUNT))
 
