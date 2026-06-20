@@ -4,7 +4,7 @@ using QuizzArena.Quizzing.Domain.Enums;
 
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Seeds;
 
-internal class MatchSeeder
+internal sealed class MatchSeeder
 {
     public static async Task SeedAsync(QuizzingDbContext context)
     {
@@ -18,7 +18,7 @@ internal class MatchSeeder
             Id = QuizzingConstants.MatchId,
             Code = "1234",
             Status = MatchStatus.Active,
-            Mode = MatchMode.Single,
+            Mode = MatchMode.Solo,
             StartedAt = DateTime.UtcNow,
             TimeMinutes = 30,
             Deleted = false,

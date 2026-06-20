@@ -4,7 +4,7 @@ using QuizzArena.Users.Domain.Enums;
 
 namespace QuizzArena.Users.Infrastructure.Adapters.Out.Persistence;
 
-internal class UserDbContext : DbContext
+internal sealed class UserDbContext : DbContext
 {
     public UserDbContext(
         DbContextOptions<UserDbContext> options)

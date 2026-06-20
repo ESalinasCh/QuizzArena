@@ -6,8 +6,12 @@ using QuizzArena.Quizzing.Domain.Enums;
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations;
 
 /// <inheritdoc />
-public partial class InitialCreate : Migration
+public sealed partial class InitialCreate : Migration
 {
+    private static readonly string[] OptionQuestionIdPositionColumns = ["QuestionId", "Position"];
+    private static readonly string[] QuizQuestionQuizIdPositionColumns = ["QuizId", "Position"];
+    private static readonly string[] QuizQuestionQuizIdQuestionIdColumns = ["QuizId", "QuestionId"];
+
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
     {
@@ -249,7 +253,7 @@ public partial class InitialCreate : Migration
             name: "IX_option_QuestionId_Position",
             schema: "quizzing",
             table: "option",
-            columns: new[] { "QuestionId", "Position" },
+            columns: OptionQuestionIdPositionColumns,
             unique: true);
 
         migrationBuilder.CreateIndex(
@@ -286,14 +290,14 @@ public partial class InitialCreate : Migration
             name: "IX_quiz_question_QuizId_Position",
             schema: "quizzing",
             table: "quiz_question",
-            columns: new[] { "QuizId", "Position" },
+            columns: QuizQuestionQuizIdPositionColumns,
             unique: true);
 
         migrationBuilder.CreateIndex(
             name: "IX_quiz_question_QuizId_QuestionId",
             schema: "quizzing",
             table: "quiz_question",
-            columns: new[] { "QuizId", "QuestionId" },
+            columns: QuizQuestionQuizIdQuestionIdColumns,
             unique: true);
     }
 

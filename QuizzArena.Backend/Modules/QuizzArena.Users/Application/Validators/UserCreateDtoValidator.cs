@@ -3,7 +3,7 @@ using QuizzArena.Users.Application.DTOs.User;
 
 namespace QuizzArena.Users.Application.Validators;
 
-internal class UserCreateDtoValidator : AbstractValidator<CreateUserDto>
+internal sealed class UserCreateDtoValidator : AbstractValidator<CreateUserDto>
 {
     public UserCreateDtoValidator()
     {

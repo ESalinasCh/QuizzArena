@@ -85,16 +85,17 @@ rabbitmq:
 
 # ── Static analysis ────────────────────────────────────────────────────────────
 
-# Verify formatting and code style — fails on any diff (mirrors CI check)
+# Verify whitespace formatting — fails on any diff (mirrors CI check).
+# Uses the 'whitespace' subcommand only: indentation, newlines, trailing
+# spaces. Code-style and CA analyzer fixes run in 'just analyze' (pre-push).
 lint:
-    cd {{ backend }} && dotnet format {{ sln }} \
-        --severity warn \
+    cd {{ backend }} && dotnet format whitespace {{ sln }} \
         --verify-no-changes \
         --no-restore
 
-# Auto-fix formatting and style issues in place
+# Auto-fix whitespace formatting in place
 lint-fix:
-    cd {{ backend }} && dotnet format {{ sln }} --severity warn --no-restore
+    cd {{ backend }} && dotnet format whitespace {{ sln }} --no-restore
 
 # Full Roslyn static analysis: builds in Release treating ALL warnings as errors.
 # Escalates beyond Directory.Build.props (which only errors on a subset) to catch

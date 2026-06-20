@@ -5,7 +5,7 @@ using QuizzArena.Quizzing.Domain.Enums;
 
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Seeds;
 
-internal class QuestionSeeder
+internal sealed class QuestionSeeder
 {
     public static async Task SeedAsync(QuizzingDbContext context)
     {

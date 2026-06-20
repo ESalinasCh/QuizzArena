@@ -4,7 +4,7 @@ using QuizzArena.Quizzing.Domain.Entities;
 
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Configurations;
 
-internal class AnswerConfiguration : IEntityTypeConfiguration<Answer>
+internal sealed class AnswerConfiguration : IEntityTypeConfiguration<Answer>
 {
     public void Configure(EntityTypeBuilder<Answer> builder)
     {

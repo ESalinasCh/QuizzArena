@@ -4,7 +4,7 @@ using QuizzArena.DocumentProcessing.Domain.Entities;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.Configurations;
 
-internal class DocumentProcessingJobConfiguration : IEntityTypeConfiguration<DocumentProcessingJob>
+internal sealed class DocumentProcessingJobConfiguration : IEntityTypeConfiguration<DocumentProcessingJob>
 {
     public void Configure(EntityTypeBuilder<DocumentProcessingJob> builder)
     {

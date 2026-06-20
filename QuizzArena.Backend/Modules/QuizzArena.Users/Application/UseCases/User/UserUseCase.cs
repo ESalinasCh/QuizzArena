@@ -7,7 +7,7 @@ using QuizzArena.Users.Application.Validators;
 
 namespace QuizzArena.Users.Application.UseCases.User;
 
-internal class UserUseCase(
+internal sealed class UserUseCase(
     IUserRepository repository,
     IMapper mapper,
     UserCreateDtoValidator createValidator

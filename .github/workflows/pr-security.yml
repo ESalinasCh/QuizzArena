@@ -36,8 +36,7 @@ jobs:
 
       - name: Verify format
         run: |
-          dotnet format QuizzArena.Backend.slnx \
-            --severity warn \
+          dotnet format whitespace QuizzArena.Backend.slnx \
             --verify-no-changes \
             --no-restore
 

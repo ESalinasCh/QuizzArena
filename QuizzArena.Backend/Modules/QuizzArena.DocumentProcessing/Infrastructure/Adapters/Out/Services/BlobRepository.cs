@@ -9,7 +9,7 @@ public class BlobRepository(BlobServiceClient blobServiceClient) : IStorageServi
 {
     public async Task<string> UploadFileAsync(Stream fileStream, string fileName, string containerName)
     {
-        var containerClient = blobServiceClient.GetBlobContainerClient(containerName.ToLower());
+        var containerClient = blobServiceClient.GetBlobContainerClient(containerName.ToLowerInvariant());
 
         await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
 
@@ -21,7 +21,7 @@ public class BlobRepository(BlobServiceClient blobServiceClient) : IStorageServi
 
     public async Task<string> UploadTextAsync(string text, string fileName, string containerName)
     {
-        var containerClient = blobServiceClient.GetBlobContainerClient(containerName.ToLower());
+        var containerClient = blobServiceClient.GetBlobContainerClient(containerName.ToLowerInvariant());
 
         await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
 
