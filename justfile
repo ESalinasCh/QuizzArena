@@ -146,6 +146,7 @@ scan-secrets:
         -v "$(pwd):/repo" \
         zricethezav/gitleaks:latest detect \
             --source /repo \
+            --config /repo/.gitleaks.toml \
             --verbose \
             --exit-code 1
 
@@ -156,6 +157,7 @@ scan-secrets-staged:
         -v "$(pwd):/repo" \
         zricethezav/gitleaks:latest protect \
             --source /repo \
+            --config /repo/.gitleaks.toml \
             --staged \
             --verbose
 
