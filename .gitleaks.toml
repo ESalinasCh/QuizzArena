@@ -1,0 +1,17 @@
+title = "QuizzArena gitleaks configuration"
+
+# ── Global allowlist ──────────────────────────────────────────────────────────
+# Entries here suppress known false positives across the entire scan.
+# Each entry MUST include a comment explaining why it is safe to allow.
+
+[allowlist]
+  description = "Known safe values that are not real secrets"
+
+  regexes = [
+    # Azurite (Azure Storage local emulator) well-known default account key.
+    # This is a PUBLIC test credential documented and published by Microsoft:
+    # https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azurite#well-known-storage-account-and-key
+    # The same key appears in every Azurite installation worldwide; rotating
+    # it has no security value. It is committed intentionally for local dev.
+    '''Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMA==''',
+  ]
