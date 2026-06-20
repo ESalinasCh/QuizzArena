@@ -3,7 +3,7 @@ using QuizzArena.Quizzing.Application.DTOs.Option;
 
 namespace QuizzArena.Quizzing.Application.Validators.Option;
 
-public class CreateOptionDtoValidator : AbstractValidator<CreateOptionDto>
+public sealed class CreateOptionDtoValidator : AbstractValidator<CreateOptionDto>
 {
     public CreateOptionDtoValidator()
     {

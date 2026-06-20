@@ -10,7 +10,7 @@ using Shared.Contracts.DTOs;
 
 namespace QuizzArena.Quizzing.Application.UseCases.MatchUseCases;
 
-public class StartAttemptUseCase(
+public sealed class StartAttemptUseCase(
     ICurrentUser currentUser,
     ICourseContract courseImpl,
     IMatchRepository matchRepository,
@@ -29,31 +29,31 @@ public class StartAttemptUseCase(
         Match? match = await matchRepository.GetMatchByIdAsync(request.MatchId);
         if (match == null || !coursesIds.Contains(match.CourseId))
         {
-            throw new Exception("Match not found or user not enrolled in the course.");
+            throw new InvalidOperationException("Match not found or user not enrolled in the course.");
         }
 
         if (match.Status != MatchStatus.Active)
         {
-            throw new Exception("Match is not active.");
+            throw new InvalidOperationException("Match is not active.");
         }
 
         int totalAttempts = await matchAttemptRepository.GetMatchAttemptCountByMatchIdAsync(match.Id);
         if (totalAttempts >= match.AttemptsAmount)
         {
-            throw new Exception("Maximum number of attempts reached for this match.");
+            throw new InvalidOperationException("Maximum number of attempts reached for this match.");
         }
 
         bool isAnyOtherAttemptInProgress = await matchAttemptRepository.HasActiveAttemptByMatchIdAsync(match.Id, userId);
         if (isAnyOtherAttemptInProgress)
         {
-            throw new Exception("User already have an active attempt for this match.");
+            throw new InvalidOperationException("User already have an active attempt for this match.");
         }
 
-        Quiz? quiz = await quizRepository.GetByIdAsync(match.QuizId) ?? throw new Exception("No quiz and questions were found for this match.");
+        Quiz? quiz = await quizRepository.GetByIdAsync(match.QuizId) ?? throw new InvalidOperationException("No quiz and questions were found for this match.");
         List<Question> questions = await quizQuestionRepository.GetQuestionsByQuizIdAsync(quiz.Id);
         if (questions.Count == 0)
         {
-            throw new Exception("No questions were found for this match");
+            throw new InvalidOperationException("No questions were found for this match");
         }
 
         var _random = random ?? new Random();

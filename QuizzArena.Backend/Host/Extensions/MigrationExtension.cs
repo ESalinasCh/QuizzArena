@@ -1,5 +1,7 @@
 ﻿using Shared.Contracts;
 
+namespace Host.Extensions;
+
 public static class MigrationExtension
 {
     public static void ApplyMigrations(this IApplicationBuilder app)

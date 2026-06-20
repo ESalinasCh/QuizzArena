@@ -9,7 +9,7 @@ internal static class SourceTypeResolver
         string extension =
             Path.GetExtension(fileName);
 
-        return extension.ToLower() switch
+        return extension.ToLowerInvariant() switch
         {
             ".mp3" => SourceType.Audio,
             ".wav" => SourceType.Audio,

@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Host.Extensions;
 using Host.Security;
 using MassTransit;
 using Microsoft.AspNetCore.Http.Features;

@@ -4,7 +4,7 @@ using QuizzArena.Users.Domain.Entities;
 
 namespace QuizzArena.Users.Infrastructure.Adapters.Out.Persistence.Repositories;
 
-internal class SqlCourseQueriesRepository(UserDbContext context) : ICourseQueriesRepository
+internal sealed class SqlCourseQueriesRepository(UserDbContext context) : ICourseQueriesRepository
 {
     public async Task<List<Course>> GetCoursesByUserId(Guid studentId)
     {

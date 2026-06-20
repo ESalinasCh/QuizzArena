@@ -1,6 +1,6 @@
 ﻿namespace QuizzArena.Users.Application.Extensions;
 
-internal class ClaimTypes
+internal sealed class ClaimTypes
 {
     public const string Sub = "sub";
     public const string PreferredUsername = "preferred_username";

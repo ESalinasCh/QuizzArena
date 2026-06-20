@@ -1,6 +1,6 @@
 ﻿namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Seeds;
 
-internal class SeedRunner
+internal sealed class SeedRunner
 {
     public static async Task SeedAsync(QuizzingDbContext context)
     {

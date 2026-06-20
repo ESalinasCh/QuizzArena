@@ -4,7 +4,7 @@ using QuizzArena.Quizzing.Domain.Entities;
 
 namespace QuizzArena.Quizzing.Application.Mapping;
 
-internal class OptionMapper : Profile
+internal sealed class OptionMapper : Profile
 {
     public OptionMapper()
     {

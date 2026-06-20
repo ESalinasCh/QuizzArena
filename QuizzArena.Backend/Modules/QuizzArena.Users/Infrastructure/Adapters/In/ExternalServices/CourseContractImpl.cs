@@ -5,7 +5,7 @@ using Shared.Contracts.DTOs;
 
 namespace QuizzArena.Users.Infrastructure.Adapters.In.ExternalServices;
 
-internal class CourseContractImpl(
+internal sealed class CourseContractImpl(
     ICourseQueriesRepository courseQuerysRepository,
     IUserQueriesRepository userQuerysRepository
 ) : ICourseContract

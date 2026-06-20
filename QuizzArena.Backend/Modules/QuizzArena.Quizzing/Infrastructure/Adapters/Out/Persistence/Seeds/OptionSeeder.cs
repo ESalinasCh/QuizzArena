@@ -4,7 +4,7 @@ using QuizzArena.Quizzing.Domain.Entities;
 
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Seeds;
 
-internal class OptionSeeder
+internal sealed class OptionSeeder
 {
     public static async Task SeedAsync(QuizzingDbContext context)
     {

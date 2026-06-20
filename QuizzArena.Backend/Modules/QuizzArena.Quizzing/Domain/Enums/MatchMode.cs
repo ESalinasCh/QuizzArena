@@ -1,8 +1,11 @@
-﻿namespace QuizzArena.Quizzing.Domain.Enums;
+﻿using NpgsqlTypes;
+
+namespace QuizzArena.Quizzing.Domain.Enums;
 
 public enum MatchMode
 {
     // TODO
-    Single = 0,
+    [PgName("single")]
+    Solo = 0,
     Multiple = 1,
 }

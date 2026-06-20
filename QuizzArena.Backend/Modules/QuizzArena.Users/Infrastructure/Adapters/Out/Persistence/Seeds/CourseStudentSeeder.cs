@@ -4,7 +4,7 @@ using QuizzArena.Users.Domain.Entities;
 
 namespace QuizzArena.Users.Infrastructure.Adapters.Out.Persistence.Seeds;
 
-internal class CourseStudentSeeder
+internal sealed class CourseStudentSeeder
 {
     public static async Task SeedAsync(UserDbContext context)
     {

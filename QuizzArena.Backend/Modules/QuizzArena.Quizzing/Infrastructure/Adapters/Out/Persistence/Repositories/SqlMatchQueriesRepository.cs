@@ -5,7 +5,7 @@ using QuizzArena.Quizzing.Domain.Entities;
 
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Repositories;
 
-internal class SqlMatchQueriesRepository(QuizzingDbContext context) : IMatchQueriesRepository
+internal sealed class SqlMatchQueriesRepository(QuizzingDbContext context) : IMatchQueriesRepository
 {
     public async Task<List<MatchAttempt>> GetAttemptsByStudentId(Guid studentId, MatchAttemptFilters filters)
     {

@@ -6,7 +6,7 @@ using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence;
 
 namespace QuizzArena.Users.Infrastructure.Adapters.Out.Persistence.Repositories;
 
-internal class SqlMatchRepository(QuizzingDbContext context) : IMatchRepository
+internal sealed class SqlMatchRepository(QuizzingDbContext context) : IMatchRepository
 {
     public async Task<Match?> GetMatchByIdAsync(Guid matchId)
     {
