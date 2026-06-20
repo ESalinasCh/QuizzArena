@@ -110,8 +110,15 @@ analyze:
 
 # ── Unit tests & coverage ──────────────────────────────────────────────────────
 
-# Run unit tests and collect Cobertura coverage into coverage/raw/
+# Run unit tests — no coverage collection (fast, used by pre-push hook and local dev)
 test:
+    cd {{ backend }} && dotnet test {{ sln }} \
+        --verbosity minimal
+
+# Run unit tests with Cobertura coverage — for CI and deliberate local runs
+# NOTE: --collect:"XPlat Code Coverage" can hang on WSL/NTFS mounts;
+#       run this from a native Windows terminal if coverage collection stalls.
+test-coverage:
     cd {{ backend }} && dotnet test {{ sln }} \
         --verbosity normal \
         --collect:"XPlat Code Coverage" \
