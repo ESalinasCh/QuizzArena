@@ -21,7 +21,7 @@ internal class SqlMatchQueriesRepository(QuizzingDbContext context) : IMatchQuer
 
         if (filters.MatchMode.HasValue)
         {
-            query = query.Where(x=> x.Match.Mode == filters.MatchMode);
+            query = query.Where(x => x.Match.Mode == filters.MatchMode);
         }
 
         if (filters.MatchId.HasValue)
