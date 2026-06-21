@@ -60,7 +60,7 @@ internal class SqlMatchQueriesRepository(QuizzingDbContext context) : IMatchQuer
             .Take(filters.PageSize)
             .Select(x => x.MatchAttempt)
             .ToListAsync();
-        
+
     }
 
     public async Task<List<Match>> GetMatchesByIds(List<Guid> matchIds)
