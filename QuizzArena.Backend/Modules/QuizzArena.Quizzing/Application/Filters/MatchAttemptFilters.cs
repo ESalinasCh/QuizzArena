@@ -11,7 +11,7 @@ public class MatchAttemptFilters
     public int? MaxScore { get; set; }
 
     public Guid? MatchId { get; set; }
-
+    public MatchMode? MatchMode { get; set; }
     public DateTimeOffset? StartedFrom { get; set; }
     public DateTimeOffset? StartedTo { get; set; }
 
