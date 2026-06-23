@@ -205,7 +205,8 @@ jobs:
           dotnet CycloneDX QuizzArena.Backend.slnx \
             --output sbom \
             --filename sbom.cyclonedx.json \
-            --json
+            --json \
+            --spec-version 1.5
 
       - name: Upload SBOM artifact
         uses: actions/upload-artifact@v4
