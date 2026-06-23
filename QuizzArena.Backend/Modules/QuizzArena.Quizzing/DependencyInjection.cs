@@ -5,9 +5,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using QuizzArena.Quizzing.Application.DTOs.Match;
 using QuizzArena.Quizzing.Application.Ports.In;
+using QuizzArena.Quizzing.Application.Ports.In.Question;
 using QuizzArena.Quizzing.Application.Ports.Out;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Application.UseCases.MatchUseCases;
+using QuizzArena.Quizzing.Application.UseCases.QuestionUseCases;
 using QuizzArena.Quizzing.Application.UseCases.QuizUseCases;
 using QuizzArena.Quizzing.Application.UseCases.SubmitAnswers;
 using QuizzArena.Quizzing.Application.Validators;
@@ -36,27 +38,26 @@ public static class DependencyInjection
         services.AddScoped<CreateQuestionsDtoValidator>();
         services.AddScoped<CreateOptionDtoValidator>();
         services.AddScoped<CreateOptionsDtoValidator>();
-
-        services.AddScoped<ICreateQuizUseCase, CreateQuizUseCase>();
-        services.AddScoped<ICreateQuestionsUseCase, CreateQuestionsUseCase>();
-        services.AddScoped<ICreateOptionsUseCase, CreateOptionsUseCase>();
-        services.AddScoped<IQuizRepository, SqlQuizRepository>();
-        services.AddScoped<IQuestionRepository, SqlQuestionRepository>();
-        services.AddScoped<IOptionRepository, SqlOptionRepository>();
-        services.AddScoped<IQuizQuestionRepository, SqlQuizQuestionRepository>();
         services.AddAutoMapper(cfg => { }, typeof(DependencyInjection).Assembly);
+
 
         #region Repositories
         services.AddScoped<IMatchAttemptRepository, SqlMatchAttemptRepository>();
         services.AddScoped<IQuizQuestionRepository, SqlQuizQuestionRepository>();
         services.AddScoped<IMatchRepository, SqlMatchRepository>();
         services.AddScoped<IQuizRepository, SqlQuizRepository>();
+        services.AddScoped<IQuestionRepository, SqlQuestionRepository>();
+        services.AddScoped<IOptionRepository, SqlOptionRepository>();
         #endregion
 
         #region UseCases
         services.AddScoped<IGetMatchesUseCase, GetMatchesUseCase>();
         services.AddScoped<IStartAttemptUseCase, StartAttemptUseCase>();
         services.AddScoped<ISubmitAnswersUseCase, SubmitAnswersUseCase>();
+        services.AddScoped<ICreateQuizUseCase, CreateQuizUseCase>();
+        services.AddScoped<ICreateQuestionsUseCase, CreateQuestionsUseCase>();
+        services.AddScoped<IGetQuestionsUseCase, GetQuestionsUseCase>();
+        services.AddScoped<ICreateOptionsUseCase, CreateOptionsUseCase>();
         #endregion
 
         #region Validators
