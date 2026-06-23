@@ -10,7 +10,7 @@ namespace QuizzArena.Quizzing.Application.UseCases.QuestionUseCases;
 public class GetQuestionsUseCase(
     IQuestionRepository questionRepository,
     IMapper mapper
-): IGetQuestionsUseCase
+) : IGetQuestionsUseCase
 {
     public async Task<List<ResponseQuestionDto>> Execute(QuestionFilters filters)
     {
