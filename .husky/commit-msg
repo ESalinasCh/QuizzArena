@@ -17,9 +17,7 @@ _husky="$(dirname "$0")/_/husky.sh"
 #   Types: build · chore · ci · docs · feat · fix · perf · refactor · revert · style · test
 #   Breaking change: append ! before the colon  →  feat(api)!: remove endpoint
 #
-# Primary:  delegates to task-runner.json via dotnet husky (Husky.Net).
-# Fallback: runs the same regex inline if dotnet/husky is not available,
-#           ensuring the check always fires regardless of environment setup.
+# Validation: a single Conventional Commits regex, run inline (see note below).
 #
 # Force-skip (strongly discouraged): git commit --no-verify
 # ─────────────────────────────────────────────────────────────────────────────
@@ -31,22 +29,17 @@ YELLOW='\033[1;33m'
 BOLD='\033[1m'
 RESET='\033[0m'
 
+# Validation is a single Conventional Commits regex. Husky.Net's task-runner.json
+# runs the *identical* grep, so invoking `dotnet husky run` here adds no extra
+# checking — only the dotnet CLI startup cost, and on WSL /mnt/c it can hang
+# indefinitely (never returning, so a fallback guarded on its exit code never
+# fires). We therefore run the regex inline directly: fast and reliable on every
+# platform. CI skips this hook entirely (CI=true guard above).
+# ─────────────────────────────────────────────────────────────────────────────
+
 # Same pattern as task-runner.json — kept in sync intentionally.
 CC_PATTERN='^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([^)]+\))?!?: .{1,}'
 
-# ── Primary: Husky.Net task runner ────────────────────────────────────────────
-if command -v dotnet > /dev/null 2>&1; then
-    dotnet husky run --name commit-message-linter --args "$MSG_FILE"
-    status=$?
-    # Exit 0 (valid) or exit 1 (invalid message) — trust the task runner.
-    # Only fall through if husky itself failed to run (exit 2+, e.g. not installed).
-    if [ ${status} -le 1 ]; then
-        exit ${status}
-    fi
-    printf "${YELLOW}⚠  dotnet husky unavailable — falling back to inline check.${RESET}\n"
-fi
-
-# ── Fallback: inline regex check ─────────────────────────────────────────────
 if grep -qE "${CC_PATTERN}" "${MSG_FILE}"; then
     exit 0
 fi

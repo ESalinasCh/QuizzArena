@@ -64,7 +64,7 @@ restart:
 # Optionally also installs Husky.Net (dotnet husky) if dotnet is available.
 install-hooks:
     git config core.hooksPath .husky
-    chmod +x .husky/commit-msg .husky/pre-commit .husky/pre-push
+    chmod +x .husky/commit-msg .husky/pre-commit .husky/pre-push .husky/lint-staged.sh
     @echo "✔  git hooks registered (core.hooksPath = .husky)"
     dotnet tool restore \
         && dotnet husky install \
@@ -96,6 +96,14 @@ lint:
 # Auto-fix whitespace formatting in place
 lint-fix:
     cd {{ backend }} && dotnet format whitespace {{ sln }} --no-restore
+
+# Verify whitespace formatting on STAGED C# files only — used by the pre-commit hook.
+# Scopes `dotnet format` to just the project(s) that own the staged files, which
+# avoids the full-solution MSBuild workspace load that stalls on slow mounts
+# (e.g. WSL /mnt/c). CI and the pre-push gate still run the full-solution check.
+# Runs via `bash <script>` (no exec bit needed) so it works on /mnt/c too.
+lint-staged:
+    bash .husky/lint-staged.sh
 
 # Full Roslyn static analysis: builds in Release treating ALL warnings as errors.
 # Escalates beyond Directory.Build.props (which only errors on a subset) to catch
