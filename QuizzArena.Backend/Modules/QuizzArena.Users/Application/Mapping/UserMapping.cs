@@ -4,7 +4,7 @@ using QuizzArena.Users.Domain.Entities;
 
 namespace QuizzArena.Users.Application.Mapping;
 
-internal class UserMapping : Profile
+internal sealed class UserMapping : Profile
 {
     public UserMapping()
     {

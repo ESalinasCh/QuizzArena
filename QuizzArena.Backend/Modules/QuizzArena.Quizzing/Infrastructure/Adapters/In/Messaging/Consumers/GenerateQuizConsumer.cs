@@ -7,7 +7,7 @@ using Shared.Messaging.Events;
 
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.In.Messaging.Consumers;
 
-public class GenerateQuizConsumer(
+public sealed class GenerateQuizConsumer(
     ICreateQuizUseCase CreateQuizUseCase,
     IHostEnvironment environment
 ) : IConsumer<TranscriptionCompletedEvent>

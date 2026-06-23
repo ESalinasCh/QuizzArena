@@ -5,7 +5,7 @@ using QuizzArena.Quizzing.Domain.Enums;
 
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Repositories;
 
-internal class SqlMatchAttemptRepository(QuizzingDbContext context) : IMatchAttemptRepository
+internal sealed class SqlMatchAttemptRepository(QuizzingDbContext context) : IMatchAttemptRepository
 {
     public async Task<MatchAttempt> AddMatchAttemptAsync(MatchAttempt matchAttempt)
     {

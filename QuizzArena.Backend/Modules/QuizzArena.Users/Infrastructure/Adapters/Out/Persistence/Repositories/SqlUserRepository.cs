@@ -4,7 +4,7 @@ using QuizzArena.Users.Domain.Entities;
 
 namespace QuizzArena.Users.Infrastructure.Adapters.Out.Persistence.Repositories;
 
-internal class SqlUserRepository(UserDbContext context) : IUserRepository
+internal sealed class SqlUserRepository(UserDbContext context) : IUserRepository
 {
     public async Task<bool> ExistsAsync(string providerId)
     {

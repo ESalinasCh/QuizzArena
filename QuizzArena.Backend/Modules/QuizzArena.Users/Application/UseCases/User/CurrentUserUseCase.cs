@@ -5,7 +5,7 @@ using Shared.Contracts;
 
 namespace QuizzArena.Users.Application.UseCases.User;
 
-internal class CurrentUserUseCase(IHttpContextAccessor accessor) : ICurrentUser
+internal sealed class CurrentUserUseCase(IHttpContextAccessor accessor) : ICurrentUser
 {
     private ClaimsPrincipal User => accessor.HttpContext?.User ?? throw new UnauthorizedAccessException();
     public string UserId => User.GetUserId();

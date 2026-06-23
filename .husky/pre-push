@@ -7,15 +7,17 @@ _husky="$(dirname "$0")/_/husky.sh"
 [ "${CI:-}" = "true" ]  && exit 0
 # ─────────────────────────────────────────────────────────────────────────────
 
-# ── Pre-commit gate (fast checks only) ───────────────────────────────────────
-# Runs lightweight checks that give instant feedback before a commit lands.
-# Heavier checks (analysis, tests, audit) run at pre-push instead.
+# ── Pre-push gate (thorough checks) ──────────────────────────────────────────
+# Runs heavier checks before code reaches the remote. Output streams in
+# real-time so every diagnostic is visible as it happens.
 #
 # Checks:
-#   1. Formatting / code style  (just lint-staged — staged files only, fast)
-#   2. Staged secret scan       (just scan-secrets-staged)
+#   1. Roslyn static analysis      (just analyze)
+#   2. Unit tests                  (just test)
+#   3. Full git history secret scan(just scan-secrets)
+#   4. NuGet vulnerability audit   (just audit)
 #
-# Force-skip (strongly discouraged): git commit --no-verify
+# Force-skip (strongly discouraged): git push --no-verify
 # ─────────────────────────────────────────────────────────────────────────────
 
 cd "$(git rev-parse --show-toplevel)" || exit 1
@@ -27,11 +29,11 @@ CYAN='\033[0;36m'
 BOLD='\033[1m'
 RESET='\033[0m'
 
-DIVIDER="════════════════════════════════════════════════════"
 SEP="────────────────────────────────────────────────────"
+DIVIDER="════════════════════════════════════════════════════"
 
 if ! command -v just > /dev/null 2>&1; then
-    printf "${YELLOW}⚠  'just' not found — pre-commit checks skipped.${RESET}\n"
+    printf "${YELLOW}⚠  'just' not found — pre-push checks skipped.${RESET}\n"
     printf "   Install: devbox add just  or  https://just.systems\n\n"
     exit 0
 fi
@@ -47,6 +49,7 @@ run_check() {
     printf "\n${CYAN}${BOLD}▶ ${label}${RESET}\n"
     printf "${SEP}\n"
 
+    # Stream output directly — no capturing, diagnostics print as they happen.
     just "${task}"
     status=$?
 
@@ -61,24 +64,25 @@ run_check() {
     fi
 }
 
-printf "\n${BOLD}Pre-commit checks${RESET}\n"
+printf "\n${BOLD}Pre-push checks${RESET}\n"
 printf "${DIVIDER}\n"
 
-run_check "Formatting / code style" "lint-staged"
-run_check "Staged secret scan"      "scan-secrets-staged"
+run_check "Roslyn static analysis"    "analyze"
+run_check "Unit tests"                "test"
+run_check "Full git history secrets"  "scan-secrets"
+run_check "NuGet vulnerability audit" "audit"
 
-printf "${DIVIDER}\n"
+printf "\n${DIVIDER}\n"
 
 TOTAL=$((PASSED_COUNT + FAILED_COUNT))
 
 if [ ${FAILED_COUNT} -gt 0 ]; then
-    printf "\n${RED}${BOLD}✘  ${FAILED_COUNT}/${TOTAL} checks failed — commit blocked.${RESET}\n"
+    printf "\n${RED}${BOLD}✘  ${FAILED_COUNT}/${TOTAL} checks failed — push blocked.${RESET}\n"
     printf "${FAILED_CHECKS}\n"
-    printf "\n${BOLD}Fix the issues above, stage your fixes, and retry.${RESET}\n"
-    printf "${YELLOW}To bypass (strongly discouraged): git commit --no-verify${RESET}\n\n"
+    printf "\n${BOLD}Fix the issues above and retry.${RESET}\n"
+    printf "${YELLOW}To bypass (strongly discouraged): git push --no-verify${RESET}\n\n"
     exit 1
 fi
 
-printf "\n${GREEN}${BOLD}✔  ${PASSED_COUNT}/${TOTAL} checks passed — committing.${RESET}\n"
-printf "   Full checks (analysis, tests, audit) run at push time.\n\n"
+printf "\n${GREEN}${BOLD}✔  ${PASSED_COUNT}/${TOTAL} checks passed — pushing.${RESET}\n\n"
 exit 0

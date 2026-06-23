@@ -4,7 +4,7 @@ using QuizzArena.Quizzing.Domain.Entities;
 
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Repositories;
 
-internal class SqlQuizQuestionRepository(QuizzingDbContext context) : IQuizQuestionRepository
+internal sealed class SqlQuizQuestionRepository(QuizzingDbContext context) : IQuizQuestionRepository
 {
     public async Task CreateMultipleAsync(IEnumerable<QuizQuestion> questions)
     {

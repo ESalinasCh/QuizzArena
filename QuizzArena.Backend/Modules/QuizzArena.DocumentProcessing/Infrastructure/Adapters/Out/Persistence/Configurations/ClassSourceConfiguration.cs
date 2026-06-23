@@ -4,7 +4,7 @@ using QuizzArena.DocumentProcessing.Domain.Entities;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.Configurations;
 
-internal class ClassSourceConfiguration : IEntityTypeConfiguration<ClassSource>
+internal sealed class ClassSourceConfiguration : IEntityTypeConfiguration<ClassSource>
 {
     public void Configure(EntityTypeBuilder<ClassSource> builder)
     {

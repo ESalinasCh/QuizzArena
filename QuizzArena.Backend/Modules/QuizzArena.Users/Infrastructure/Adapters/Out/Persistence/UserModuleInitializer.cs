@@ -5,7 +5,7 @@ using Shared.Contracts;
 
 namespace QuizzArena.Users.Infrastructure.Adapters.Out.Persistence;
 
-internal class UserModuleInitializer : IModuleInitializer
+internal sealed class UserModuleInitializer : IModuleInitializer
 {
     public async void Initialize(IServiceProvider serviceProvider)
     {

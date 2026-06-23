@@ -15,7 +15,7 @@ public class MatchQueryParametersValidatorTests
         var model = new MatchQueryParametersDto
         {
             Code = "ABC123",
-            Mode = MatchMode.Single,
+            Mode = MatchMode.Solo,
             Status = MatchStatus.Active,
             CourseId = Guid.NewGuid(),
             QuizId = Guid.NewGuid()

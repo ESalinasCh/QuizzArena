@@ -5,7 +5,7 @@ public class DocumentChunk
     public Guid Id { get; set; }
     public int ChunkOrder { get; set; }
     public string? Content { get; set; }
-    public Pgvector.Vector? Embedding { get; set; } = null;
+    public Pgvector.Vector? Embedding { get; set; }
 
     public Guid DocumentId { get; set; }
 }

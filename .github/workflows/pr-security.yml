@@ -1,0 +1,244 @@
+name: PR Security Gate
+
+# Runs on every PR targeting main.
+# Combines the full quality gate with SAST (CodeQL) and SBOM generation +
+# vulnerability scan (CycloneDX / Grype) — results surface in the
+# Security tab and as PR artifacts.
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+env:
+  DOTNET_VERSION: '10.0.x'
+  HUSKY: '0'
+  DOTNET_NOLOGO: '1'
+
+defaults:
+  run:
+    working-directory: QuizzArena.Backend
+
+jobs:
+  # ── 1. Formatting & code style ──────────────────────────────────────────────
+  lint:
+    name: Formatting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Verify format
+        run: |
+          dotnet format whitespace QuizzArena.Backend.slnx \
+            --verify-no-changes \
+            --no-restore
+
+  # ── 2. Roslyn static analysis ───────────────────────────────────────────────
+  analyze:
+    name: Static analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build — all warnings as errors
+        run: |
+          dotnet build QuizzArena.Backend.slnx \
+            -c Release \
+            --no-restore \
+            /p:TreatWarningsAsErrors=true \
+            /p:EnforceCodeStyleInBuild=true
+
+  # ── 3. Unit tests + coverage comment ────────────────────────────────────────
+  test:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Test + collect coverage
+        run: |
+          dotnet test QuizzArena.Backend.slnx \
+            --verbosity normal \
+            --collect:"XPlat Code Coverage" \
+            --results-directory coverage/raw
+
+      - name: Coverage summary
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: QuizzArena.Backend/coverage/raw/**/coverage.cobertura.xml
+          badge: true
+          format: markdown
+          indicators: true
+          output: both
+          thresholds: '60 80'
+
+      - name: Post coverage to PR
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: coverage
+          recreate: true
+          path: code-coverage-results.md
+
+  # ── 4. Secret scan (full git history) ───────────────────────────────────────
+  scan-secrets:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Gitleaks — detect secrets in history
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ── 5. Dependency vulnerability audit ───────────────────────────────────────
+  audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Check for vulnerable NuGet packages
+        run: |
+          output=$(dotnet list package --vulnerable --include-transitive 2>&1)
+          echo "$output"
+          if echo "$output" | grep -q "has the following vulnerable packages"; then
+            echo "::error::Vulnerable NuGet packages detected — see output above."
+            exit 1
+          fi
+          echo "No vulnerable packages found."
+
+  # ── 6. SAST — CodeQL ────────────────────────────────────────────────────────
+  sast:
+    name: SAST (CodeQL)
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write   # required to upload SARIF results
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: csharp
+          # security-extended adds OWASP-aligned queries on top of the default set.
+          # security-and-quality adds code quality rules as well.
+          queries: security-extended,security-and-quality
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Build for CodeQL tracing
+        # CodeQL needs to observe the build; do NOT use --no-restore here.
+        run: dotnet build QuizzArena.Backend.slnx -c Release
+
+      - name: Analyze — upload SARIF to Security tab
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: /language:csharp
+
+  # ── 7. SBOM — generate + scan ───────────────────────────────────────────────
+  sbom:
+    name: SBOM (CycloneDX + Grype)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write   # to upload Grype SARIF results
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        working-directory: QuizzArena.Backend
+        run: dotnet restore
+
+      - name: Install CycloneDX .NET tool
+        run: dotnet tool install --global CycloneDX
+
+      - name: Generate SBOM (CycloneDX JSON)
+        # Produces a machine-readable inventory of every direct and transitive
+        # NuGet dependency with versions, licenses, and package URLs.
+        working-directory: QuizzArena.Backend
+        run: |
+          mkdir -p sbom
+          dotnet CycloneDX QuizzArena.Backend.slnx \
+            --output sbom \
+            --filename sbom.cyclonedx.json \
+            --json \
+            --spec-version 1.5
+
+      - name: Upload SBOM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-cyclonedx
+          path: QuizzArena.Backend/sbom/sbom.cyclonedx.json
+          retention-days: 90   # retain for compliance / auditing
+
+      - name: Install Grype
+        run: |
+          curl -sSfL \
+            https://raw.githubusercontent.com/anchore/grype/main/install.sh \
+            | sh -s -- -b /usr/local/bin
+
+      - name: Scan SBOM with Grype
+        # Fails the job if any High or Critical CVE is found in the dependency set.
+        working-directory: QuizzArena.Backend
+        run: |
+          grype sbom:sbom/sbom.cyclonedx.json \
+            --output sarif \
+            > grype-results.sarif
+        continue-on-error: true   # allow SARIF upload even on failure
+
+      - name: Upload Grype SARIF to Security tab
+        uses: github/codeql-action/upload-sarif@v4
+        if: always()
+        with:
+          sarif_file: QuizzArena.Backend/grype-results.sarif
+          category: sbom-grype
+
+      - name: Fail if Grype found vulnerabilities
+        working-directory: QuizzArena.Backend
+        # Re-run without SARIF output so the step exits non-zero and blocks the PR.
+        run: |
+          grype sbom:sbom/sbom.cyclonedx.json --fail-on high

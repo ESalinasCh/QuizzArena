@@ -1,6 +1,5 @@
 ﻿using Moq;
 using QuizzArena.Quizzing.Application.DTOs.MatchAttempt;
-using QuizzArena.Quizzing.Application.Ports.In;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Application.UseCases.MatchUseCases;
 using QuizzArena.Quizzing.Domain.Entities;
@@ -19,7 +18,7 @@ public class StartAttemptUseCaseTests
     private readonly Mock<IQuizQuestionRepository> _mockQuizQuestionRepository;
     private readonly Mock<IMatchAttemptRepository> _mockMatchAttemptRepository;
 
-    private readonly IStartAttemptUseCase _useCase;
+    private readonly StartAttemptUseCase _useCase;
 
     public StartAttemptUseCaseTests()
     {
@@ -65,7 +64,7 @@ public class StartAttemptUseCaseTests
         var request = new StartAttemptRequestDto { MatchId = match.Id };
 
         // Act & Assert
-        var ex = await Assert.ThrowsAsync<Exception>(() => _useCase.Execute(request));
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _useCase.Execute(request));
         Assert.Equal("Match not found or user not enrolled in the course.", ex.Message);
     }
 
@@ -84,7 +83,7 @@ public class StartAttemptUseCaseTests
         var request = new StartAttemptRequestDto { MatchId = match.Id };
 
         // Act & Assert
-        var ex = await Assert.ThrowsAsync<Exception>(() => _useCase.Execute(request));
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _useCase.Execute(request));
         Assert.Equal("Match is not active.", ex.Message);
     }
 
@@ -104,7 +103,7 @@ public class StartAttemptUseCaseTests
         var request = new StartAttemptRequestDto { MatchId = match.Id };
 
         // Act & Assert
-        var ex = await Assert.ThrowsAsync<Exception>(() => _useCase.Execute(request));
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _useCase.Execute(request));
         Assert.Equal("Maximum number of attempts reached for this match.", ex.Message);
     }
 
@@ -125,7 +124,7 @@ public class StartAttemptUseCaseTests
         var request = new StartAttemptRequestDto { MatchId = match.Id };
 
         // Act & Assert
-        var ex = await Assert.ThrowsAsync<Exception>(() => _useCase.Execute(request));
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _useCase.Execute(request));
         Assert.Equal("User already have an active attempt for this match.", ex.Message);
     }
 
@@ -147,7 +146,7 @@ public class StartAttemptUseCaseTests
         var request = new StartAttemptRequestDto { MatchId = match.Id };
 
         // Act & Assert
-        var ex = await Assert.ThrowsAsync<Exception>(() => _useCase.Execute(request));
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _useCase.Execute(request));
         Assert.Equal("No quiz and questions were found for this match.", ex.Message);
     }
 
@@ -170,7 +169,7 @@ public class StartAttemptUseCaseTests
         var request = new StartAttemptRequestDto { MatchId = match.Id };
 
         // Act
-        var ex = await Assert.ThrowsAsync<Exception>(() => _useCase.Execute(request));
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _useCase.Execute(request));
 
         // Assert
         Assert.Equal("No questions were found for this match", ex.Message);

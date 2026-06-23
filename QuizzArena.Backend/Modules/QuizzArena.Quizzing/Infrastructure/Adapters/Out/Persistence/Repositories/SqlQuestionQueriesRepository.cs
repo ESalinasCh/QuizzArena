@@ -4,7 +4,7 @@ using QuizzArena.Quizzing.Domain.Entities;
 
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Repositories;
 
-internal class SqlQuestionQueriesRepository(QuizzingDbContext context) : IQuestionQueriesRepository
+internal sealed class SqlQuestionQueriesRepository(QuizzingDbContext context) : IQuestionQueriesRepository
 {
     public async Task<List<Question>> GetQuestionsByIds(List<Guid> ids)
     {

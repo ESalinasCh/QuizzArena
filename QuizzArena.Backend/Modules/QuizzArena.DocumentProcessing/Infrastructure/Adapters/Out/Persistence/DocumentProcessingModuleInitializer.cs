@@ -4,7 +4,7 @@ using Shared.Contracts;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence;
 
-internal class DocumentProcessingModuleInitializer : IModuleInitializer
+internal sealed class DocumentProcessingModuleInitializer : IModuleInitializer
 {
     public void Initialize(IServiceProvider serviceProvider)
     {

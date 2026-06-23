@@ -1,0 +1,137 @@
+name: Feature CI
+
+# Mirrors the local pre-push quality gate for every push to a feature branch.
+# Keeps feedback fast and local-to-CI consistent.
+
+on:
+  push:
+    branches:
+      - 'feature/**'
+      - 'fix/**'
+      - 'chore/**'
+      - 'docs/**'
+      - 'refactor/**'
+
+env:
+  DOTNET_VERSION: '10.0.x'
+  HUSKY: '0'           # prevent Husky hooks from running inside the runner
+  DOTNET_NOLOGO: '1'   # suppress the .NET CLI logo in log output
+
+defaults:
+  run:
+    working-directory: QuizzArena.Backend
+
+jobs:
+  # ── 1. Formatting & code style ──────────────────────────────────────────────
+  lint:
+    name: Formatting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Verify format
+        run: |
+          dotnet format whitespace QuizzArena.Backend.slnx \
+            --verify-no-changes \
+            --no-restore
+
+  # ── 2. Roslyn static analysis ───────────────────────────────────────────────
+  analyze:
+    name: Static analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build — all warnings as errors
+        # Escalates beyond Directory.Build.props to catch every Roslyn
+        # nullable, CA, and IDE diagnostic in the solution.
+        run: |
+          dotnet build QuizzArena.Backend.slnx \
+            -c Release \
+            --no-restore \
+            /p:TreatWarningsAsErrors=true \
+            /p:EnforceCodeStyleInBuild=true
+
+  # ── 3. Unit tests + coverage ────────────────────────────────────────────────
+  test:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Test + collect coverage
+        run: |
+          dotnet test QuizzArena.Backend.slnx \
+            --verbosity normal \
+            --collect:"XPlat Code Coverage" \
+            --results-directory coverage/raw
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: QuizzArena.Backend/coverage/raw/
+          retention-days: 7
+
+  # ── 4. Secret scan (full git history) ───────────────────────────────────────
+  scan-secrets:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    # Override the default working-directory — gitleaks needs the repo root.
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0   # full history required for gitleaks detect
+
+      - name: Gitleaks — detect secrets in history
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ── 5. Dependency vulnerability audit ───────────────────────────────────────
+  audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Check for vulnerable NuGet packages
+        run: |
+          output=$(dotnet list package --vulnerable --include-transitive 2>&1)
+          echo "$output"
+          if echo "$output" | grep -q "has the following vulnerable packages"; then
+            echo "::error::Vulnerable NuGet packages detected — see output above."
+            exit 1
+          fi
+          echo "No vulnerable packages found."

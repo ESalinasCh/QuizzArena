@@ -3,7 +3,7 @@ using QuizzArena.Users.Domain.Enums;
 
 namespace QuizzArena.Users.Infrastructure.Adapters.Out.Persistence.Seeds;
 
-internal class UserSeeder
+internal sealed class UserSeeder
 {
     public static async Task SeedAsync(UserDbContext context)
     {

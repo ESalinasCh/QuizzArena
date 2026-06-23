@@ -4,7 +4,7 @@ using QuizzArena.DocumentProcessing.Domain.Entities;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.Configurations;
 
-internal class DocumentChunkConfiguration : IEntityTypeConfiguration<DocumentChunk>
+internal sealed class DocumentChunkConfiguration : IEntityTypeConfiguration<DocumentChunk>
 {
     public void Configure(EntityTypeBuilder<DocumentChunk> builder)
     {
