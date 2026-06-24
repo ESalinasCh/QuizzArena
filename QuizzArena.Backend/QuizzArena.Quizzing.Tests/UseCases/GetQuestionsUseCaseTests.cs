@@ -30,7 +30,41 @@ public class GetQuestionsUseCaseTests
     }
 
     [Fact]
-    public async Task Execute_ValidOptions_CallsRepositoryCreateMultipleAsync()
+    public async Task GetQuestions_NoQuestions_ReturnsEmptyList()
+    {
+        // Arrange
+        Guid processingJobId = Guid.NewGuid();
+        QuestionFilters filters = new QuestionFilters()
+        {
+            Page = 1,
+            PageSize = 10,
+            ProcessingJobIds = [processingJobId],
+            Status = QuestionStatus.Draft
+        };
+
+        List<ResponseQuestionDto> responseQuestionDto = [];
+
+        _mockQuestionRepository
+            .Setup(r => r.GetByProcessingJobIdAsync(filters))
+            .ReturnsAsync([]);
+
+        _mockMapper.Setup(m => m.Map<ResponseQuestionDto>(It.IsAny<Question>()))
+            .Returns((Question dto) => responseQuestionDto.First(q => q.Content == dto.Content));
+
+        // Act
+        List<ResponseQuestionDto> result = await _getQuestionsUseCase.Execute(filters);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Empty(result);
+
+        _mockQuestionRepository.Verify(r => r.GetByProcessingJobIdAsync(filters),Times.Once);
+
+        _mockMapper.Verify(m => m.Map<ResponseQuestionDto>(It.IsAny<Question>()),Times.Exactly(0));
+    }
+
+    [Fact]
+    public async Task GetQuestions_ValidQuestions_ReturnsResponseQuestionList()
     {
         // Arrange
         Guid processingJobId = Guid.NewGuid();
@@ -114,8 +148,8 @@ public class GetQuestionsUseCaseTests
 
         Assert.Equal(questions[1].Content, result[1].Content);
 
-        _mockQuestionRepository.Verify(r => r.GetByProcessingJobIdAsync(filters),Times.Once);
+        _mockQuestionRepository.Verify(r => r.GetByProcessingJobIdAsync(filters), Times.Once);
 
-        _mockMapper.Verify(m => m.Map<ResponseQuestionDto>(It.IsAny<Question>()),Times.Exactly(questions.Count));
+        _mockMapper.Verify(m => m.Map<ResponseQuestionDto>(It.IsAny<Question>()), Times.Exactly(questions.Count));
     }
 }
