@@ -12,6 +12,7 @@ public class GetMatchesUseCase(
     IValidator<MatchQueryParametersDto> queryValidator,
     ICourseContract courseImpl,
     IMatchRepository matchRepository,
+    IQuizQuestionQueriesRepository quizQuestionQueriesRepository,
     ICurrentUser currentUser
 ) : IGetMatchesUseCase
 {
@@ -21,7 +22,17 @@ public class GetMatchesUseCase(
 
         string userId = currentUser.UserId;
         List<CourseSummaryDTO> courses = await courseImpl.GetCoursesByStudent(Guid.Parse(userId));
-        List<Match> matches = await matchRepository.GetMatchesAsync(courses.Select(c => c.Id).ToList(), query);
+        List<Guid> coursesIds = courses.Select(c => c.Id).ToList();
+        List<Match> matches = await matchRepository.GetMatchesAsync(coursesIds, query);
+
+        List<Guid> quizIdsWithDefaultQuestionAmount = matches
+            .Where(m => m.QuestionsAmount is null)
+            .Select(m => m.QuizId)
+            .Distinct()
+            .ToList();
+
+        Dictionary<Guid, int> questionCountsByQuizId = quizIdsWithDefaultQuestionAmount.Count == 0 ? []
+            : await quizQuestionQueriesRepository.GetQuestionCountsByQuizIdsAsync(quizIdsWithDefaultQuestionAmount) ?? [];
 
         List<MatchResponseDto> matchesDtos = matches.Select(m =>
         {
@@ -30,7 +41,11 @@ public class GetMatchesUseCase(
             {
                 Id = m.Id,
                 Title = m.Title,
-                CourseName = course.CourseName
+                CourseName = course.CourseName,
+                CreatedAt = m.CreatedAt,
+                QuestionCount = m.QuestionsAmount ?? questionCountsByQuizId.GetValueOrDefault(m.QuizId),
+                ProfessorName = course.ProfessorName,
+                Duration = m.TimeMinutes
             };
         }).ToList();
 

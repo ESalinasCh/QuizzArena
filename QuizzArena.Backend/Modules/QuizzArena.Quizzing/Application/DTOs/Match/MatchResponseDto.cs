@@ -6,5 +6,7 @@ public record MatchResponseDto
     public string? Title { get; set; } = "";
     public string CourseName { get; set; } = "";
     public DateTimeOffset CreatedAt { get; set; }
-
+    public int QuestionCount { get; set; }
+    public string ProfessorName { get; set; } = "";
+    public int Duration { get; set; }
 }
