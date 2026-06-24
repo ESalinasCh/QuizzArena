@@ -26,6 +26,7 @@ public static class DependencyInjection
         services.AddScoped<IUploadSourceUseCase, UploadSourceUseCase>();
         services.AddScoped<UploadClassSourceRequestValidator>();
         services.AddScoped<IClassSourceRepository, SqlClassSourceRepository>();
+        services.AddScoped<IDocumentChunkRepository, SqlDocumentChunkRepository>();
 
         services.AddAutoMapper(cfg => { }, typeof(DependencyInjection).Assembly);
 
