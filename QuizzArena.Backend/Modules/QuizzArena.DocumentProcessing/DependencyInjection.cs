@@ -43,6 +43,13 @@ public static class DependencyInjection
             client.Timeout = TimeSpan.FromMinutes(60);
         });
 
+        services.AddHttpClient<ITextGenerationService, OllamaTextGeneration>(client =>
+        {
+            var ollamaUrl = configuration["OllamaSettings:BaseUrl"] ?? "http://localhost:11434/";
+            client.BaseAddress = new Uri(ollamaUrl);
+            client.Timeout = TimeSpan.FromMinutes(60);
+        });
+
         #region BDD
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
