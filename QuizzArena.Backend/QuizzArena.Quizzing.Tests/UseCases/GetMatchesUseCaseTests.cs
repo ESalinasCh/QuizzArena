@@ -95,7 +95,7 @@ public class GetMatchesUseCaseTests
     }
 
     [Fact]
-    public async Task GetMatches_MatchesMapped_TitleIsAaaa()
+    public async Task GetMatches_MatchesMappedCorrectly_ReturnsCorrectDtos()
     {
         // Arrange
         string userId = Guid.NewGuid().ToString();
