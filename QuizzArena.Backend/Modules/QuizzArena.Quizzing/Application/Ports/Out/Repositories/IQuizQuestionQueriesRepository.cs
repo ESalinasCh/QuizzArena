@@ -1,4 +1,4 @@
-namespace QuizzArena.Quizzing.Application.Ports.Out.Repositories;
+﻿namespace QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 
 public interface IQuizQuestionQueriesRepository
 {
