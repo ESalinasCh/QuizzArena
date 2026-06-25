@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using QuizzArena.Quizzing.Application.DTOs.Quiz;
+﻿using QuizzArena.Quizzing.Application.DTOs.Quiz;
 
 namespace QuizzArena.Quizzing.Application.Ports.In;
 

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace QuizzArena.Quizzing.Application.DTOs.Question;
+﻿namespace QuizzArena.Quizzing.Application.DTOs.QuizQuestion;
 
 public class QuizQuestionResponseDto
 {

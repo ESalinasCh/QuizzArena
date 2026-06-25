@@ -1,4 +1,4 @@
-using FluentValidation.TestHelper;
+﻿using FluentValidation.TestHelper;
 using QuizzArena.Quizzing.Application.DTOs.Quiz;
 using QuizzArena.Quizzing.Application.Validators.Quiz;
 using QuizzArena.Quizzing.Domain.Enums;
@@ -138,7 +138,7 @@ public class CreateExamDtoValidatorTests
         var result = _validator.TestValidate(dto);
 
         // Only one error (the NotEmpty), not additional per-element errors
-        Assert.Single(result.Errors.Where(e => e.PropertyName.StartsWith(nameof(dto.QuestionIds))));
+        Assert.Single(result.Errors, e => e.PropertyName.StartsWith(nameof(dto.QuestionIds), StringComparison.Ordinal));
     }
 
     [Fact]

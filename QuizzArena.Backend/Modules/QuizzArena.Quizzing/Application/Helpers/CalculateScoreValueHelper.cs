@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace QuizzArena.Quizzing.Application.Helpers;
+﻿namespace QuizzArena.Quizzing.Application.Helpers;
 
 internal static class CalculateScoreValueHelper
 {

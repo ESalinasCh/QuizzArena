@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using FluentValidation;
 using Moq;
 using QuizzArena.Quizzing.Application.DTOs.Quiz;
@@ -68,7 +68,7 @@ public class CreateExamUseCaseTests
 
         Quiz mappedQuiz = new() { Id = quizId, Title = dto.Title, Description = dto.Description };
         Quiz createdQuiz = new() { Id = quizId, Title = dto.Title, Description = dto.Description };
-        CreateQuizResponseDto expectedResponse = new() { id = quizId, Title = dto.Title };
+        CreateQuizResponseDto expectedResponse = new() { Id = quizId, Title = dto.Title };
 
         _mockQuestionRepository
             .Setup(r => r.GetByIdsAsync(It.IsAny<List<Guid>>()))
