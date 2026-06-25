@@ -58,9 +58,9 @@ public class GetQuestionsUseCaseTests
         Assert.NotNull(result);
         Assert.Empty(result);
 
-        _mockQuestionRepository.Verify(r => r.GetByProcessingJobIdAsync(filters),Times.Once);
+        _mockQuestionRepository.Verify(r => r.GetByProcessingJobIdAsync(filters), Times.Once);
 
-        _mockMapper.Verify(m => m.Map<ResponseQuestionDto>(It.IsAny<Question>()),Times.Exactly(0));
+        _mockMapper.Verify(m => m.Map<ResponseQuestionDto>(It.IsAny<Question>()), Times.Exactly(0));
     }
 
     [Fact]

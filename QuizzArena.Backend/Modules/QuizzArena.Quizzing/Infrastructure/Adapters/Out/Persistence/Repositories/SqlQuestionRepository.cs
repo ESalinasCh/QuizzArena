@@ -31,12 +31,10 @@ public class SqlQuestionRepository(QuizzingDbContext context) : IQuestionReposit
     {
         IQueryable<Question> query = context.Questions
             .AsNoTracking()
-            .Where(q => q.ProcessingJobId.HasValue && filters.ProcessingJobIds.Contains(q.ProcessingJobId.Value));
-
-        if (filters.Status.HasValue)
-        {
-            query = query.Where(x => x.Status == filters.Status);
-        }
+            .Where(q =>
+                q.ProcessingJobId.HasValue &&
+                filters.ProcessingJobIds.Contains(q.ProcessingJobId.Value) &&
+                q.Status == filters.Status);
 
         return await query
             .OrderByDescending(x => x.CreatedAt)
