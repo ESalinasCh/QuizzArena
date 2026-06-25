@@ -34,10 +34,12 @@ public static class DependencyInjection
             .AddApplicationPart(typeof(IQuizzingInfrastructureMarker).Assembly);
 
         services.AddScoped<CreateQuizDtoValidator>();
+        services.AddScoped<CreateExamDtoValidator>();
         services.AddScoped<CreateQuestionDtoValidator>();
         services.AddScoped<CreateQuestionsDtoValidator>();
         services.AddScoped<CreateOptionDtoValidator>();
         services.AddScoped<CreateOptionsDtoValidator>();
+
         services.AddAutoMapper(cfg => { }, typeof(DependencyInjection).Assembly);
 
 
@@ -58,6 +60,7 @@ public static class DependencyInjection
         services.AddScoped<ICreateQuestionsUseCase, CreateQuestionsUseCase>();
         services.AddScoped<IGetQuestionsUseCase, GetQuestionsUseCase>();
         services.AddScoped<ICreateOptionsUseCase, CreateOptionsUseCase>();
+        services.AddScoped<ICreateExamUseCase, CreateExamUseCase>();
         #endregion
 
         #region Validators
