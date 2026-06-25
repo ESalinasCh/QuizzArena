@@ -5,7 +5,6 @@ using QuizzArena.DocumentProcessing.Application.Ports.Out;
 using QuizzArena.DocumentProcessing.Domain.Entities;
 using QuizzArena.DocumentProcessing.Domain.Enums;
 using Shared.Messaging.Events;
-using static QuizzArena.DocumentProcessing.Application.Ports.Out.IDocumentChunkRepository;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Consumers;
 

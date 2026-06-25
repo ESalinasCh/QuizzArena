@@ -45,6 +45,8 @@ public class GenerationSaga : MassTransitStateMachine<GenerationSagaState>
                 .Publish(ctx => new GenerationRequestCommand
                 {
                     ClassSourceId = ctx.Message.ClassSourceId,
+                    ProcessingJobId = ctx.Message.ProcessingJobId,
+                    DocumentProcessingJobId = ctx.Message.DocumentProcessingJobId
                 })
                 .TransitionTo(GeneratingQuiz)
         );
