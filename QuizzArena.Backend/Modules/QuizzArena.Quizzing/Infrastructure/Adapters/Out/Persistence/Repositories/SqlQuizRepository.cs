@@ -1,4 +1,5 @@
-﻿using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
+﻿using Microsoft.EntityFrameworkCore;
+using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Domain.Entities;
 
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Repositories;
@@ -14,6 +15,8 @@ internal sealed class SqlQuizRepository(QuizzingDbContext context) : IQuizReposi
     {
         context.Quizzes.Add(quiz);
         await context.SaveChangesAsync();
-        return quiz;
+        return await context.Quizzes
+            .Include(q => q.QuizQuestions)
+            .FirstAsync(q => q.Id == quiz.Id);
     }
 }

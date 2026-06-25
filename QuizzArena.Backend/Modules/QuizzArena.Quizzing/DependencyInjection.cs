@@ -32,12 +32,14 @@ public static class DependencyInjection
             .AddApplicationPart(typeof(IQuizzingInfrastructureMarker).Assembly);
 
         services.AddScoped<CreateQuizDtoValidator>();
+        services.AddScoped<CreateExamDtoValidator>();
         services.AddScoped<CreateQuestionDtoValidator>();
         services.AddScoped<CreateQuestionsDtoValidator>();
         services.AddScoped<CreateOptionDtoValidator>();
         services.AddScoped<CreateOptionsDtoValidator>();
 
         services.AddScoped<ICreateQuizUseCase, CreateQuizUseCase>();
+        services.AddScoped<ICreateExamUseCase, CreateExamUseCase>();
         services.AddScoped<ICreateQuestionsUseCase, CreateQuestionsUseCase>();
         services.AddScoped<ICreateOptionsUseCase, CreateOptionsUseCase>();
         services.AddScoped<IQuizRepository, SqlQuizRepository>();
