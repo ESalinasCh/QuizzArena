@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using QuizzArena.Quizzing.Application.DTOs.Question;
 using QuizzArena.Quizzing.Application.DTOs.Quiz;
 using QuizzArena.Quizzing.Domain.Entities;
 
@@ -10,5 +11,12 @@ internal sealed class QuizMapping : Profile
     {
         CreateMap<Quiz, QuizDto>().ReverseMap();
         CreateMap<Quiz, CreateQuizDto>().ReverseMap();
+
+        CreateMap<CreateExamDto, Quiz>()
+            .ForMember(dest => dest.Origin, opt => opt.Ignore());
+
+        CreateMap<Quiz, CreateQuizResponseDto>()
+            .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.QuizQuestions));
+        CreateMap<QuizQuestion, QuizQuestionResponseDto>();
     }
 }
