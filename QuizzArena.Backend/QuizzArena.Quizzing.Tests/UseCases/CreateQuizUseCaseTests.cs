@@ -3,6 +3,7 @@ using Moq;
 using QuizzArena.Quizzing.Application.DTOs.Option;
 using QuizzArena.Quizzing.Application.DTOs.Quiz;
 using QuizzArena.Quizzing.Application.Ports.In;
+using QuizzArena.Quizzing.Application.Ports.In.Question;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Application.UseCases.QuizUseCases;
 using QuizzArena.Quizzing.Application.Validators.Quiz;
