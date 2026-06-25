@@ -34,9 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Application\Ports\In\" />
     <Folder Include="Application\UseCases\MatchAttempt\" />
-    <Folder Include="Infrastructure\Adapters\Out\Persistence\Repositories\" />
   </ItemGroup>
 
 </Project>

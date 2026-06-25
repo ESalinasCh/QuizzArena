@@ -50,6 +50,7 @@ public static class DependencyInjection
         services.AddScoped<IQuizRepository, SqlQuizRepository>();
         services.AddScoped<IQuestionRepository, SqlQuestionRepository>();
         services.AddScoped<IOptionRepository, SqlOptionRepository>();
+        services.AddScoped<IAnswerRepository, SqlAnswerRepository>();
         #endregion
 
         #region UseCases
@@ -61,6 +62,7 @@ public static class DependencyInjection
         services.AddScoped<IGetQuestionsUseCase, GetQuestionsUseCase>();
         services.AddScoped<ICreateOptionsUseCase, CreateOptionsUseCase>();
         services.AddScoped<ICreateExamUseCase, CreateExamUseCase>();
+        services.AddScoped<ITrackAnswerUseCase, TrackAnswerUseCase>();
         #endregion
 
         #region Validators
