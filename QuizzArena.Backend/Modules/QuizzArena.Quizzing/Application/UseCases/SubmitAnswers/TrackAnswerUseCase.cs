@@ -3,6 +3,7 @@ using QuizzArena.Quizzing.Application.Ports.In;
 using QuizzArena.Quizzing.Application.Ports.Out;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Domain.Entities;
+using QuizzArena.Quizzing.Domain.Enums;
 using Shared.Contracts;
 namespace QuizzArena.Quizzing.Application.UseCases.SubmitAnswers;
 
@@ -14,10 +15,15 @@ public class TrackAnswerUseCase(IAnswerRepository answerRepository, IOptionRepos
     {
 
         MatchAttempt? attempt = await matchRepository.GetMatchAttemptsDetailById(attemptId) ?? throw new InvalidOperationException();
-        if (!Guid.TryParse(currentUser.UserId, out var userId) ||
+        if (!Guid.TryParse(currentUser.UserId, out Guid userId) ||
              attempt.UserId != userId)
         {
             throw new UnauthorizedAccessException();
+        }
+
+        if (attempt.Status != QuizAttemptStatus.InProgress)
+        {
+            throw new InvalidOperationException();
         }
 
         Option? option = await optionRepository.GetByIdAsync(trackAnswerRequestDto.SelectedOptionId);
