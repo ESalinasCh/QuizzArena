@@ -4,7 +4,7 @@ using QuizzArena.Quizzing.Domain.Entities;
 
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Repositories;
 
-internal class SqlAnswerRepository(QuizzingDbContext context) : IAnswerRepository
+internal sealed class SqlAnswerRepository(QuizzingDbContext context) : IAnswerRepository
 {
     public async Task<Answer> CreateAnswerAsync(Answer answer)
     {
