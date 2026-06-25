@@ -6,6 +6,10 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Repositori
 
 public class SqlOptionRepository(QuizzingDbContext context) : IOptionRepository
 {
+    public async Task<Option?> GetByIdAsync(Guid optionId)
+    {
+        return await context.Options.FirstOrDefaultAsync(x => x.Id == optionId && x.Deleted == false);
+    }
     public async Task<List<Option>> GetByIdsAsync(List<Guid> optionIds)
     {
         return await context.Options

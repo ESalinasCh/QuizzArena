@@ -51,12 +51,14 @@ public static class DependencyInjection
         services.AddScoped<IQuizQuestionRepository, SqlQuizQuestionRepository>();
         services.AddScoped<IMatchRepository, SqlMatchRepository>();
         services.AddScoped<IQuizRepository, SqlQuizRepository>();
+        services.AddScoped<IAnswerRepository, SqlAnswerRepository>();
         #endregion
 
         #region UseCases
         services.AddScoped<IGetMatchesUseCase, GetMatchesUseCase>();
         services.AddScoped<IStartAttemptUseCase, StartAttemptUseCase>();
         services.AddScoped<ISubmitAnswersUseCase, SubmitAnswersUseCase>();
+        services.AddScoped<ITrackAnswerUseCase, TrackAnswerUseCase>();
         #endregion
 
         #region Validators

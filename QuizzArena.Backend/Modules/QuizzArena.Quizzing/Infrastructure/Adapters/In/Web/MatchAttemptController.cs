@@ -11,7 +11,8 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.In.Web;
 [Route("api/v{version:apiVersion}")]
 public class MatchAttemptController(
     IStartAttemptUseCase startAttemptUseCase,
-    ISubmitAnswersUseCase submitAnswersUseCase
+    ISubmitAnswersUseCase submitAnswersUseCase,
+    ITrackAnswerUseCase trackAnswerUserCase
 ) : ControllerBase
 {
     [HttpPost("plays")]
@@ -32,6 +33,16 @@ public class MatchAttemptController(
     )
     {
         SubmitAnswersResponseDto response = await submitAnswersUseCase.Execute(matchAttemptId, dto);
+        return Ok(response);
+    }
+
+    [HttpPut("match-attempts/{attemptId}/questions/{questionId}/answer")]
+
+    public async Task<ActionResult<MatchAttemptSmallProgressDto>> TrackAnswer(Guid attemptId, Guid questionId,
+        [FromBody] TrackAnswerRequestDto trackAnswerRequestDto
+    )
+    {
+        var response = await trackAnswerUserCase.Execute(attemptId, questionId, trackAnswerRequestDto);
         return Ok(response);
     }
 }
