@@ -13,6 +13,7 @@ namespace QuizzArena.Quizzing.Application.UseCases.SubmitAnswers;
 public class SubmitAnswersUseCase(
     SubmitAnswersRequestValidator submitAnswersValidator,
     IOptionRepository optionRepository,
+    IMatchRepository matchRepository,
     IMatchAttemptRepository matchAttemptRepository,
     IMapper mapper,
     IQuestionRepository questionRepository,
@@ -39,6 +40,15 @@ public class SubmitAnswersUseCase(
         if (matchAttempt.Status == Domain.Enums.QuizAttemptStatus.Completed)
         {
             throw new UnauthorizedAccessException("User already completed this match attempt.");
+        }
+
+        Guid matchId = matchAttempt.MatchId;
+        Match match = await matchRepository.GetMatchByIdAsync(matchId)
+            ?? throw new InvalidOperationException($"Match not found for {matchAttemptId}."); ;
+        int totalAttempts = await matchAttemptRepository.GetMatchAttemptCountByMatchIdAsync(matchId);
+        if (totalAttempts > match.AttemptsAmount)
+        {
+            throw new InvalidOperationException("Maximum number of attempts reached for this match.");
         }
 
         // Validate incoming object
