@@ -12,7 +12,7 @@ _husky="$(dirname "$0")/_/husky.sh"
 # Heavier checks (analysis, tests, audit) run at pre-push instead.
 #
 # Checks:
-#   1. Formatting / code style  (just lint-staged — staged files only, fast)
+#   1. Formatting / code style  (just format-check — full solution)
 #   2. Staged secret scan       (just scan-secrets-staged)
 #
 # Force-skip (strongly discouraged): git commit --no-verify
@@ -64,7 +64,7 @@ run_check() {
 printf "\n${BOLD}Pre-commit checks${RESET}\n"
 printf "${DIVIDER}\n"
 
-run_check "Formatting / code style" "lint-staged"
+run_check "Formatting / code style" "format-check"
 run_check "Staged secret scan"      "scan-secrets-staged"
 
 printf "${DIVIDER}\n"

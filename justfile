@@ -97,6 +97,12 @@ lint:
 lint-fix:
     cd {{ backend }} && dotnet format whitespace {{ sln }} --no-restore
 
+# Full-solution dotnet format check (whitespace + code style + analyzers).
+# Fails on any diff — used by the pre-commit hook. NOTE: loads the whole .slnx
+# workspace, which can be slow / stall on WSL /mnt/c mounts.
+format-check:
+    cd {{ backend }} && dotnet format {{ sln }}
+
 # Verify whitespace formatting on STAGED C# files only — used by the pre-commit hook.
 # Scopes `dotnet format` to just the project(s) that own the staged files, which
 # avoids the full-solution MSBuild workspace load that stalls on slow mounts

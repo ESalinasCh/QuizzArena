@@ -36,7 +36,8 @@ jobs:
 
       - name: Verify format
         run: |
-          dotnet format whitespace QuizzArena.Backend.slnx \
+          dotnet format QuizzArena.Backend.slnx \
+            --severity warn \
             --verify-no-changes \
             --no-restore
 
@@ -91,6 +92,8 @@ jobs:
           filename: QuizzArena.Backend/coverage/raw/**/coverage.cobertura.xml
           badge: true
           format: markdown
+          hide_branch_rate: true
+          hide_complexity: true
           indicators: true
           output: both
           thresholds: '60 80'
