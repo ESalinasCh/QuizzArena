@@ -46,6 +46,7 @@ public static class DependencyInjection
         #region Repositories
         services.AddScoped<IMatchAttemptRepository, SqlMatchAttemptRepository>();
         services.AddScoped<IQuizQuestionRepository, SqlQuizQuestionRepository>();
+        services.AddScoped<IQuizQuestionQueriesRepository, SqlQuizQuestionQueriesRepository>();
         services.AddScoped<IMatchRepository, SqlMatchRepository>();
         services.AddScoped<IQuizRepository, SqlQuizRepository>();
         services.AddScoped<IQuestionRepository, SqlQuestionRepository>();

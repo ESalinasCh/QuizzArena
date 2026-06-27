@@ -9,6 +9,7 @@ using QuizzArena.Quizzing.Application.UseCases.SubmitAnswers;
 using QuizzArena.Quizzing.Application.Validators;
 using QuizzArena.Quizzing.Domain.Entities;
 using Shared.Contracts;
+using DomainMatch = QuizzArena.Quizzing.Domain.Entities.Match;
 
 namespace QuizzArena.Quizzing.Tests.UseCases;
 
@@ -16,6 +17,7 @@ public class SubmitAnswersUseCaseTests
 {
     // Mocks
     private readonly Mock<IOptionRepository> _mockOptionRepository;
+    private readonly Mock<IMatchRepository> _mockMatchRepository;
     private readonly Mock<IMatchAttemptRepository> _mockMatchAttemptRepository;
     private readonly Mock<IMapper> _mockMapper;
     private readonly Mock<IQuestionRepository> _mockQuestionRepository;
@@ -30,6 +32,7 @@ public class SubmitAnswersUseCaseTests
     public SubmitAnswersUseCaseTests()
     {
         _mockOptionRepository = new Mock<IOptionRepository>();
+        _mockMatchRepository = new Mock<IMatchRepository>();
         _mockMatchAttemptRepository = new Mock<IMatchAttemptRepository>();
         _mockMapper = new Mock<IMapper>();
         _mockQuestionRepository = new Mock<IQuestionRepository>();
@@ -37,12 +40,13 @@ public class SubmitAnswersUseCaseTests
         _submitAnswersValidator = new SubmitAnswersRequestValidator();
 
         _submitAnswersUseCase = new SubmitAnswersUseCase(
-        _submitAnswersValidator,
+            _submitAnswersValidator,
             _mockOptionRepository.Object,
-        _mockMatchAttemptRepository.Object,
-        _mockMapper.Object,
-        _mockQuestionRepository.Object,
-        _mockCurrentUser.Object
+            _mockMatchRepository.Object,
+            _mockMatchAttemptRepository.Object,
+            _mockMapper.Object,
+            _mockQuestionRepository.Object,
+            _mockCurrentUser.Object
         );
     }
 
@@ -52,15 +56,22 @@ public class SubmitAnswersUseCaseTests
         // Arrange
         string userId = Guid.NewGuid().ToString();
         var matchAttemptId = Guid.NewGuid();
+        var matchId = Guid.NewGuid();
         var questionId = Guid.NewGuid();
         var optionId = Guid.NewGuid();
 
         _mockCurrentUser.Setup(user => user.UserId).Returns(userId);
 
-        var matchAttempt = new MatchAttempt { Id = matchAttemptId, UserId = Guid.Parse(userId) };
+        var matchAttempt = new MatchAttempt { Id = matchAttemptId, MatchId = matchId, UserId = Guid.Parse(userId) };
         _mockMatchAttemptRepository
             .Setup(repo => repo.GetByIdAsync(matchAttemptId))
             .ReturnsAsync(matchAttempt);
+        _mockMatchRepository
+            .Setup(repo => repo.GetMatchByIdAsync(matchId))
+            .ReturnsAsync(new DomainMatch { Id = matchId, AttemptsAmount = 1 });
+        _mockMatchAttemptRepository
+            .Setup(repo => repo.GetMatchAttemptCountByMatchIdAsync(matchId))
+            .ReturnsAsync(1);
 
         var dto = new SubmitAnswersRequestDto
         {
@@ -158,11 +169,18 @@ public class SubmitAnswersUseCaseTests
         // Arrange
         string userId = Guid.NewGuid().ToString();
         var matchAttemptId = Guid.NewGuid();
+        var matchId = Guid.NewGuid();
 
         _mockCurrentUser.Setup(user => user.UserId).Returns(userId);
         _mockMatchAttemptRepository
             .Setup(repo => repo.GetByIdAsync(matchAttemptId))
-            .ReturnsAsync(new MatchAttempt { Id = matchAttemptId, UserId = Guid.Parse(userId) });
+            .ReturnsAsync(new MatchAttempt { Id = matchAttemptId, MatchId = matchId, UserId = Guid.Parse(userId) });
+        _mockMatchRepository
+            .Setup(repo => repo.GetMatchByIdAsync(matchId))
+            .ReturnsAsync(new DomainMatch { Id = matchId, AttemptsAmount = 1 });
+        _mockMatchAttemptRepository
+            .Setup(repo => repo.GetMatchAttemptCountByMatchIdAsync(matchId))
+            .ReturnsAsync(1);
 
         var dto = new SubmitAnswersRequestDto { Answers = [] };
 
@@ -178,15 +196,22 @@ public class SubmitAnswersUseCaseTests
         // Arrange
         string userId = Guid.NewGuid().ToString();
         var matchAttemptId = Guid.NewGuid();
+        var matchId = Guid.NewGuid();
         var questionId = Guid.NewGuid();
         var optionId = Guid.NewGuid();
 
         _mockCurrentUser.Setup(user => user.UserId).Returns(userId);
 
-        var matchAttempt = new MatchAttempt { Id = matchAttemptId, UserId = Guid.Parse(userId) };
+        var matchAttempt = new MatchAttempt { Id = matchAttemptId, MatchId = matchId, UserId = Guid.Parse(userId) };
         _mockMatchAttemptRepository
             .Setup(repo => repo.GetByIdAsync(matchAttemptId))
             .ReturnsAsync(matchAttempt);
+        _mockMatchRepository
+            .Setup(repo => repo.GetMatchByIdAsync(matchId))
+            .ReturnsAsync(new DomainMatch { Id = matchId, AttemptsAmount = 1 });
+        _mockMatchAttemptRepository
+            .Setup(repo => repo.GetMatchAttemptCountByMatchIdAsync(matchId))
+            .ReturnsAsync(1);
 
         var dto = new SubmitAnswersRequestDto
         {
@@ -218,5 +243,65 @@ public class SubmitAnswersUseCaseTests
         Assert.Equal(0, result.CorrectCount);
         Assert.Equal(1, result.IncorrectCount);
         Assert.False(result.Questions[0].IsCorrect);
+    }
+
+    [Fact]
+    public async Task SubmitAnswer_MatchNotFound_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        string userId = Guid.NewGuid().ToString();
+        var matchAttemptId = Guid.NewGuid();
+        var matchId = Guid.NewGuid();
+
+        _mockCurrentUser.Setup(user => user.UserId).Returns(userId);
+        _mockMatchAttemptRepository
+            .Setup(repo => repo.GetByIdAsync(matchAttemptId))
+            .ReturnsAsync(new MatchAttempt { Id = matchAttemptId, MatchId = matchId, UserId = Guid.Parse(userId) });
+        _mockMatchRepository
+            .Setup(repo => repo.GetMatchByIdAsync(matchId))
+            .ReturnsAsync((DomainMatch?)null);
+
+        var dto = new SubmitAnswersRequestDto
+        {
+            Answers = [new SubmitAnswerBody(Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.UtcNow.AddMinutes(-1))]
+        };
+
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => _submitAnswersUseCase.Execute(matchAttemptId, dto)
+        );
+    }
+
+    [Fact]
+    public async Task SubmitAnswer_AttemptCountExceedsMatchLimit_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        string userId = Guid.NewGuid().ToString();
+        var matchAttemptId = Guid.NewGuid();
+        var matchId = Guid.NewGuid();
+
+        _mockCurrentUser.Setup(user => user.UserId).Returns(userId);
+        _mockMatchAttemptRepository
+            .Setup(repo => repo.GetByIdAsync(matchAttemptId))
+            .ReturnsAsync(new MatchAttempt { Id = matchAttemptId, MatchId = matchId, UserId = Guid.Parse(userId) });
+        _mockMatchRepository
+            .Setup(repo => repo.GetMatchByIdAsync(matchId))
+            .ReturnsAsync(new DomainMatch { Id = matchId, AttemptsAmount = 1 });
+        _mockMatchAttemptRepository
+            .Setup(repo => repo.GetMatchAttemptCountByMatchIdAsync(matchId))
+            .ReturnsAsync(2);
+
+        var dto = new SubmitAnswersRequestDto
+        {
+            Answers = [new SubmitAnswerBody(Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.UtcNow.AddMinutes(-1))]
+        };
+
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => _submitAnswersUseCase.Execute(matchAttemptId, dto)
+        );
+
+        _mockMapper.Verify(mapper => mapper.Map<List<Answer>>(It.IsAny<object>()), Times.Never);
+        _mockOptionRepository.Verify(repo => repo.GetByIdsAsync(It.IsAny<List<Guid>>()), Times.Never);
     }
 }
