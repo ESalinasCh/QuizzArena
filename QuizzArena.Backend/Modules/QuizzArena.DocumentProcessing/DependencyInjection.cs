@@ -12,8 +12,8 @@ using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Web;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.Repositories;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Services;
+using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Utils;
 using Shared.Contracts;
-using static QuizzArena.DocumentProcessing.Application.Ports.Out.IDocumentChunkRepository;
 
 namespace QuizzArena.DocumentProcessing;
 
@@ -27,6 +27,7 @@ public static class DependencyInjection
         services.AddScoped<UploadClassSourceRequestValidator>();
         services.AddScoped<IClassSourceRepository, SqlClassSourceRepository>();
         services.AddScoped<IDocumentChunkRepository, SqlDocumentChunkRepository>();
+        services.AddScoped<ICosineSimilarity, TensorCosineSimilarity>();
 
         services.AddAutoMapper(cfg => { }, typeof(DependencyInjection).Assembly);
 
