@@ -12,7 +12,6 @@
         IEmbeddingService embeddingGenerationService,
         ITextGenerationService textGenerationService,
         ICosineSimilarity cosineSimilarityService,
-        IProcesingJobRepository procesingJobRepository,
         float cosineSimilarityThreshold = 0.92f,
         float judgementThreshold = 0.75f,
         string questionEmbeddingModel = "bge-m3",
@@ -20,8 +19,8 @@
         string quizJudgementModel = "llama3.1:8b-instruct-q4_K_M"
     ) : IConsumer<GenerationRequestCommand>
     {
-        public record QuizGenerationFormat(List<QuestionGenerationFormat> Questions);
-        public record QuestionGenerationFormat(string Question, List<string> Options, int CorrectAnswer, string Justification);
+        public record QuizGenerationFormat(string Title, List<QuestionGenerationFormat> Questions);
+            public record QuestionGenerationFormat(string Question, List<string> Options, int CorrectAnswer, string Justification, int ValueScore);
 
         public record QuestionJudgement(float FactualFidelity, float DistractorQuality, float Relevance);
         public record QuizJudgementFormat(List<QuestionJudgement> Evaluations);
@@ -39,7 +38,11 @@
             string prompt = $"Generate a quiz with {numberOfQuestions} questions based on the following content:\n{combinedContent}\n\n" +
                             $"Each question should have between {minNumberOfOptions} and {maxNumberOfOptions} answer options.\n" +
                             $"The questions should be designed to assess the following Bloom's Taxonomy level: {bloomTaxonomy}.\n" +
-                            $"Please provide the questions in a structured format, including the question text, answer options, the correct answer for each question and its justification.";
+                            $"Please provide the questions in a structured format, including:\n" +
+                            $"- A descriptive title for the entire quiz\n" +
+                            $"- For each question: the question text, answer options, the correct answer index, justification, and a value score (integer >= 1)\n" +
+                            $"- Most questions should have a value score of 1\n" +
+                            $"- Assign higher scores (2 or more) only if you consider the question particularly difficult or important\n" +
 
             return prompt;
         }
@@ -118,6 +121,7 @@
                 .ToArray();
 
             llmQuiz = new QuizGenerationFormat(
+                llmQuiz.Title,
                 llmQuiz.Questions
                     .Zip(averageScore, (question, score) => (question, score))
                     .Where(qs => qs.score >= judgementThreshold)
@@ -132,6 +136,7 @@
 
             List<int> acceptedQuestionsIndexes = [];
             llmQuiz = new QuizGenerationFormat(
+                llmQuiz.Title,
                 llmQuiz.Questions.Where((_, candidateIndex) =>
                 {
                     foreach (int acceptedIndex in acceptedQuestionsIndexes)
@@ -149,10 +154,6 @@
                     return true;
                 }).ToList()
             );
-
-
-            Console.WriteLine("Completed!");
-            
 
 
         }
