@@ -9,8 +9,11 @@ internal class TensorCosineSimilarity : ICosineSimilarity
 {
     public double CalculateCosineSimilarity(Vector vectorA, Vector vectorB)
     {
-        ReadOnlySpan<float> a = vectorA.ToArray();
-        ReadOnlySpan<float> b = vectorB.ToArray();
-        return TensorPrimitives.CosineSimilarity(a, b);
+        return TensorPrimitives.CosineSimilarity(vectorA.ToArray(), vectorB.ToArray());
+    }
+
+    public double CalculateCosineSimilarity(float[] vectorA, float[] vectorB)
+    {
+        return TensorPrimitives.CosineSimilarity(vectorA, vectorB);
     }
 }
