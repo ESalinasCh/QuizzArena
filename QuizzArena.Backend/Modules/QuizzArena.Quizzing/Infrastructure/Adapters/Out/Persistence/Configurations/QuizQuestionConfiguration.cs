@@ -22,7 +22,7 @@ internal sealed class QuizQuestionConfiguration : IEntityTypeConfiguration<QuizQ
             .IsRequired();
 
         builder.Property(x => x.ValueScore).
-            HasPrecision(5,2)
+            HasPrecision(5, 2)
             .IsRequired();
 
         builder.Property(x => x.QuizId)

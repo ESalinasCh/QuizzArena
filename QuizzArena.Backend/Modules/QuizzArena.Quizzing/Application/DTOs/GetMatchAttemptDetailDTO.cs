@@ -5,7 +5,7 @@ namespace QuizzArena.Quizzing.Application.DTOs;
 public class GetMatchAttemptDetailDTO
 {
     public Guid Id { get; set; }
-    public int Score { get; set; }
+    public decimal Score { get; set; }
     public QuizAttemptStatus Status { get; set; }
     public IEnumerable<GetMatchAttemptQuestionDTO> Questions { get; set; } = [];
 

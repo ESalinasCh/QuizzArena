@@ -28,7 +28,7 @@ internal sealed class QuizAttemptConfiguration : IEntityTypeConfiguration<MatchA
         builder.Property(x => x.Status).HasColumnType($"{QuizzingConstants.Schema}.quiz_attempt_status");
 
         builder.Property(x => x.Score)
-            .HasPrecision(5,2);
+            .HasPrecision(5, 2);
         builder.Property(x => x.UserId);
 
         builder.HasOne<Match>()

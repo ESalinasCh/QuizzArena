@@ -12,7 +12,7 @@ public record GetMatchAttemptDTO
     public DateTimeOffset? StartedAt { get; set; }
 
     public DateTimeOffset? CompletedAt { get; set; }
-    public int Score { get; set; }
+    public decimal Score { get; set; }
     public QuizAttemptStatus Status { get; set; }
     public int Duration { get; set; }
 }

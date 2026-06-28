@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pgvector;
@@ -13,9 +14,11 @@ using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence;
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.Migrations
 {
     [DbContext(typeof(DocumentProcessingDbContext))]
-    partial class DocumentProcessingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260628221113_UpdatingIdTypeAndNames")]
+    partial class UpdatingIdTypeAndNames
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
