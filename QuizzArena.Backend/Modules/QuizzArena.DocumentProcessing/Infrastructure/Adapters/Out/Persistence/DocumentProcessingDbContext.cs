@@ -15,7 +15,7 @@ public class DocumentProcessingDbContext : DbContext
     public DbSet<ClassSource> ClassSource => Set<ClassSource>();
     public DbSet<DocumentChunk> DocumentChunk => Set<DocumentChunk>();
     public DbSet<DocumentProcessingJob> DocumentProcessingJob => Set<DocumentProcessingJob>();
-    public DbSet<ProcessingJob> CourseStudents => Set<ProcessingJob>();
+    public DbSet<ProcessingJob> ProcessingJobs => Set<ProcessingJob>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
