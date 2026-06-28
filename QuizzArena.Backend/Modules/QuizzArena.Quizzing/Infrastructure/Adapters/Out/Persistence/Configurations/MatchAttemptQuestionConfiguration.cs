@@ -11,5 +11,8 @@ internal sealed class MatchAttemptQuestionConfiguration : IEntityTypeConfigurati
         builder.ToTable(
       "match_attempt_question",
       QuizzingConstants.Schema);
+
+        builder.Property(x => x.ValueScore)
+            .HasPrecision(5, 2);
     }
 }

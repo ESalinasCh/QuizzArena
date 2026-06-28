@@ -21,7 +21,8 @@ internal sealed class QuizQuestionConfiguration : IEntityTypeConfiguration<QuizQ
         builder.Property(x => x.Position)
             .IsRequired();
 
-        builder.Property(x => x.ValueScore)
+        builder.Property(x => x.ValueScore).
+            HasPrecision(5,2)
             .IsRequired();
 
         builder.Property(x => x.QuizId)
