@@ -8,9 +8,10 @@ public class DocumentProcessingMassTransit
 {
     public static void AddConsumers(IBusRegistrationConfigurator x)
     {
-        x.AddSagaStateMachine<IngestionSaga, IngestionSagaState>()
-            .InMemoryRepository();
-
+        x.AddSagaStateMachine<IngestionSaga, IngestionSagaState>().InMemoryRepository();
         x.AddConsumer<TranscriptionRequestConsumer>();
+
+        x.AddSagaStateMachine<GenerationSaga, GenerationSagaState>().InMemoryRepository();
+        x.AddConsumer<GenerationRequestConsumer>();
     }
 }

@@ -27,6 +27,7 @@ public static class DependencyInjection
         services.AddScoped<UploadClassSourceRequestValidator>();
         services.AddScoped<IClassSourceRepository, SqlClassSourceRepository>();
         services.AddScoped<IDocumentChunkRepository, SqlDocumentChunkRepository>();
+        services.AddScoped<IProcesingJobRepository, SqlProcessingJobRepository>();
         services.AddScoped<ICosineSimilarity, TensorCosineSimilarity>();
 
         services.AddAutoMapper(cfg => { }, typeof(DependencyInjection).Assembly);

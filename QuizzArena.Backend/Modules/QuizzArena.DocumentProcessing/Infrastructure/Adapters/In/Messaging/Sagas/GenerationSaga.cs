@@ -46,7 +46,11 @@ public class GenerationSaga : MassTransitStateMachine<GenerationSagaState>
                 {
                     ClassSourceId = ctx.Message.ClassSourceId,
                     ProcessingJobId = ctx.Message.ProcessingJobId,
-                    DocumentProcessingJobId = ctx.Message.DocumentProcessingJobId
+                    DocumentProcessingJobId = ctx.Message.DocumentProcessingJobId,
+                    NumberOfQuestions = ctx.Message.NumberOfQuestions,
+                    MinNumberOfOptions = ctx.Message.MinNumberOfOptions,
+                    MaxNumberOfOptions = ctx.Message.MaxNumberOfOptions,
+                    BloomTaxonomy = ctx.Message.BloomTaxonomy
                 })
                 .TransitionTo(GeneratingQuiz)
         );
