@@ -2,7 +2,7 @@
 
 namespace QuizzArena.DocumentProcessing.Application.Ports.Out;
 
-internal interface IProcesingJobRepository
+internal interface IProcessingJobRepository
 {
     public Task<ProcessingJob> CreateAsync(ProcessingJob processingJob);
     public Task<ProcessingJob> UpdateAsync(ProcessingJob processingJob);

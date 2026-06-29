@@ -3,7 +3,7 @@ using QuizzArena.DocumentProcessing.Domain.Entities;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.Repositories;
 
-internal class SqlProcessingJobRepository(DocumentProcessingDbContext context) : IProcesingJobRepository
+internal class SqlProcessingJobRepository(DocumentProcessingDbContext context) : IProcessingJobRepository
 {
     public async Task<ProcessingJob> CreateAsync(ProcessingJob processingJob)
     {
