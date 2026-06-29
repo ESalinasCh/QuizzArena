@@ -24,7 +24,7 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Con
         string quizJudgementModel = "llama3.1:8b-instruct-q4_K_M"
     ) : IConsumer<GenerationRequestCommand>
     {
-        public record QuizGenerationFormat(string Title, List<QuestionGenerationFormat> Questions);
+        public record QuizGenerationFormat(string Title, string Description, List<QuestionGenerationFormat> Questions);
         public record QuestionGenerationFormat(string Question, List<string> Options, int CorrectAnswer, string Justification, int ValueScore);
 
         public record QuestionJudgement(float FactualFidelity, float DistractorQuality, float Relevance);
@@ -45,6 +45,7 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Con
                         $"The questions should be designed to assess the following Bloom's Taxonomy level: {bloomTaxonomy}.\n" +
                         $"Please provide the questions in a structured format, including:\n" +
                         $"- A descriptive title for the entire quiz\n" +
+                        $"- A very short summary description of the quiz (between 4 and 10 words)\n" +
                         $"- For each question: the question text, answer options, the correct answer index (0-indexed, starting from 0), justification, and a value score (integer >= 1)\n" +
                         $"- IMPORTANT: The correct answer index must be 0-indexed. For example, if the correct answer is the first option, use index 0; if it's the second option, use index 1, etc.\n" +
                         $"- Most questions should have a value score of 1\n" +
@@ -94,6 +95,7 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Con
 
         llmQuiz = new QuizGenerationFormat(
             llmQuiz.Title,
+            llmQuiz.Description,
             llmQuiz.Questions
                 .Where(q => q.CorrectAnswer >= 0 && q.CorrectAnswer < q.Options.Count)
                 .ToList()
@@ -121,6 +123,7 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Con
 
         llmQuiz = new QuizGenerationFormat(
             llmQuiz.Title,
+            llmQuiz.Description,
             llmQuiz.Questions
                 .Zip(averageScore, (question, score) => (question, score))
                 .Where(qs => qs.score >= judgementThreshold)
@@ -136,6 +139,7 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Con
         List<int> acceptedQuestionsIndexes = [];
         llmQuiz = new QuizGenerationFormat(
             llmQuiz.Title,
+            llmQuiz.Description,
             llmQuiz.Questions.Where((_, candidateIndex) =>
             {
                 foreach (int acceptedIndex in acceptedQuestionsIndexes)
@@ -171,7 +175,7 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Con
             {
                 Id = Guid.NewGuid(),
                 Title = llmQuiz.Title,
-                Description = "",
+                Description = llmQuiz.Description,
                 Questions = createdQuestionIds.Select((questionId, index) => new QuizQuestionRequestDTO
                 {
                     QuestionId = questionId,
