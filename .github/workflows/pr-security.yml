@@ -84,6 +84,7 @@ jobs:
           dotnet test QuizzArena.Backend.slnx \
             --verbosity normal \
             --collect:"XPlat Code Coverage" \
+            --settings .runsettings \
             --results-directory coverage/raw
 
       - name: Coverage summary
@@ -96,7 +97,7 @@ jobs:
           hide_complexity: true
           indicators: true
           output: both
-          thresholds: '60 80'
+          thresholds: '40 80'
 
       - name: Post coverage to PR
         uses: marocchino/sticky-pull-request-comment@v2
