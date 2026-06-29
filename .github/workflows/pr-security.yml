@@ -95,7 +95,7 @@ jobs:
           dotnet tool run reportgenerator \
             -reports:coverage/raw/**/*.xml \
             -targetdir:coverage/report \
-            -reporttypes:MarkdownSummary
+            -reporttypes:MarkdownSummaryGithub
 
       - name: Add Coverage to Job Summary
         run: cat coverage/report/Summary.md >> $GITHUB_STEP_SUMMARY
