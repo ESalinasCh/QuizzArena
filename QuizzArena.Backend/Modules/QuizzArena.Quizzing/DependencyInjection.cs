@@ -18,6 +18,7 @@ using QuizzArena.Quizzing.Application.Validators.Option;
 using QuizzArena.Quizzing.Application.Validators.Question;
 using QuizzArena.Quizzing.Application.Validators.Quiz;
 using QuizzArena.Quizzing.Domain.Enums;
+using QuizzArena.Quizzing.Infrastructure.Adapters.In.ExternalServices;
 using QuizzArena.Quizzing.Infrastructure.Adapters.In.Web;
 using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence;
 using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Repositories;
@@ -42,6 +43,8 @@ public static class DependencyInjection
 
         services.AddAutoMapper(cfg => { }, typeof(DependencyInjection).Assembly);
 
+        services.AddScoped<IQuizContract, QuizContractImpl>();
+        services.AddScoped<IQuestionContract, QuestionContractImpl>();
 
         #region Repositories
         services.AddScoped<IMatchAttemptRepository, SqlMatchAttemptRepository>();
