@@ -88,6 +88,19 @@ jobs:
             --settings .runsettings \
             --results-directory coverage/raw
 
+      - name: Restore tools
+        run: dotnet tool restore
+
+      - name: Generate coverage report
+        run: |
+          dotnet tool run reportgenerator \
+            -reports:coverage/raw/**/*.xml \
+            -targetdir:coverage/report \
+            -reporttypes:MarkdownSummary
+
+      - name: Add Coverage to Job Summary
+        run: cat coverage/report/Summary.md >> $GITHUB_STEP_SUMMARY
+
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         with:
