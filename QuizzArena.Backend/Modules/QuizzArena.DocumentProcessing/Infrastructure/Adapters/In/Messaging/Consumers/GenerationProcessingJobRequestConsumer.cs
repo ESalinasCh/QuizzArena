@@ -16,9 +16,12 @@ internal class GenerationProcessingJobRequestConsumer(
         await processingJobRepository.CreateAsync(new ProcessingJob(){
             Id = context.Message.ProcessingJobId,
             Status = JobStatus.Processing,
+            ErrorMessage = "",
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
             DocumentProcessingJobs = new List<DocumentProcessingJob>() {
                 new DocumentProcessingJob {
-                    Id = 0, // CHANGE THIS
+                    Id = context.Message.DocumentProcessingJobId,
                     DocumentId = context.Message.ClassSourceId,
                     ProcessingJobId = context.Message.ProcessingJobId
                 }
