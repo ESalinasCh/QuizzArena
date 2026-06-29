@@ -10,25 +10,25 @@ using Shared.Contracts.DTOs;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Consumers;
 
-    internal class GenerationRequestConsumer(
-        IDocumentChunkRepository documentChunkRepository,
-        IEmbeddingService embeddingGenerationService,
-        ITextGenerationService textGenerationService,
-        ICosineSimilarity cosineSimilarityService,
-        IQuizContract quizContract,
-        IQuestionContract questionContract,
-        float cosineSimilarityThreshold = 0.92f,
-        float judgementThreshold = 0.75f,
-        string questionEmbeddingModel = "bge-m3",
-        string quizGenerationModel = "qwen2.5:7b-instruct",
-        string quizJudgementModel = "llama3.1:8b-instruct-q4_K_M"
-    ) : IConsumer<GenerationRequestCommand>
-    {
-        public record QuizGenerationFormat(string Title, string Description, List<QuestionGenerationFormat> Questions);
-        public record QuestionGenerationFormat(string Question, List<string> Options, int CorrectAnswer, string Justification, int ValueScore);
+public class GenerationRequestConsumer(
+    IDocumentChunkRepository documentChunkRepository,
+    IEmbeddingService embeddingGenerationService,
+    ITextGenerationService textGenerationService,
+    ICosineSimilarity cosineSimilarityService,
+    IQuizContract quizContract,
+    IQuestionContract questionContract,
+    float cosineSimilarityThreshold = 0.92f,
+    float judgementThreshold = 0.75f,
+    string questionEmbeddingModel = "bge-m3",
+    string quizGenerationModel = "qwen2.5:7b-instruct",
+    string quizJudgementModel = "llama3.1:8b-instruct-q4_K_M"
+) : IConsumer<GenerationRequestCommand>
+{
+    public record QuizGenerationFormat(string Title, string Description, List<QuestionGenerationFormat> Questions);
+    public record QuestionGenerationFormat(string Question, List<string> Options, int CorrectAnswer, string Justification, int ValueScore);
 
-        public record QuestionJudgement(float FactualFidelity, float DistractorQuality, float Relevance);
-        public record QuizJudgementFormat(List<QuestionJudgement> Evaluations);
+    public record QuestionJudgement(float FactualFidelity, float DistractorQuality, float Relevance);
+    public record QuizJudgementFormat(List<QuestionJudgement> Evaluations);
 
     public static string GenerateQuizPrompt(
         IEnumerable<DocumentChunk> documentChunks,
