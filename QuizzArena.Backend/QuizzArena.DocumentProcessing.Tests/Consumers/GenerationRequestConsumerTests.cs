@@ -1,4 +1,4 @@
-using MassTransit;
+﻿using MassTransit;
 using Moq;
 using QuizzArena.DocumentProcessing.Application.Messaging.Commands;
 using QuizzArena.DocumentProcessing.Application.Messaging.Events;

@@ -160,13 +160,13 @@ public class GenerationRequestConsumer(
 
         List<Guid> createdQuestionIds = await questionContract.CreateQuestions(
             llmQuiz.Questions.Select(q => new QuestionCreationRequestDTO
-                {
-                    ProcessingJobId = context.Message.ProcessingJobId,
-                    Content = q.Question,
-                    Options = q.Options,
-                    CorrectAnswer = q.CorrectAnswer,
-                    Justification = q.Justification,
-                }
+            {
+                ProcessingJobId = context.Message.ProcessingJobId,
+                Content = q.Question,
+                Options = q.Options,
+                CorrectAnswer = q.CorrectAnswer,
+                Justification = q.Justification,
+            }
             ).ToList()
         );
 
@@ -179,7 +179,7 @@ public class GenerationRequestConsumer(
                 Questions = createdQuestionIds.Select((questionId, index) => new QuizQuestionRequestDTO
                 {
                     QuestionId = questionId,
-                    Position = index+1,
+                    Position = index + 1,
                     ValueScore = llmQuiz.Questions[index].ValueScore,
                 }).ToList()
             }

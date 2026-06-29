@@ -6,7 +6,8 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.
 
 public class SqlDocumentChunkRepository(DocumentProcessingDbContext context) : IDocumentChunkRepository
 {
-    public async Task<IEnumerable<DocumentChunk>> GetChunksByClassSourceIdAsync(Guid classSourceId){
+    public async Task<IEnumerable<DocumentChunk>> GetChunksByClassSourceIdAsync(Guid classSourceId)
+    {
         IEnumerable<DocumentChunk> chunks = await context.DocumentChunk
             .Where(chunk => chunk.DocumentId == classSourceId)
             .ToListAsync();

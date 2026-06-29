@@ -8,9 +8,9 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Services;
 internal class OllamaTextGeneration : ITextGenerationService
 {
     private readonly HttpClient _httpClient;
-    private readonly JsonSerializerOptions _caseInsensitiveOptions = new() 
-    { 
-        PropertyNameCaseInsensitive = true 
+    private readonly JsonSerializerOptions _caseInsensitiveOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
     };
 
     public OllamaTextGeneration(HttpClient httpClient)
@@ -47,8 +47,8 @@ internal class OllamaTextGeneration : ITextGenerationService
     }
 
     private async Task<OllamaGenerateResponseString> GetOllamaResponseAsync(
-        string model, 
-        string prompt, 
+        string model,
+        string prompt,
         JsonNode? schema = null)
     {
         var payload = new
@@ -72,7 +72,7 @@ internal class OllamaTextGeneration : ITextGenerationService
 
         var rawContent = await response.Content.ReadAsStringAsync();
         var ollamaResponse = JsonSerializer.Deserialize<OllamaGenerateResponseString>(
-            rawContent, 
+            rawContent,
             _caseInsensitiveOptions
         );
 

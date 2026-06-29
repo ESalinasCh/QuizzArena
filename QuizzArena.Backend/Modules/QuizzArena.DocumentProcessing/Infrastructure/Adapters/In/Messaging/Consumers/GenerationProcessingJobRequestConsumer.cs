@@ -13,7 +13,8 @@ internal class GenerationProcessingJobRequestConsumer(
 {
     public async Task Consume(ConsumeContext<GenerationProcessingJobRequestCommand> context)
     {
-        await processingJobRepository.CreateAsync(new ProcessingJob(){
+        await processingJobRepository.CreateAsync(new ProcessingJob()
+        {
             Id = context.Message.ProcessingJobId,
             Status = JobStatus.Processing,
             ErrorMessage = "",
