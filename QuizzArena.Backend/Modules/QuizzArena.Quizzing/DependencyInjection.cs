@@ -43,9 +43,9 @@ public static class DependencyInjection
 
         services.AddAutoMapper(cfg => { }, typeof(DependencyInjection).Assembly);
 
-        services.AddScoped<IQuizContract, QuizContractImpl>();
-        services.AddScoped<IQuestionContract, QuestionContractImpl>();
-        services.AddScoped<IMatchContract, MatchContractImpl>();
+        services.AddScoped<IQuizContract, QuizContract>();
+        services.AddScoped<IQuestionContract, QuestionContract>();
+        services.AddScoped<IMatchContract, MatchContract>();
 
         #region Repositories
         services.AddScoped<IMatchAttemptRepository, SqlMatchAttemptRepository>();

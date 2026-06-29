@@ -6,7 +6,7 @@ using Shared.Contracts.DTOs;
 
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.In.ExternalServices;
 
-public class QuestionContractImpl(
+public class QuestionContract(
     IQuestionRepository questionRepository
 ) : IQuestionContract
 {

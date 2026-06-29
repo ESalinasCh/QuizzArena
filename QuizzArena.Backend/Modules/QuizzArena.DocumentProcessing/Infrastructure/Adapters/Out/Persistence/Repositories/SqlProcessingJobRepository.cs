@@ -4,7 +4,7 @@ using QuizzArena.DocumentProcessing.Domain.Entities;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.Repositories;
 
-internal class SqlProcessingJobRepository(DocumentProcessingDbContext context) : IProcessingJobRepository
+internal sealed class SqlProcessingJobRepository(DocumentProcessingDbContext context) : IProcessingJobRepository
 {
     public async Task<ProcessingJob?> GetByIdAsync(Guid processingJobId)
     {

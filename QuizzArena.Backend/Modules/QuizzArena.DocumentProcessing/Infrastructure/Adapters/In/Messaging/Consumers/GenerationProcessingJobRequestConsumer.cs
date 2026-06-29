@@ -7,7 +7,7 @@ using QuizzArena.DocumentProcessing.Domain.Enums;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Consumers;
 
-internal class GenerationProcessingJobRequestConsumer(
+internal sealed class GenerationProcessingJobRequestConsumer(
     IProcessingJobRepository processingJobRepository
 ) : IConsumer<GenerationProcessingJobRequestCommand>
 {

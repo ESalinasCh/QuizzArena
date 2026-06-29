@@ -4,7 +4,7 @@ using QuizzArena.DocumentProcessing.Application.Ports.Out;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Services;
 
-internal class OllamaEmbeddingGeneration : IEmbeddingService
+internal sealed class OllamaEmbeddingGeneration : IEmbeddingService
 {
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _caseInsensitiveOptions = new()

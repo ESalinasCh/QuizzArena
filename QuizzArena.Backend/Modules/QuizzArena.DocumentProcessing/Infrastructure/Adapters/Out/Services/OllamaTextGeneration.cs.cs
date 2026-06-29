@@ -5,7 +5,7 @@ using QuizzArena.DocumentProcessing.Application.Ports.Out;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Services;
 
-internal class OllamaTextGeneration : ITextGenerationService
+internal sealed class OllamaTextGeneration : ITextGenerationService
 {
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _caseInsensitiveOptions = new()
@@ -38,10 +38,7 @@ internal class OllamaTextGeneration : ITextGenerationService
 
         var result = JsonSerializer.Deserialize<T>(ollamaResponse.Response);
 
-        if (result == null)
-        {
-            throw new InvalidOperationException($"Failed to deserialize response to {typeof(T).Name}");
-        }
+        ArgumentNullException.ThrowIfNull(result, $"Failed to deserialize response to {typeof(T).Name}");
 
         return result;
     }
