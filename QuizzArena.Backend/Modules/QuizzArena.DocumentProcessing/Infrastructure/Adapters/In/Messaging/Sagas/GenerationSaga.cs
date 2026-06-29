@@ -8,11 +8,13 @@ public class GenerationSaga : MassTransitStateMachine<GenerationSagaState>
 {
     public State CreatingProcessingJob { get; private set; } = null!;
     public State GeneratingQuiz { get; private set; } = null!;
+    public State TerminatingProcessing { get; private set; } = null!;
     public State QuizGenerationSuccess { get; private set; } = null!;
     public State QuizGenerationFailed { get; private set; } = null!;
 
     public Event<GenerationProcessingJobRequestEvent> QuizGenerationProcessingJobRequest { get; private set; } = null!;
     public Event<GenerationRequestEvent> QuizGenerationRequest { get; private set; } = null!;
+    public Event<GenerationFinalizeProcessingRequestEvent> FinalizeProcessingRequest { get; private set; } = null!;
     public Event<GenerationCompletedEvent> QuizGenerationCompleted { get; private set; } = null!;
     public Event<GenerationFailedEvent> QuizGenerationError { get; private set; } = null!;
 
@@ -28,6 +30,9 @@ public class GenerationSaga : MassTransitStateMachine<GenerationSagaState>
         });
 
         Event(() => QuizGenerationRequest, e =>
+            e.CorrelateBy(state => state.GenerationIdKey, ctx => ctx.Message.DocumentProcessingJobId.ToString()));
+
+        Event(() => FinalizeProcessingRequest, e =>
             e.CorrelateBy(state => state.GenerationIdKey, ctx => ctx.Message.DocumentProcessingJobId.ToString()));
 
         Event(() => QuizGenerationCompleted, e =>
@@ -80,6 +85,22 @@ public class GenerationSaga : MassTransitStateMachine<GenerationSagaState>
         );
 
         During(GeneratingQuiz,
+            When(FinalizeProcessingRequest)
+                .Then(ctx => Console.WriteLine($"[Saga] Quiz generation #{ctx.Saga.ClassSourceId} is finishing."))
+                .Publish(ctx => new GenerationTerminatingProcessingRequestCommand
+                {
+                    ClassSourceId = ctx.Message.ClassSourceId,
+                    ProcessingJobId = ctx.Message.ProcessingJobId,
+                    DocumentProcessingJobId = ctx.Message.DocumentProcessingJobId,
+                    CreateMatch = ctx.Message.CreateMatch,
+                    Title = ctx.Message.Title,
+                    QuestionAmount = ctx.Message.QuestionAmount,
+                    QuizId = ctx.Message.QuizId
+                })
+                .TransitionTo(TerminatingProcessing)
+        );
+
+        During(TerminatingProcessing,
             When(QuizGenerationCompleted)
                 .Then(ctx => Console.WriteLine($"[Saga] Quiz generation #{ctx.Saga.ClassSourceId} completed."))
                 .TransitionTo(QuizGenerationSuccess)

@@ -181,11 +181,15 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Con
             }
         );
 
-        await context.Publish<GenerationCompletedEvent>(new GenerationCompletedEvent
+        await context.Publish(new GenerationFinalizeProcessingRequestEvent
         {
             ProcessingJobId = context.Message.ProcessingJobId,
             ClassSourceId = context.Message.ClassSourceId,
             DocumentProcessingJobId = context.Message.DocumentProcessingJobId,
+            CreateMatch = context.Message.CreateMatch,
+            Title = llmQuiz.Title,
+            QuestionAmount = llmQuiz.Questions.Count,
+            QuizId = quizId,
         });
 
     }

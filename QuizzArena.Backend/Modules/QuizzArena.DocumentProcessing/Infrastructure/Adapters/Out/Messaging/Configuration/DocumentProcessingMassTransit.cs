@@ -14,5 +14,6 @@ public class DocumentProcessingMassTransit
         x.AddSagaStateMachine<GenerationSaga, GenerationSagaState>().InMemoryRepository();
         x.AddConsumer<GenerationRequestConsumer>();
         x.AddConsumer<GenerationProcessingJobRequestConsumer>();
+        x.AddConsumer<GenerationTerminatingProcessingRequestConsumer>();
     }
 }

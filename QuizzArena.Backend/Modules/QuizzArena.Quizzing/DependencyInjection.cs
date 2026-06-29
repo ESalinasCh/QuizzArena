@@ -45,6 +45,7 @@ public static class DependencyInjection
 
         services.AddScoped<IQuizContract, QuizContractImpl>();
         services.AddScoped<IQuestionContract, QuestionContractImpl>();
+        services.AddScoped<IMatchContract, MatchContractImpl>();
 
         #region Repositories
         services.AddScoped<IMatchAttemptRepository, SqlMatchAttemptRepository>();
