@@ -12,9 +12,9 @@ namespace QuizzArena.DocumentProcessing.Tests.Consumers;
 
 public class GenerationRequestConsumerTests
 {
-    private static readonly float[][] SingleQuestionEmbedding = [[1f, 0f]];
-    private static readonly float[][] DistinctQuestionEmbeddings = [[1f, 0f], [0f, 1f]];
-    private static readonly float[][] SimilarQuestionEmbeddings = [[1f, 0f], [0.99f, 0.01f]];
+    private static readonly float[][] _singleQuestionEmbedding = [[1f, 0f]];
+    private static readonly float[][] _distinctQuestionEmbeddings = [[1f, 0f], [0f, 1f]];
+    private static readonly float[][] _similarQuestionEmbeddings = [[1f, 0f], [0.99f, 0.01f]];
 
     private readonly Mock<IDocumentChunkRepository> _mockDocumentChunkRepository;
     private readonly Mock<IEmbeddingService> _mockEmbeddingService;
@@ -178,7 +178,7 @@ public class GenerationRequestConsumerTests
             new(0.9f, 0.9f, 0.9f),
             new(0.6f, 0.6f, 0.6f),
         }));
-        SetupEmbeddings(SingleQuestionEmbedding);
+        SetupEmbeddings(_singleQuestionEmbedding);
 
         _mockQuestionContract
             .Setup(q => q.CreateQuestions(It.IsAny<List<QuestionCreationRequestDTO>>()))
@@ -217,7 +217,7 @@ public class GenerationRequestConsumerTests
             new(0.9f, 0.9f, 0.9f),
             new(0.9f, 0.9f, 0.9f),
         }));
-        SetupEmbeddings(SimilarQuestionEmbeddings);
+        SetupEmbeddings(_similarQuestionEmbeddings);
 
         _mockCosineSimilarity
             .Setup(c => c.CalculateCosineSimilarity(It.IsAny<float[]>(), It.IsAny<float[]>()))
@@ -254,7 +254,7 @@ public class GenerationRequestConsumerTests
             new(0.9f, 0.9f, 0.9f),
             new(0.8f, 0.8f, 0.8f),
         }));
-        SetupEmbeddings(DistinctQuestionEmbeddings);
+        SetupEmbeddings(_distinctQuestionEmbeddings);
 
         _mockCosineSimilarity
             .Setup(c => c.CalculateCosineSimilarity(It.IsAny<float[]>(), It.IsAny<float[]>()))
