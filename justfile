@@ -136,6 +136,7 @@ test-coverage:
     cd {{ backend }} && dotnet test {{ sln }} \
         --verbosity normal \
         --collect:"XPlat Code Coverage" \
+        --settings .runsettings \
         --results-directory coverage/raw
 
 # Generate an HTML + text summary from the last test run.
