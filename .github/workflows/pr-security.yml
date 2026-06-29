@@ -98,14 +98,14 @@ jobs:
             -reporttypes:MarkdownSummaryGithub
 
       - name: Add Coverage to Job Summary
-        run: cat coverage/report/Summary.md >> $GITHUB_STEP_SUMMARY
+        run: cat coverage/report/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
 
       - name: Post coverage to PR
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: coverage
           recreate: true
-          path: QuizzArena.Backend/coverage/report/Summary.md
+          path: QuizzArena.Backend/coverage/report/SummaryGithub.md
 
   # ── 4. Secret scan (full git history) ───────────────────────────────────────
   scan-secrets:
