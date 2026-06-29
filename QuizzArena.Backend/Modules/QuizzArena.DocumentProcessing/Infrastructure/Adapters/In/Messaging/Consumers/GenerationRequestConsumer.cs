@@ -45,7 +45,8 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Con
                         $"The questions should be designed to assess the following Bloom's Taxonomy level: {bloomTaxonomy}.\n" +
                         $"Please provide the questions in a structured format, including:\n" +
                         $"- A descriptive title for the entire quiz\n" +
-                        $"- For each question: the question text, answer options, the correct answer index, justification, and a value score (integer >= 1)\n" +
+                        $"- For each question: the question text, answer options, the correct answer index (0-indexed, starting from 0), justification, and a value score (integer >= 1)\n" +
+                        $"- IMPORTANT: The correct answer index must be 0-indexed. For example, if the correct answer is the first option, use index 0; if it's the second option, use index 1, etc.\n" +
                         $"- Most questions should have a value score of 1\n" +
                         $"- Assign higher scores (2 or more) only if you consider the question particularly difficult or important.";
 
@@ -91,6 +92,17 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Con
             quizPrompt
         );
 
+        llmQuiz = new QuizGenerationFormat(
+            llmQuiz.Title,
+            llmQuiz.Questions
+                .Where(q => q.CorrectAnswer >= 0 && q.CorrectAnswer < q.Options.Count)
+                .ToList()
+        );
+
+        if (llmQuiz.Questions.Count == 0)
+        {
+            throw new InvalidOperationException("No valid questions found after filtering out questions with invalid CorrectAnswer indices.");
+        }
 
         string judgementPrompt = GenerateJudgementPrompt(documentChunks, llmQuiz);
         QuizJudgementFormat llmJudgement = await textGenerationService.GenerateAsync<QuizJudgementFormat>(
