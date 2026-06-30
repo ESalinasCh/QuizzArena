@@ -60,7 +60,13 @@ public sealed class StartAttemptUseCase(
         var _random = random ?? new Random();
         if (match.QuestionsAmount is int amount && questions.Count > amount)
         {
-            questions = questions.Take(amount).ToList();
+            questions = questions
+                .Select((q, index) => new { Question = q, Index = index })
+                .OrderBy(_ => _random.Next())
+                .Take(amount)
+                .OrderBy(x => x.Index)
+                .Select(x => x.Question)
+                .ToList();
         }
 
         if (match.ShuffleQuestion)
