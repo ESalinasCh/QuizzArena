@@ -33,13 +33,12 @@ internal sealed class SqlQuizQuestionRepository(QuizzingDbContext context) : IQu
     {
         List<AugmentedQuestionDto> augmentedQuestions = await context.QuizQuestions
             .Where(qq => qq.QuizId == QuizId)
-            .Join(context.Questions,
+            .Join(context.Questions.Include(q => q.Options),
                 qq => qq.QuestionId,
                 q => q.Id,
                 (qq, q) => new { qq, q })
             .OrderBy(x => x.qq.Position)
             .Select(x => new AugmentedQuestionDto(x.q, x.qq.ValueScore))
-            .Include(x => x.Question.Options)
             .ToListAsync();
         return augmentedQuestions;
     }
