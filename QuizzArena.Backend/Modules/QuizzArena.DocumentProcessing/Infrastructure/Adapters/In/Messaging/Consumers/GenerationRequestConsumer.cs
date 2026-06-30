@@ -22,7 +22,7 @@ public class GenerationRequestConsumer(
     IOptions<QuizGenerationOptions> quizGenerationOptions
 ) : IConsumer<GenerationRequestCommand>
 {
-    private readonly QuizGenerationOptions quizGenerationConfig = quizGenerationOptions.Value;
+    private readonly QuizGenerationOptions _quizGenerationConfig = quizGenerationOptions.Value;
 
     public record QuizGenerationFormat(string Title, string Description, List<QuestionGenerationFormat> Questions);
     public record QuestionGenerationFormat(string Question, List<string> Options, int CorrectAnswer, string Justification, int ValueScore);
@@ -89,7 +89,7 @@ public class GenerationRequestConsumer(
             context.Message.BloomTaxonomy
         );
         QuizGenerationFormat llmQuiz = await textGenerationService.GenerateAsync<QuizGenerationFormat>(
-            quizGenerationConfig.QuizGenerationModel,
+            _quizGenerationConfig.QuizGenerationModel,
             quizPrompt
         );
 
@@ -108,7 +108,7 @@ public class GenerationRequestConsumer(
 
         string judgementPrompt = GenerateJudgementPrompt(documentChunks, llmQuiz);
         QuizJudgementFormat llmJudgement = await textGenerationService.GenerateAsync<QuizJudgementFormat>(
-            quizGenerationConfig.QuizJudgementModel,
+            _quizGenerationConfig.QuizJudgementModel,
             judgementPrompt
         );
 
@@ -126,13 +126,13 @@ public class GenerationRequestConsumer(
             llmQuiz.Description,
             llmQuiz.Questions
                 .Zip(averageScore, (question, score) => (question, score))
-                .Where(qs => qs.score >= quizGenerationConfig.JudgementThreshold)
+                .Where(qs => qs.score >= _quizGenerationConfig.JudgementThreshold)
                 .Select(qs => qs.question)
                 .ToList()
         );
 
         float[][] embeddedQuestions = await embeddingGenerationService.GenerateMultipleEmbeddingsAsync(
-            quizGenerationConfig.QuestionEmbeddingModel,
+            _quizGenerationConfig.QuestionEmbeddingModel,
             llmQuiz.Questions.Select(qs => $"Question: {qs.Question}\nAnswer: {qs.Options[qs.CorrectAnswer]}").ToArray()
         );
 
@@ -148,7 +148,7 @@ public class GenerationRequestConsumer(
                         embeddedQuestions[candidateIndex],
                         embeddedQuestions[acceptedIndex]
                     );
-                    if (cosineSim >= quizGenerationConfig.CosineSimilarityThreshold)
+                    if (cosineSim >= _quizGenerationConfig.CosineSimilarityThreshold)
                     {
                         return false;
                     }
