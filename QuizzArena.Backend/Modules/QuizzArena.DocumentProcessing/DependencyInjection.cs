@@ -12,8 +12,9 @@ using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Web;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.Repositories;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Services;
+using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Utils;
+using QuizzArena.DocumentProcessing.Infrastructure.Configuration;
 using Shared.Contracts;
-using static QuizzArena.DocumentProcessing.Application.Ports.Out.IDocumentChunkRepository;
 
 namespace QuizzArena.DocumentProcessing;
 
@@ -26,6 +27,11 @@ public static class DependencyInjection
         services.AddScoped<IUploadSourceUseCase, UploadSourceUseCase>();
         services.AddScoped<UploadClassSourceRequestValidator>();
         services.AddScoped<IClassSourceRepository, SqlClassSourceRepository>();
+        services.AddScoped<IDocumentChunkRepository, SqlDocumentChunkRepository>();
+        services.AddScoped<IProcessingJobRepository, SqlProcessingJobRepository>();
+        services.AddScoped<ICosineSimilarity, TensorCosineSimilarity>();
+
+        services.Configure<QuizGenerationOptions>(configuration.GetSection(QuizGenerationOptions.SectionName));
 
         services.AddAutoMapper(cfg => { }, typeof(DependencyInjection).Assembly);
 
@@ -40,6 +46,20 @@ public static class DependencyInjection
         {
             var whisperUrl = configuration["WhisperSettings:BaseUrl"] ?? "http://localhost:9000/";
             client.BaseAddress = new Uri(whisperUrl);
+            client.Timeout = TimeSpan.FromMinutes(60);
+        });
+
+        services.AddHttpClient<ITextGenerationService, OllamaTextGeneration>(client =>
+        {
+            var ollamaUrl = configuration["OllamaSettings:BaseUrl"] ?? "http://localhost:11434/";
+            client.BaseAddress = new Uri(ollamaUrl);
+            client.Timeout = TimeSpan.FromMinutes(60);
+        });
+
+        services.AddHttpClient<IEmbeddingService, OllamaEmbeddingGeneration>(client =>
+        {
+            var ollamaUrl = configuration["OllamaSettings:BaseUrl"] ?? "http://localhost:11434/";
+            client.BaseAddress = new Uri(ollamaUrl);
             client.Timeout = TimeSpan.FromMinutes(60);
         });
 

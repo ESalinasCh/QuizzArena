@@ -1,5 +1,5 @@
 ﻿using System.Net.Http.Headers;
-using static QuizzArena.DocumentProcessing.Application.Ports.Out.IDocumentChunkRepository;
+using QuizzArena.DocumentProcessing.Application.Ports.Out;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Services;
 
