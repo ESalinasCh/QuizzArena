@@ -37,7 +37,7 @@ public class MatchAttemptController(
     }
 
     [HttpPut("match-attempts/{attemptId}/questions/{questionId}/answer")]
-
+    [Authorize(Roles = "student")]
     public async Task<ActionResult<MatchAttemptSmallProgressDto>> TrackAnswer(Guid attemptId, Guid questionId,
         [FromBody] TrackAnswerRequestDto trackAnswerRequestDto
     )
