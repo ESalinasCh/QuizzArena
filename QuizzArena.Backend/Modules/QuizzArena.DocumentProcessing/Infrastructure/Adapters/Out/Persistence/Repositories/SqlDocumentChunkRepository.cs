@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using QuizzArena.DocumentProcessing.Application.Ports.Out;
 using QuizzArena.DocumentProcessing.Domain.Entities;
 
@@ -12,5 +12,10 @@ public class SqlDocumentChunkRepository(DocumentProcessingDbContext context) : I
             .Where(chunk => chunk.DocumentId == classSourceId)
             .ToListAsync();
         return chunks;
+    }
+    public async Task SaveChunksAsync(IReadOnlyList<DocumentChunk> chunks)
+    {
+        context.DocumentChunk.AddRange(chunks);
+        await context.SaveChangesAsync();
     }
 }
