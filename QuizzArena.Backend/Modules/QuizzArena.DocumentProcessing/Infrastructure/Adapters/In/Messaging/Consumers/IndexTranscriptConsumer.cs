@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using Microsoft.Extensions.Logging;
 using Pgvector;
 using QuizzArena.DocumentProcessing.Application.Helpers;
 using QuizzArena.DocumentProcessing.Application.Messaging.Commands;
@@ -12,15 +13,12 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Con
 /// <summary>
 /// Indexing transcript to get most valuable chunks.
 /// </summary>
-/// <param name="storageServiceRepository"></param>
-/// <param name="embeddingService"></param>
-/// <param name="chunkClassifier"></param>
-/// <param name="documentChunkRepository"></param>
-public class IndexTranscriptConsumer(
+public partial class IndexTranscriptConsumer(
     IStorageServiceRepository storageServiceRepository,
     IEmbeddingService embeddingService,
     IChunkClassifier chunkClassifier,
-    IDocumentChunkRepository documentChunkRepository
+    IDocumentChunkRepository documentChunkRepository,
+    ILogger<IndexTranscriptConsumer> logger
 ) : IConsumer<IndexTranscriptCommand>
 {
     // Keep only chunks the classifier marks academic with at least this confidence.
@@ -32,9 +30,12 @@ public class IndexTranscriptConsumer(
 
         try
         {
+            LogStarted(logger, command.ClassSourceId, command.TranscriptUrl);
+
             string transcript = await storageServiceRepository.DownloadTextAsync(command.TranscriptUrl);
 
             List<string> sentences = SentenceSplitter.SplitIntoSentences(transcript);
+            LogSentences(logger, sentences.Count, command.ClassSourceId);
             if (sentences.Count == 0)
             {
                 await PublishCompleted(context, command.ClassSourceId, 0);
@@ -43,6 +44,7 @@ public class IndexTranscriptConsumer(
 
             IReadOnlyList<float[]> sentenceEmbeddings = await embeddingService.EmbedInBatchesAsync(sentences);
             List<string> chunks = SemanticChunker.GenerateChunk(sentences, sentenceEmbeddings);
+            LogChunks(logger, chunks.Count, command.ClassSourceId);
 
             // Classify each chunk and keep only the relevant ones. Category/confidence are used
             // here purely to filter — they are not persisted.
@@ -56,6 +58,7 @@ public class IndexTranscriptConsumer(
                 }
             }
 
+            LogFiltered(logger, keptChunks.Count, chunks.Count, command.ClassSourceId);
             if (keptChunks.Count == 0)
             {
                 await PublishCompleted(context, command.ClassSourceId, 0);
@@ -76,11 +79,14 @@ public class IndexTranscriptConsumer(
                 .ToList();
 
             await documentChunkRepository.SaveChunksAsync(documentChunks);
+            LogStored(logger, documentChunks.Count, command.ClassSourceId);
 
             await PublishCompleted(context, command.ClassSourceId, documentChunks.Count);
         }
         catch (Exception ex)
         {
+            LogFailed(logger, ex, command.ClassSourceId);
+
             await context.Publish(new IndexingFailedEvent
             {
                 ClassSourceId = command.ClassSourceId,
@@ -95,4 +101,22 @@ public class IndexTranscriptConsumer(
             ClassSourceId = classSourceId,
             StoredChunkCount = storedChunkCount,
         });
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Indexing started for ClassSource {ClassSourceId} (transcript {TranscriptUrl}).")]
+    private static partial void LogStarted(ILogger logger, Guid classSourceId, string transcriptUrl);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Split into {SentenceCount} sentences for ClassSource {ClassSourceId}.")]
+    private static partial void LogSentences(ILogger logger, int sentenceCount, Guid classSourceId);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Generated {ChunkCount} semantic chunks for ClassSource {ClassSourceId}.")]
+    private static partial void LogChunks(ILogger logger, int chunkCount, Guid classSourceId);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Kept {KeptCount} of {ChunkCount} chunks after classification for ClassSource {ClassSourceId}.")]
+    private static partial void LogFiltered(ILogger logger, int keptCount, int chunkCount, Guid classSourceId);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Stored {StoredCount} chunks for ClassSource {ClassSourceId}.")]
+    private static partial void LogStored(ILogger logger, int storedCount, Guid classSourceId);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "Indexing failed for ClassSource {ClassSourceId}.")]
+    private static partial void LogFailed(ILogger logger, Exception exception, Guid classSourceId);
 }

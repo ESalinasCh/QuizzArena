@@ -173,6 +173,20 @@ services:
           - whisper
     restart: unless-stopped
 
+  whisper-medium:
+    image: onerahmet/openai-whisper-asr-webservice:latest
+    profiles: ["medium"]
+    environment:
+      ASR_MODEL: medium
+      ASR_ENGINE: openai_whisper
+    ports:
+      - "9000:9000"
+    networks:
+      default:
+        aliases:
+          - whisper
+    restart: unless-stopped
+
 volumes:
   postgres_data:
   ollama_models:
