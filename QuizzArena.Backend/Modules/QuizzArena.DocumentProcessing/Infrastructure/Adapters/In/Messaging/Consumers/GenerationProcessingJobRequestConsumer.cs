@@ -34,6 +34,7 @@ internal sealed class GenerationProcessingJobRequestConsumer(
             ClassSourceId = context.Message.ClassSourceId,
             ProcessingJobId = context.Message.ProcessingJobId,
             DocumentProcessingJobId = context.Message.DocumentProcessingJobId,
+            NumberOfQuestions = context.Message.NumberOfQuestions,
             MinNumberOfOptions = context.Message.MinNumberOfOptions,
             MaxNumberOfOptions = context.Message.MaxNumberOfOptions,
             CreateMatch = context.Message.CreateMatch,
