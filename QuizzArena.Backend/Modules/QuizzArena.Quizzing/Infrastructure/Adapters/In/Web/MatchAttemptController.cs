@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using QuizzArena.Quizzing.Application.DTOs;
 using QuizzArena.Quizzing.Application.DTOs.Match;
 using QuizzArena.Quizzing.Application.DTOs.MatchAttempt;
 using QuizzArena.Quizzing.Application.DTOs.SubmitAnswers;
+using QuizzArena.Quizzing.Application.Filters;
 using QuizzArena.Quizzing.Application.Ports.In;
 
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.In.Web;
@@ -13,7 +15,9 @@ public class MatchAttemptController(
     IStartAttemptUseCase startAttemptUseCase,
     ISubmitAnswersUseCase submitAnswersUseCase,
     ITrackAnswerUseCase trackAnswerUserCase,
-    IFinishMatchTrackedUseCase finishMatchTrackedUseCase
+    IFinishMatchTrackedUseCase finishMatchTrackedUseCase,
+    IGetMatchAttemptsByStudent getMatchAttemptsByStudent,
+    IGetMatchAttemptDetail getMatchAttemptDetail
 ) : ControllerBase
 {
     [HttpPost("plays")]
@@ -53,5 +57,21 @@ public class MatchAttemptController(
     {
         var response = await finishMatchTrackedUseCase.Execute(attemptId);
         return Ok(response);
+    }
+
+    [HttpGet("users/me/match-attempts")]
+    [Authorize(Roles = "student")]
+    public async Task<ActionResult<List<GetMatchAttemptDTO>>> GetMyMatchAttempts([FromQuery] MatchAttemptFilters filters)
+    {
+        var matchAttemptsDto = await getMatchAttemptsByStudent.Execute(filters);
+        return Ok(matchAttemptsDto);
+    }
+
+    [HttpGet("match-attempts/{attemptId}")]
+    [Authorize(Roles = "student,teacher")]
+    public async Task<ActionResult<GetMatchAttemptDetailDTO>> GetMatchAttemptDetail([FromRoute] Guid attemptId)
+    {
+        var matchAttemptDetail = await getMatchAttemptDetail.Execute(attemptId);
+        return Ok(matchAttemptDetail);
     }
 }

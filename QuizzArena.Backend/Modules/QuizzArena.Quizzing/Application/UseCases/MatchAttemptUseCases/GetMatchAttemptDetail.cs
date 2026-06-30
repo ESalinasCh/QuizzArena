@@ -4,7 +4,7 @@ using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Domain.Entities;
 using QuizzArena.Quizzing.Domain.Enums;
 
-namespace QuizzArena.Quizzing.Application.UseCases.MatchUseCases;
+namespace QuizzArena.Quizzing.Application.UseCases.MatchAttemptUseCases;
 
 public class GetMatchAttemptDetail(IMatchRepository matchRepository, IQuestionQueriesRepository questionQueriesRepository) : IGetMatchAttemptDetail
 {
