@@ -20,8 +20,10 @@ public class CreateMatchUseCase(
     public async Task<MatchCreatedResponseDto> Execute(MatchCreateDto dto)
     {
         await createValidator.ValidateAndThrowAsync(dto);
+        Console.WriteLine($"DTO.ShuffleQuestion = {dto.ShuffleQuestion}");
         Quiz? quiz = await quizRepository.GetByIdAsync(dto.QuizId) ?? throw new KeyNotFoundException("Quiz not found.");
         Match match = mapper.Map<Match>(dto);
+        Console.WriteLine($"DTO.ShuffleQuestion = {dto.ShuffleQuestion}");
 
         match.Mode = MatchMode.Exam;
         match.CreatedAt = DateTimeOffset.UtcNow;
@@ -29,7 +31,6 @@ public class CreateMatchUseCase(
         match.Title = quiz.Title + " " + match.CreatedAt;
         match.QuestionsAmount = null;
         match.Code = Random.Shared.Next(100000, 999999).ToString(CultureInfo.InvariantCulture);
-        match.QuestionsAmount = null;
 
         Match createdMatch = await matchRepository.CreateMatchAsync(match);
 

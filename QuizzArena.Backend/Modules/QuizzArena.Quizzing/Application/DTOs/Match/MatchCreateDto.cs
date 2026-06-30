@@ -7,7 +7,7 @@ public class MatchCreateDto
     public int TimeMinutes { get; set; }
     public int? QuestionsAmount { get; set; }
     public int AttemptsAmount { get; set; }
-    public bool ShuffleQuestions { get; set; }
+    public bool ShuffleQuestion { get; set; }
     public bool ShuffleOptions { get; set; }
     public Guid QuizId { get; set; }
     public Guid? CourseId { get; set; }
