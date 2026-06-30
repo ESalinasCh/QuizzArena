@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using QuizzArena.Quizzing.Application.DTOs.Question;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Domain.Entities;
 
@@ -26,5 +27,19 @@ internal sealed class SqlQuizQuestionRepository(QuizzingDbContext context) : IQu
             .ToListAsync();
 
         return questions;
+    }
+
+    public async Task<List<AugmentedQuestionDto>> GetQuestionsAndScoreByQuizIdAsync(Guid QuizId)
+    {
+        List<AugmentedQuestionDto> augmentedQuestions = await context.QuizQuestions
+            .Where(qq => qq.QuizId == QuizId)
+            .Join(context.Questions.Include(q => q.Options),
+                qq => qq.QuestionId,
+                q => q.Id,
+                (qq, q) => new { qq, q })
+            .OrderBy(x => x.qq.Position)
+            .Select(x => new AugmentedQuestionDto(x.q, x.qq.ValueScore))
+            .ToListAsync();
+        return augmentedQuestions;
     }
 }

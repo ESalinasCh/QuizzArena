@@ -49,8 +49,9 @@ public sealed class StartAttemptUseCase(
             throw new InvalidOperationException("User already have an active attempt for this match.");
         }
 
-        Quiz? quiz = await quizRepository.GetByIdAsync(match.QuizId) ?? throw new InvalidOperationException("No quiz and questions were found for this match.");
-        List<Question> questions = await quizQuestionRepository.GetQuestionsByQuizIdAsync(quiz.Id);
+        Quiz quiz = await quizRepository.GetByIdAsync(match.QuizId) ?? throw new InvalidOperationException("No quiz and questions were found for this match.");
+        List<AugmentedQuestionDto> questions = await quizQuestionRepository.GetQuestionsAndScoreByQuizIdAsync(quiz.Id);
+
         if (questions.Count == 0)
         {
             throw new InvalidOperationException("No questions were found for this match");
@@ -59,7 +60,13 @@ public sealed class StartAttemptUseCase(
         var _random = random ?? new Random();
         if (match.QuestionsAmount is int amount && questions.Count > amount)
         {
-            questions = questions.Take(amount).ToList();
+            questions = questions
+                .Select((q, index) => new { Question = q, Index = index })
+                .OrderBy(_ => _random.Next())
+                .Take(amount)
+                .OrderBy(x => x.Index)
+                .Select(x => x.Question)
+                .ToList();
         }
 
         if (match.ShuffleQuestion)
@@ -71,7 +78,7 @@ public sealed class StartAttemptUseCase(
         {
             foreach (var question in questions)
             {
-                question.Options = question.Options.OrderBy(_ => _random.Next()).ToList();
+                question.Question.Options = question.Question.Options.OrderBy(_ => _random.Next()).ToList();
             }
         }
 
@@ -89,7 +96,8 @@ public sealed class StartAttemptUseCase(
             MatchAttemptQuestions = questions.Select(q => new MatchAttemptQuestion
             {
                 Id = Guid.NewGuid(),
-                QuestionId = q.Id,
+                QuestionId = q.Question.Id,
+                ValueScore = q.ValueScore,
                 MatchAttemptId = matchAttemptId
             }).ToList()
         };
@@ -102,9 +110,9 @@ public sealed class StartAttemptUseCase(
             MatchAttemptId = addedMatchAttempt.Id,
             Questions = questions.Select(q => new StartAttemptQuestionResponseDto()
             {
-                Id = q.Id,
-                Statement = q.Content,
-                Options = q.Options.Select(o => new StartAttemptOptionResponseDto()
+                Id = q.Question.Id,
+                Statement = q.Question.Content,
+                Options = q.Question.Options.Select(o => new StartAttemptOptionResponseDto()
                 {
                     Id = o.Id,
                     Label = o.Description

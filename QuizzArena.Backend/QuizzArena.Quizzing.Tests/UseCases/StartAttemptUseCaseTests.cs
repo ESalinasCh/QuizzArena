@@ -1,5 +1,6 @@
 ﻿using Moq;
 using QuizzArena.Quizzing.Application.DTOs.MatchAttempt;
+using QuizzArena.Quizzing.Application.DTOs.Question;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Application.UseCases.MatchUseCases;
 using QuizzArena.Quizzing.Domain.Entities;
@@ -164,7 +165,7 @@ public class StartAttemptUseCaseTests
         _mockMatchAttemptRepository.Setup(r => r.GetMatchAttemptCountByMatchIdAsync(match.Id)).ReturnsAsync(0);
         _mockMatchAttemptRepository.Setup(r => r.HasActiveAttemptByMatchIdAsync(match.Id, Guid.Parse(userId))).ReturnsAsync(false);
         _mockQuizRepository.Setup(q => q.GetByIdAsync(match.QuizId)).ReturnsAsync(new Quiz { Id = match.QuizId });
-        _mockQuizQuestionRepository.Setup(q => q.GetQuestionsByQuizIdAsync(match.QuizId)).ReturnsAsync(new List<Question>());
+        _mockQuizQuestionRepository.Setup(q => q.GetQuestionsAndScoreByQuizIdAsync(match.QuizId)).ReturnsAsync(new List<AugmentedQuestionDto>());
 
         var request = new StartAttemptRequestDto { MatchId = match.Id };
 
@@ -198,14 +199,14 @@ public class StartAttemptUseCaseTests
             Id = Guid.NewGuid(),
             Content = "Q1",
             Options = new List<Option> {
-            new Option { Id = Guid.NewGuid(), Description = "A" },
-            new Option { Id = Guid.NewGuid(), Description = "B" }
-        }
+                new Option { Id = Guid.NewGuid(), Description = "A" },
+                new Option { Id = Guid.NewGuid(), Description = "B" }
+            }
         };
 
-        _mockQuizQuestionRepository.Setup(q => q.GetQuestionsByQuizIdAsync(quiz.Id)).ReturnsAsync(new List<Question> { question1 });
+        _mockQuizQuestionRepository.Setup(q => q.GetQuestionsAndScoreByQuizIdAsync(quiz.Id))
+            .ReturnsAsync(new List<AugmentedQuestionDto> { new AugmentedQuestionDto(question1, 1m) });
 
-        // Capture the added MatchAttempt and return it
         _mockMatchAttemptRepository.Setup(r => r.AddMatchAttemptAsync(It.IsAny<MatchAttempt>()))
             .ReturnsAsync((MatchAttempt ma) => ma);
 
@@ -216,7 +217,6 @@ public class StartAttemptUseCaseTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(result.MatchAttemptId, result.MatchAttemptId); // simple sanity check
         Assert.Single(result.Questions);
         Assert.Equal(question1.Id, result.Questions[0].Id);
         Assert.Equal("Q1", result.Questions[0].Statement);
@@ -244,12 +244,12 @@ public class StartAttemptUseCaseTests
         var quiz = new Quiz { Id = match.QuizId };
         _mockQuizRepository.Setup(q => q.GetByIdAsync(match.QuizId)).ReturnsAsync(quiz);
 
-        var questions = new List<Question> {
-            new Question { Id = Guid.NewGuid(), Content = "Q1", Options = new List<Option> { new Option { Id = Guid.NewGuid(), Description = "A" } } },
-            new Question { Id = Guid.NewGuid(), Content = "Q2", Options = new List<Option> { new Option { Id = Guid.NewGuid(), Description = "B" } } },
-            new Question { Id = Guid.NewGuid(), Content = "Q3", Options = new List<Option> { new Option { Id = Guid.NewGuid(), Description = "C" } } }
+        var questions = new List<AugmentedQuestionDto> {
+            new AugmentedQuestionDto(new Question { Id = Guid.NewGuid(), Content = "Q1", Options = new List<Option> { new Option { Id = Guid.NewGuid(), Description = "A" } } }, 1m),
+            new AugmentedQuestionDto(new Question { Id = Guid.NewGuid(), Content = "Q2", Options = new List<Option> { new Option { Id = Guid.NewGuid(), Description = "B" } } }, 1m),
+            new AugmentedQuestionDto(new Question { Id = Guid.NewGuid(), Content = "Q3", Options = new List<Option> { new Option { Id = Guid.NewGuid(), Description = "C" } } }, 1m)
         };
-        _mockQuizQuestionRepository.Setup(q => q.GetQuestionsByQuizIdAsync(quiz.Id)).ReturnsAsync(questions);
+        _mockQuizQuestionRepository.Setup(q => q.GetQuestionsAndScoreByQuizIdAsync(quiz.Id)).ReturnsAsync(questions);
 
         _mockMatchAttemptRepository.Setup(r => r.AddMatchAttemptAsync(It.IsAny<MatchAttempt>()))
             .ReturnsAsync((MatchAttempt ma) => ma);
@@ -287,12 +287,12 @@ public class StartAttemptUseCaseTests
         var q3Id = Guid.NewGuid();
 
         _mockQuizQuestionRepository
-            .Setup(q => q.GetQuestionsByQuizIdAsync(quiz.Id))
-            .ReturnsAsync(() => new List<Question>
+            .Setup(q => q.GetQuestionsAndScoreByQuizIdAsync(quiz.Id))
+            .ReturnsAsync(() => new List<AugmentedQuestionDto>
             {
-            new Question { Id = q1Id, Content = "Q1", Options = new List<Option> { new Option { Id = Guid.NewGuid(), Description = "A" } } },
-            new Question { Id = q2Id, Content = "Q2", Options = new List<Option> { new Option { Id = Guid.NewGuid(), Description = "B" } } },
-            new Question { Id = q3Id, Content = "Q3", Options = new List<Option> { new Option { Id = Guid.NewGuid(), Description = "C" } } }
+                new AugmentedQuestionDto(new Question { Id = q1Id, Content = "Q1", Options = new List<Option> { new Option { Id = Guid.NewGuid(), Description = "A" } } }, 1m),
+                new AugmentedQuestionDto(new Question { Id = q2Id, Content = "Q2", Options = new List<Option> { new Option { Id = Guid.NewGuid(), Description = "B" } } }, 1m),
+                new AugmentedQuestionDto(new Question { Id = q3Id, Content = "Q3", Options = new List<Option> { new Option { Id = Guid.NewGuid(), Description = "C" } } }, 1m)
             });
 
         _mockMatchAttemptRepository.Setup(r => r.AddMatchAttemptAsync(It.IsAny<MatchAttempt>()))
@@ -327,7 +327,7 @@ public class StartAttemptUseCaseTests
         var result1 = await useCase1.Execute(request);
         var result2 = await useCase2.Execute(request);
 
-        // Assert: question order deterministic with same seed
+        // Assert
         Assert.Equal(result1.Questions.Select(q => q.Id).ToList(), result2.Questions.Select(q => q.Id).ToList());
     }
 
@@ -355,14 +355,14 @@ public class StartAttemptUseCaseTests
         var optCId = Guid.NewGuid();
 
         _mockQuizQuestionRepository
-            .Setup(q => q.GetQuestionsByQuizIdAsync(quiz.Id))
-            .ReturnsAsync(() => new List<Question>
+            .Setup(q => q.GetQuestionsAndScoreByQuizIdAsync(quiz.Id))
+            .ReturnsAsync(() => new List<AugmentedQuestionDto>
             {
-            new Question { Id = q1Id, Content = "Q1", Options = new List<Option> {
-                new Option { Id = optAId, Description = "A" },
-                new Option { Id = optBId, Description = "B" },
-                new Option { Id = optCId, Description = "C" }
-            }}
+                new AugmentedQuestionDto(new Question { Id = q1Id, Content = "Q1", Options = new List<Option> {
+                    new Option { Id = optAId, Description = "A" },
+                    new Option { Id = optBId, Description = "B" },
+                    new Option { Id = optCId, Description = "C" }
+                }}, 1m)
             });
 
         _mockMatchAttemptRepository.Setup(r => r.AddMatchAttemptAsync(It.IsAny<MatchAttempt>()))
@@ -397,7 +397,7 @@ public class StartAttemptUseCaseTests
         var result1 = await useCase1.Execute(request);
         var result2 = await useCase2.Execute(request);
 
-        // Assert: options order deterministic with same seed
+        // Assert
         Assert.Equal(result1.Questions.Select(q => q.Id).ToList(), result2.Questions.Select(q => q.Id).ToList());
         var opt1 = result1.Questions[0].Options.Select(o => o.Label).ToList();
         var opt2 = result2.Questions[0].Options.Select(o => o.Label).ToList();
@@ -428,19 +428,19 @@ public class StartAttemptUseCaseTests
         var optDId = Guid.NewGuid(); var optEId = Guid.NewGuid(); var optFId = Guid.NewGuid();
 
         _mockQuizQuestionRepository
-            .Setup(q => q.GetQuestionsByQuizIdAsync(quiz.Id))
-            .ReturnsAsync(() => new List<Question>
+            .Setup(q => q.GetQuestionsAndScoreByQuizIdAsync(quiz.Id))
+            .ReturnsAsync(() => new List<AugmentedQuestionDto>
             {
-            new Question { Id = q1Id, Content = "Q1", Options = new List<Option> {
-                new Option { Id = optAId, Description = "A" },
-                new Option { Id = optBId, Description = "B" },
-                new Option { Id = optCId, Description = "C" }
-            }},
-            new Question { Id = q2Id, Content = "Q2", Options = new List<Option> {
-                new Option { Id = optDId, Description = "D" },
-                new Option { Id = optEId, Description = "E" },
-                new Option { Id = optFId, Description = "F" }
-            }}
+                new AugmentedQuestionDto(new Question { Id = q1Id, Content = "Q1", Options = new List<Option> {
+                    new Option { Id = optAId, Description = "A" },
+                    new Option { Id = optBId, Description = "B" },
+                    new Option { Id = optCId, Description = "C" }
+                }}, 1m),
+                new AugmentedQuestionDto(new Question { Id = q2Id, Content = "Q2", Options = new List<Option> {
+                    new Option { Id = optDId, Description = "D" },
+                    new Option { Id = optEId, Description = "E" },
+                    new Option { Id = optFId, Description = "F" }
+                }}, 1m)
             });
 
         _mockMatchAttemptRepository.Setup(r => r.AddMatchAttemptAsync(It.IsAny<MatchAttempt>()))
@@ -475,7 +475,7 @@ public class StartAttemptUseCaseTests
         var result1 = await useCase1.Execute(request);
         var result2 = await useCase2.Execute(request);
 
-        // Assert: deterministic ordering with same seed for both questions and options
+        // Assert
         Assert.Equal(result1.Questions.Select(q => q.Id).ToList(), result2.Questions.Select(q => q.Id).ToList());
         for (int i = 0; i < result1.Questions.Count; i++)
         {
@@ -484,7 +484,4 @@ public class StartAttemptUseCaseTests
             Assert.Equal(o1, o2);
         }
     }
-
-
-
 }
