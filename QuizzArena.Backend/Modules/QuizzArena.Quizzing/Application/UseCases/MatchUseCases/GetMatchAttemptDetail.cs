@@ -2,6 +2,7 @@
 using QuizzArena.Quizzing.Application.Ports.In;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Domain.Entities;
+using QuizzArena.Quizzing.Domain.Enums;
 
 namespace QuizzArena.Quizzing.Application.UseCases.MatchUseCases;
 
@@ -13,10 +14,13 @@ public class GetMatchAttemptDetail(IMatchRepository matchRepository, IQuestionQu
         List<Question> questions = await questionQueriesRepository.GetQuestionsByIds(matchAttempt.MatchAttemptQuestions.Select(x => x.QuestionId).ToList());
         var answersDictionary = matchAttempt.Answers.ToDictionary(x => x.QuestionId);
 
+        Match match = await matchRepository.GetMatchByIdAsync(matchAttempt.MatchId) ?? throw new InvalidOperationException();
+        bool showResults = match.Status != MatchStatus.Active || match.Mode != MatchMode.Exam; ;
+
         var matchAttemptDetail = new GetMatchAttemptDetailDTO()
         {
             Id = matchAttempt.Id,
-            Score = matchAttempt.Score,
+            Score = showResults ? matchAttempt.Score : null,
             Status = matchAttempt.Status,
             Questions = questions.Select(x =>
             {
@@ -25,10 +29,10 @@ public class GetMatchAttemptDetail(IMatchRepository matchRepository, IQuestionQu
                 {
                     QuestionId = x.Id,
                     Content = x.Content,
-                    Justification = "",
+                    Justification = showResults ? x.Justification : null,
                     SelectedOptionId = answer?.OptionId,
-                    IsCorrect = answer?.IsCorrect ?? false,
-                    Options = x.Options.Select(y => new GetMatchAttemptOptionDTO() { Id = y.Id, IsCorrect = y.IsCorrect, Description = y.Description })
+                    IsCorrect = showResults ? (answer?.IsCorrect ?? false) : null,
+                    Options = x.Options.Select(y => new GetMatchAttemptOptionDTO() { Id = y.Id, IsCorrect = showResults ? y.IsCorrect : null, Description = y.Description })
                 };
             })
         };
