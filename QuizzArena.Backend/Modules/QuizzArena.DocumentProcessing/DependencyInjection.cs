@@ -13,6 +13,7 @@ using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.Repositories;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Services;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Utils;
+using QuizzArena.DocumentProcessing.Infrastructure.Configuration;
 using Shared.Contracts;
 
 namespace QuizzArena.DocumentProcessing;
@@ -29,6 +30,8 @@ public static class DependencyInjection
         services.AddScoped<IDocumentChunkRepository, SqlDocumentChunkRepository>();
         services.AddScoped<IProcessingJobRepository, SqlProcessingJobRepository>();
         services.AddScoped<ICosineSimilarity, TensorCosineSimilarity>();
+
+        services.Configure<QuizGenerationOptions>(configuration.GetSection(QuizGenerationOptions.SectionName));
 
         services.AddAutoMapper(cfg => { }, typeof(DependencyInjection).Assembly);
 
