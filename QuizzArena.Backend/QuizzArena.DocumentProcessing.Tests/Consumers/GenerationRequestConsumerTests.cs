@@ -1,10 +1,12 @@
 ﻿using MassTransit;
+using Microsoft.Extensions.Options;
 using Moq;
 using QuizzArena.DocumentProcessing.Application.Messaging.Commands;
 using QuizzArena.DocumentProcessing.Application.Messaging.Events;
 using QuizzArena.DocumentProcessing.Application.Ports.Out;
 using QuizzArena.DocumentProcessing.Domain.Entities;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Consumers;
+using QuizzArena.DocumentProcessing.Infrastructure.Configuration;
 using Shared.Contracts;
 using Shared.Contracts.DTOs;
 
@@ -23,9 +25,11 @@ public class GenerationRequestConsumerTests
     private readonly Mock<IQuizContract> _mockQuizContract;
     private readonly Mock<IQuestionContract> _mockQuestionContract;
     private readonly Mock<ConsumeContext<GenerationRequestCommand>> _mockContext;
+    private readonly Mock<IOptions<QuizGenerationOptions>> _mockOptions;
 
     private readonly GenerationRequestCommand _command;
     private readonly GenerationRequestConsumer _consumer;
+    private readonly QuizGenerationOptions _optionsValues;
 
     public GenerationRequestConsumerTests()
     {
@@ -36,6 +40,17 @@ public class GenerationRequestConsumerTests
         _mockQuizContract = new Mock<IQuizContract>();
         _mockQuestionContract = new Mock<IQuestionContract>();
         _mockContext = new Mock<ConsumeContext<GenerationRequestCommand>>();
+        _mockOptions = new Mock<IOptions<QuizGenerationOptions>>();
+
+        _optionsValues = new QuizGenerationOptions
+        {
+            CosineSimilarityThreshold = 0.92f,
+            JudgementThreshold = 0.75f,
+            QuestionEmbeddingModel = "bge-m3",
+            QuizGenerationModel = "qwen2.5:7b-instruct",
+            QuizJudgementModel = "llama3.1:8b-instruct-q4_K_M"
+        };
+        _mockOptions.Setup(o => o.Value).Returns(_optionsValues);
 
         _command = new GenerationRequestCommand
         {
@@ -56,7 +71,8 @@ public class GenerationRequestConsumerTests
             _mockTextGenerationService.Object,
             _mockCosineSimilarity.Object,
             _mockQuizContract.Object,
-            _mockQuestionContract.Object
+            _mockQuestionContract.Object,
+            _mockOptions.Object
         );
     }
 
@@ -98,8 +114,7 @@ public class GenerationRequestConsumerTests
     {
         // Arrange
         SetupDocumentChunks();
-        SetupGeneratedQuiz(CreateValidQuiz());
-        SetupJudgement(new GenerationRequestConsumer.QuizJudgementFormat(new List<GenerationRequestConsumer.QuestionJudgement>()));
+        SetupSequenceGeneration(CreateValidQuiz(), new GenerationRequestConsumer.QuizJudgementFormat(new List<GenerationRequestConsumer.QuestionJudgement>()));
 
         // Act & Assert
         var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _consumer.Consume(_mockContext.Object));
@@ -116,7 +131,7 @@ public class GenerationRequestConsumerTests
         QuizCreationRequestDTO? createdQuiz = null;
         List<QuestionCreationRequestDTO>? createdQuestions = null;
 
-        SetupSuccessfulGeneration(questionIds, quizId);
+        SetupSuccessfulPipeline(questionIds, quizId);
 
         _mockQuestionContract
             .Setup(q => q.CreateQuestions(It.IsAny<List<QuestionCreationRequestDTO>>()))
@@ -172,12 +187,14 @@ public class GenerationRequestConsumerTests
         List<QuestionCreationRequestDTO>? createdQuestions = null;
 
         SetupDocumentChunks();
-        SetupGeneratedQuiz(CreateValidQuiz());
-        SetupJudgement(new GenerationRequestConsumer.QuizJudgementFormat(new List<GenerationRequestConsumer.QuestionJudgement>
-        {
-            new(0.9f, 0.9f, 0.9f),
-            new(0.6f, 0.6f, 0.6f),
-        }));
+        SetupSequenceGeneration(
+            CreateValidQuiz(),
+            new GenerationRequestConsumer.QuizJudgementFormat(new List<GenerationRequestConsumer.QuestionJudgement>
+            {
+                new(0.9f, 0.9f, 0.9f),
+                new(0.6f, 0.6f, 0.6f),
+            })
+        );
         SetupEmbeddings(_singleQuestionEmbedding);
 
         _mockQuestionContract
@@ -211,12 +228,14 @@ public class GenerationRequestConsumerTests
         List<QuestionCreationRequestDTO>? createdQuestions = null;
 
         SetupDocumentChunks();
-        SetupGeneratedQuiz(CreateValidQuiz());
-        SetupJudgement(new GenerationRequestConsumer.QuizJudgementFormat(new List<GenerationRequestConsumer.QuestionJudgement>
-        {
-            new(0.9f, 0.9f, 0.9f),
-            new(0.9f, 0.9f, 0.9f),
-        }));
+        SetupSequenceGeneration(
+            CreateValidQuiz(),
+            new GenerationRequestConsumer.QuizJudgementFormat(new List<GenerationRequestConsumer.QuestionJudgement>
+            {
+                new(0.9f, 0.9f, 0.9f),
+                new(0.9f, 0.9f, 0.9f),
+            })
+        );
         SetupEmbeddings(_similarQuestionEmbeddings);
 
         _mockCosineSimilarity
@@ -245,15 +264,17 @@ public class GenerationRequestConsumerTests
         Assert.Equal("What is dependency injection?", createdQuestions[0].Content);
     }
 
-    private void SetupSuccessfulGeneration(List<Guid> questionIds, Guid quizId)
+    private void SetupSuccessfulPipeline(List<Guid> questionIds, Guid quizId)
     {
         SetupDocumentChunks();
-        SetupGeneratedQuiz(CreateValidQuiz());
-        SetupJudgement(new GenerationRequestConsumer.QuizJudgementFormat(new List<GenerationRequestConsumer.QuestionJudgement>
-        {
-            new(0.9f, 0.9f, 0.9f),
-            new(0.8f, 0.8f, 0.8f),
-        }));
+        SetupSequenceGeneration(
+            CreateValidQuiz(),
+            new GenerationRequestConsumer.QuizJudgementFormat(new List<GenerationRequestConsumer.QuestionJudgement>
+            {
+                new(0.9f, 0.9f, 0.9f),
+                new(0.8f, 0.8f, 0.8f),
+            })
+        );
         SetupEmbeddings(_distinctQuestionEmbeddings);
 
         _mockCosineSimilarity
@@ -287,10 +308,17 @@ public class GenerationRequestConsumerTests
             .ReturnsAsync(quiz);
     }
 
-    private void SetupJudgement(GenerationRequestConsumer.QuizJudgementFormat judgement)
+    private void SetupSequenceGeneration(GenerationRequestConsumer.QuizGenerationFormat quiz, GenerationRequestConsumer.QuizJudgementFormat judgement)
     {
+        var sequence = new MockSequence();
         _mockTextGenerationService
-            .Setup(s => s.GenerateAsync<GenerationRequestConsumer.QuizJudgementFormat>(It.IsAny<string>(), It.IsAny<string>()))
+            .InSequence(sequence)
+            .Setup(s => s.GenerateAsync<GenerationRequestConsumer.QuizGenerationFormat>(_optionsValues.QuizGenerationModel, It.IsAny<string>()))
+            .ReturnsAsync(quiz);
+
+        _mockTextGenerationService
+            .InSequence(sequence)
+            .Setup(s => s.GenerateAsync<GenerationRequestConsumer.QuizJudgementFormat>(_optionsValues.QuizJudgementModel, It.IsAny<string>()))
             .ReturnsAsync(judgement);
     }
 
