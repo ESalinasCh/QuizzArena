@@ -36,7 +36,7 @@ public class CreateMatchDtoValidator : AbstractValidator<MatchCreateDto>
 
         RuleFor(x => x.CourseId)
             .NotEqual(Guid.Empty)
-            .WithMessage("Quiz ID must be a valid GUID");
+            .WithMessage("Course ID must be a valid GUID");
 
     }
 }

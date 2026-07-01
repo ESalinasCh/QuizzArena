@@ -10,5 +10,5 @@ public class MatchCreateDto
     public bool ShuffleQuestion { get; set; }
     public bool ShuffleOptions { get; set; }
     public Guid QuizId { get; set; }
-    public Guid? CourseId { get; set; }
+    public Guid CourseId { get; set; }
 }
