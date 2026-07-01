@@ -16,6 +16,7 @@ public class FinishMatchTrackedUseCase(IMatchRepository matchRepository,
 {
     public async Task<FinishedMatchTrackedDto> Execute(Guid attemptId)
     {
+        decimal maxScore = 100;
         #region Validations
         if (!Guid.TryParse(currentUser.UserId, out Guid userId))
         {
@@ -43,16 +44,14 @@ public class FinishMatchTrackedUseCase(IMatchRepository matchRepository,
         }
         #endregion
 
-
         List<Question> questions = await questionRepository.GetByIdsAsync(attempt.MatchAttemptQuestions.Select(x => x.QuestionId));
         var matchQuestionDictionary = attempt.MatchAttemptQuestions.ToDictionary(x => x.QuestionId);
         var answersDictionary = attempt.Answers.ToDictionary(x => x.QuestionId);
 
-        decimal maxScore = 100;
         decimal defaultValue = maxScore / matchQuestionDictionary.Count;
-        var res = attempt.Answers.Sum(x => x.IsCorrect ? matchQuestionDictionary[x.QuestionId].ValueScore ?? defaultValue : 0);
+        var totalScore = attempt.Answers.Sum(x => x.IsCorrect ? matchQuestionDictionary[x.QuestionId].ValueScore ?? defaultValue : 0);
 
-        attempt.Score = res;
+        attempt.Score = totalScore;
         attempt.Status = QuizAttemptStatus.Completed;
         attempt.EndDateTime = DateTimeOffset.UtcNow;
 
