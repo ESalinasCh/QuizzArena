@@ -252,7 +252,7 @@ public class CreateMatchUseCaseTests
         dto.QuizId = Guid.Empty; // will fail validation
 
         // Act
-        try { await _useCase.Execute(dto); } catch (ValidationException) { }
+        await Assert.ThrowsAsync<ValidationException>(() => _useCase.Execute(dto));
 
         // Assert
         _mockMatchRepository.Verify(r => r.CreateMatchAsync(It.IsAny<Match>()), Times.Never);
@@ -280,7 +280,7 @@ public class CreateMatchUseCaseTests
         _mockQuizRepository.Setup(r => r.GetByIdAsync(dto.QuizId)).ReturnsAsync((Quiz?)null);
 
         // Act
-        try { await _useCase.Execute(dto); } catch (KeyNotFoundException) { }
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => _useCase.Execute(dto));
 
         // Assert
         _mockMatchRepository.Verify(r => r.CreateMatchAsync(It.IsAny<Match>()), Times.Never);
