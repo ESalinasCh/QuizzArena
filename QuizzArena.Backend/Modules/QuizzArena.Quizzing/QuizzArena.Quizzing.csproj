@@ -35,6 +35,7 @@
 
   <ItemGroup>
     <Folder Include="Application\UseCases\MatchAttempt\" />
+    <Folder Include="Application\Validators\MatchAttempt\" />
   </ItemGroup>
 
 </Project>

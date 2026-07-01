@@ -14,9 +14,9 @@ internal sealed class SqlMatchAttemptRepository(QuizzingDbContext context) : IMa
         return matchAttempt;
     }
 
-    public async Task<int> GetMatchAttemptCountByMatchIdAsync(Guid matchId)
+    public async Task<int> GetMatchAttemptCountByMatchIdAndUserIdAsync(Guid matchId, Guid userId)
     {
-        return await context.MatchAttempts.CountAsync(ma => ma.MatchId == matchId);
+        return await context.MatchAttempts.CountAsync(ma => ma.MatchId == matchId && ma.UserId == userId);
     }
 
     public async Task<bool> HasActiveAttemptByMatchIdAsync(Guid matchId, Guid userId)
