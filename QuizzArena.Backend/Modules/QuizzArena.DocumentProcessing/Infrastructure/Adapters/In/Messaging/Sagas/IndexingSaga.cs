@@ -1,5 +1,7 @@
 ﻿using MassTransit;
 using QuizzArena.DocumentProcessing.Application.Messaging.Commands;
+using QuizzArena.DocumentProcessing.Application.Messaging.Events;
+using QuizzArena.DocumentProcessing.Domain.Enums;
 using Shared.Messaging.Events;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Sagas;
@@ -55,6 +57,17 @@ public class IndexingSaga : MassTransitStateMachine<IndexingSagaState>
                     Console.WriteLine(
                         $"[Saga] Indexing #{ctx.Saga.ClassSourceId} completed → stored {ctx.Message.StoredChunkCount} chunks."))
                 .TransitionTo(Indexed)
+                .Publish(ctx => new GenerationProcessingJobRequestEvent
+                {
+                    ClassSourceId = ctx.Message.ClassSourceId,
+                    ProcessingJobId = Guid.NewGuid(),
+                    DocumentProcessingJobId = Guid.NewGuid(),
+                    NumberOfQuestions = 5,
+                    MinNumberOfOptions = 2,
+                    MaxNumberOfOptions = 3,
+                    CreateMatch = true,
+                    BloomTaxonomy = BloomTaxonomyLevel.Remember
+                })
                 .Finalize(),
 
             When(IndexingFailed)
