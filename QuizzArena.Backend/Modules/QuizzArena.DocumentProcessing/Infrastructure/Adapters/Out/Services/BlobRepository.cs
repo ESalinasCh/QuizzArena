@@ -30,4 +30,14 @@ public class BlobRepository(BlobServiceClient blobServiceClient) : IStorageServi
 
         return blobClient.Uri.AbsoluteUri;
     }
+
+    public async Task<string> DownloadTextAsync(string fileUrl)
+    {
+        var uri = new BlobUriBuilder(new Uri(fileUrl));
+        var containerClient = blobServiceClient.GetBlobContainerClient(uri.BlobContainerName);
+        var blobClient = containerClient.GetBlobClient(uri.BlobName);
+
+        BlobDownloadResult result = await blobClient.DownloadContentAsync();
+        return result.Content.ToString();
+    }
 }

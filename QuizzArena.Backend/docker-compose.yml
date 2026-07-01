@@ -19,6 +19,7 @@ services:
       RabbitMq__Username: guest
       RabbitMq__Password: guest
       WhisperSettings__BaseUrl: "http://whisper:9000/"
+      OllamaSettings__BaseUrl: "http://ollama:11434/"
     ports:
       - "8080:8080"
     depends_on:
@@ -164,6 +165,20 @@ services:
             - driver: ${GPU_DRIVER:-nvidia}
               count: all
               capabilities: [gpu]
+    ports:
+      - "9000:9000"
+    networks:
+      default:
+        aliases:
+          - whisper
+    restart: unless-stopped
+
+  whisper-medium:
+    image: onerahmet/openai-whisper-asr-webservice:latest
+    profiles: ["medium"]
+    environment:
+      ASR_MODEL: medium
+      ASR_ENGINE: openai_whisper
     ports:
       - "9000:9000"
     networks:

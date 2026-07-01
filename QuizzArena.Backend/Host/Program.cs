@@ -53,12 +53,12 @@ public class Program
             x.UsingRabbitMq((context, cfg) =>
             {
                 cfg.Host(
-                    "localhost",
+                    builder.Configuration["RabbitMq:Host"] ?? "localhost",
                     "/",
                     h =>
                     {
-                        h.Username("guest");
-                        h.Password("guest");
+                        h.Username(builder.Configuration["RabbitMq:Username"] ?? "guest");
+                        h.Password(builder.Configuration["RabbitMq:Password"] ?? "guest");
                     });
 
                 cfg.ConfigureEndpoints(

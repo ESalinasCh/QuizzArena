@@ -49,18 +49,23 @@ public static class DependencyInjection
             client.Timeout = TimeSpan.FromMinutes(60);
         });
 
+        var ollamaUrl = configuration["OllamaSettings:BaseUrl"] ?? "http://localhost:11434/";
         services.AddHttpClient<ITextGenerationService, OllamaTextGeneration>(client =>
         {
-            var ollamaUrl = configuration["OllamaSettings:BaseUrl"] ?? "http://localhost:11434/";
             client.BaseAddress = new Uri(ollamaUrl);
             client.Timeout = TimeSpan.FromMinutes(60);
         });
 
         services.AddHttpClient<IEmbeddingService, OllamaEmbeddingGeneration>(client =>
         {
-            var ollamaUrl = configuration["OllamaSettings:BaseUrl"] ?? "http://localhost:11434/";
             client.BaseAddress = new Uri(ollamaUrl);
             client.Timeout = TimeSpan.FromMinutes(60);
+        });
+
+        services.AddHttpClient<IChunkClassifier, OllamaChunkClassifier>(client =>
+        {
+            client.BaseAddress = new Uri(ollamaUrl);
+            client.Timeout = TimeSpan.FromMinutes(30);
         });
 
         #region BDD
