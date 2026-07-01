@@ -99,7 +99,7 @@ public class StartAttemptUseCaseTests
 
         var match = new Domain.Entities.Match { Id = Guid.NewGuid(), CourseId = course.Id, Status = MatchStatus.Active, AttemptsAmount = 1 };
         _mockMatchRepository.Setup(m => m.GetMatchByIdAsync(It.IsAny<Guid>())).ReturnsAsync(match);
-        _mockMatchAttemptRepository.Setup(r => r.GetMatchAttemptCountByMatchIdAsync(match.Id)).ReturnsAsync(1);
+        _mockMatchAttemptRepository.Setup(r => r.GetMatchAttemptCountByMatchIdAndUserIdAsync(match.Id)).ReturnsAsync(1);
 
         var request = new StartAttemptRequestDto { MatchId = match.Id };
 
@@ -119,7 +119,7 @@ public class StartAttemptUseCaseTests
 
         var match = new Domain.Entities.Match { Id = Guid.NewGuid(), CourseId = course.Id, Status = MatchStatus.Active, AttemptsAmount = 2 };
         _mockMatchRepository.Setup(m => m.GetMatchByIdAsync(It.IsAny<Guid>())).ReturnsAsync(match);
-        _mockMatchAttemptRepository.Setup(r => r.GetMatchAttemptCountByMatchIdAsync(match.Id)).ReturnsAsync(0);
+        _mockMatchAttemptRepository.Setup(r => r.GetMatchAttemptCountByMatchIdAndUserIdAsync(match.Id)).ReturnsAsync(0);
         _mockMatchAttemptRepository.Setup(r => r.HasActiveAttemptByMatchIdAsync(match.Id, Guid.Parse(userId))).ReturnsAsync(true);
 
         var request = new StartAttemptRequestDto { MatchId = match.Id };
@@ -140,7 +140,7 @@ public class StartAttemptUseCaseTests
 
         var match = new Domain.Entities.Match { Id = Guid.NewGuid(), CourseId = course.Id, Status = MatchStatus.Active, AttemptsAmount = 2, QuizId = Guid.NewGuid() };
         _mockMatchRepository.Setup(m => m.GetMatchByIdAsync(It.IsAny<Guid>())).ReturnsAsync(match);
-        _mockMatchAttemptRepository.Setup(r => r.GetMatchAttemptCountByMatchIdAsync(match.Id)).ReturnsAsync(0);
+        _mockMatchAttemptRepository.Setup(r => r.GetMatchAttemptCountByMatchIdAndUserIdAsync(match.Id)).ReturnsAsync(0);
         _mockMatchAttemptRepository.Setup(r => r.HasActiveAttemptByMatchIdAsync(match.Id, Guid.Parse(userId))).ReturnsAsync(false);
         _mockQuizRepository.Setup(q => q.GetByIdAsync(match.QuizId)).ReturnsAsync((Quiz?)null);
 
@@ -162,7 +162,7 @@ public class StartAttemptUseCaseTests
 
         var match = new Domain.Entities.Match { Id = Guid.NewGuid(), CourseId = course.Id, Status = MatchStatus.Active, AttemptsAmount = 2, QuizId = Guid.NewGuid() };
         _mockMatchRepository.Setup(m => m.GetMatchByIdAsync(It.IsAny<Guid>())).ReturnsAsync(match);
-        _mockMatchAttemptRepository.Setup(r => r.GetMatchAttemptCountByMatchIdAsync(match.Id)).ReturnsAsync(0);
+        _mockMatchAttemptRepository.Setup(r => r.GetMatchAttemptCountByMatchIdAndUserIdAsync(match.Id)).ReturnsAsync(0);
         _mockMatchAttemptRepository.Setup(r => r.HasActiveAttemptByMatchIdAsync(match.Id, Guid.Parse(userId))).ReturnsAsync(false);
         _mockQuizRepository.Setup(q => q.GetByIdAsync(match.QuizId)).ReturnsAsync(new Quiz { Id = match.QuizId });
         _mockQuizQuestionRepository.Setup(q => q.GetQuestionsAndScoreByQuizIdAsync(match.QuizId)).ReturnsAsync(new List<AugmentedQuestionDto>());
@@ -188,7 +188,7 @@ public class StartAttemptUseCaseTests
 
         var match = new Domain.Entities.Match { Id = Guid.NewGuid(), CourseId = course.Id, Status = MatchStatus.Active, AttemptsAmount = 2, QuizId = Guid.NewGuid(), ShuffleOptions = false, ShuffleQuestion = false };
         _mockMatchRepository.Setup(m => m.GetMatchByIdAsync(It.IsAny<Guid>())).ReturnsAsync(match);
-        _mockMatchAttemptRepository.Setup(r => r.GetMatchAttemptCountByMatchIdAsync(match.Id)).ReturnsAsync(0);
+        _mockMatchAttemptRepository.Setup(r => r.GetMatchAttemptCountByMatchIdAndUserIdAsync(match.Id)).ReturnsAsync(0);
         _mockMatchAttemptRepository.Setup(r => r.HasActiveAttemptByMatchIdAsync(match.Id, userGuid)).ReturnsAsync(false);
 
         var quiz = new Quiz { Id = match.QuizId };
@@ -238,7 +238,7 @@ public class StartAttemptUseCaseTests
 
         var match = new Domain.Entities.Match { Id = Guid.NewGuid(), CourseId = course.Id, Status = MatchStatus.Active, AttemptsAmount = 2, QuizId = Guid.NewGuid(), QuestionsAmount = 1, ShuffleOptions = false, ShuffleQuestion = false };
         _mockMatchRepository.Setup(m => m.GetMatchByIdAsync(It.IsAny<Guid>())).ReturnsAsync(match);
-        _mockMatchAttemptRepository.Setup(r => r.GetMatchAttemptCountByMatchIdAsync(match.Id)).ReturnsAsync(0);
+        _mockMatchAttemptRepository.Setup(r => r.GetMatchAttemptCountByMatchIdAndUserIdAsync(match.Id)).ReturnsAsync(0);
         _mockMatchAttemptRepository.Setup(r => r.HasActiveAttemptByMatchIdAsync(match.Id, userGuid)).ReturnsAsync(false);
 
         var quiz = new Quiz { Id = match.QuizId };
@@ -276,7 +276,7 @@ public class StartAttemptUseCaseTests
 
         var match = new Domain.Entities.Match { Id = Guid.NewGuid(), CourseId = course.Id, Status = MatchStatus.Active, AttemptsAmount = 2, QuizId = Guid.NewGuid(), ShuffleOptions = false, ShuffleQuestion = true };
         _mockMatchRepository.Setup(m => m.GetMatchByIdAsync(It.IsAny<Guid>())).ReturnsAsync(match);
-        _mockMatchAttemptRepository.Setup(r => r.GetMatchAttemptCountByMatchIdAsync(match.Id)).ReturnsAsync(0);
+        _mockMatchAttemptRepository.Setup(r => r.GetMatchAttemptCountByMatchIdAndUserIdAsync(match.Id)).ReturnsAsync(0);
         _mockMatchAttemptRepository.Setup(r => r.HasActiveAttemptByMatchIdAsync(match.Id, userGuid)).ReturnsAsync(false);
 
         var quiz = new Quiz { Id = match.QuizId };
@@ -343,7 +343,7 @@ public class StartAttemptUseCaseTests
 
         var match = new Domain.Entities.Match { Id = Guid.NewGuid(), CourseId = course.Id, Status = MatchStatus.Active, AttemptsAmount = 2, QuizId = Guid.NewGuid(), ShuffleOptions = true, ShuffleQuestion = false };
         _mockMatchRepository.Setup(m => m.GetMatchByIdAsync(It.IsAny<Guid>())).ReturnsAsync(match);
-        _mockMatchAttemptRepository.Setup(r => r.GetMatchAttemptCountByMatchIdAsync(match.Id)).ReturnsAsync(0);
+        _mockMatchAttemptRepository.Setup(r => r.GetMatchAttemptCountByMatchIdAndUserIdAsync(match.Id)).ReturnsAsync(0);
         _mockMatchAttemptRepository.Setup(r => r.HasActiveAttemptByMatchIdAsync(match.Id, userGuid)).ReturnsAsync(false);
 
         var quiz = new Quiz { Id = match.QuizId };
@@ -416,7 +416,7 @@ public class StartAttemptUseCaseTests
 
         var match = new Domain.Entities.Match { Id = Guid.NewGuid(), CourseId = course.Id, Status = MatchStatus.Active, AttemptsAmount = 2, QuizId = Guid.NewGuid(), ShuffleOptions = true, ShuffleQuestion = true };
         _mockMatchRepository.Setup(m => m.GetMatchByIdAsync(It.IsAny<Guid>())).ReturnsAsync(match);
-        _mockMatchAttemptRepository.Setup(r => r.GetMatchAttemptCountByMatchIdAsync(match.Id)).ReturnsAsync(0);
+        _mockMatchAttemptRepository.Setup(r => r.GetMatchAttemptCountByMatchIdAndUserIdAsync(match.Id)).ReturnsAsync(0);
         _mockMatchAttemptRepository.Setup(r => r.HasActiveAttemptByMatchIdAsync(match.Id, userGuid)).ReturnsAsync(false);
 
         var quiz = new Quiz { Id = match.QuizId };

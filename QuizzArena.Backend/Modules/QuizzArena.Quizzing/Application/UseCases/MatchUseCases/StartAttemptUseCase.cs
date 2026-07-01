@@ -37,7 +37,7 @@ public sealed class StartAttemptUseCase(
             throw new InvalidOperationException("Match is not active.");
         }
 
-        int totalAttempts = await matchAttemptRepository.GetMatchAttemptCountByMatchIdAsync(match.Id);
+        int totalAttempts = await matchAttemptRepository.GetMatchAttemptCountByMatchIdAndUserIdAsync(match.Id);
         if (totalAttempts >= match.AttemptsAmount)
         {
             throw new InvalidOperationException("Maximum number of attempts reached for this match.");

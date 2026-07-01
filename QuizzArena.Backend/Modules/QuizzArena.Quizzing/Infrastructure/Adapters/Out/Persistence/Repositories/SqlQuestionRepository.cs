@@ -13,7 +13,7 @@ public class SqlQuestionRepository(QuizzingDbContext context) : IQuestionReposit
         await context.SaveChangesAsync();
     }
 
-    public async Task<List<Question>> GetByIdsAsync(List<Guid> questionIds)
+    public async Task<List<Question>> GetByIdsAsync(IEnumerable<Guid> questionIds)
     {
         return await context.Questions
             .Where(q => questionIds.Contains(q.Id))

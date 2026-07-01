@@ -68,6 +68,7 @@ public static class DependencyInjection
         services.AddScoped<ICreateOptionsUseCase, CreateOptionsUseCase>();
         services.AddScoped<ICreateExamUseCase, CreateExamUseCase>();
         services.AddScoped<ITrackAnswerUseCase, TrackAnswerUseCase>();
+        services.AddScoped<IFinishMatchTrackedUseCase, FinishMatchTrackedUseCase>();
         #endregion
 
         #region Validators
