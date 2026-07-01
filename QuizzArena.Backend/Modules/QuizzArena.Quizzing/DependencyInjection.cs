@@ -8,12 +8,14 @@ using QuizzArena.Quizzing.Application.Ports.In;
 using QuizzArena.Quizzing.Application.Ports.In.Question;
 using QuizzArena.Quizzing.Application.Ports.Out;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
+using QuizzArena.Quizzing.Application.UseCases.MatchAttemptUseCases;
 using QuizzArena.Quizzing.Application.UseCases.MatchUseCases;
 using QuizzArena.Quizzing.Application.UseCases.QuestionUseCases;
 using QuizzArena.Quizzing.Application.UseCases.QuizUseCases;
 using QuizzArena.Quizzing.Application.UseCases.SubmitAnswers;
 using QuizzArena.Quizzing.Application.Validators;
 using QuizzArena.Quizzing.Application.Validators.FiltersValidators;
+using QuizzArena.Quizzing.Application.Validators.Match;
 using QuizzArena.Quizzing.Application.Validators.Option;
 using QuizzArena.Quizzing.Application.Validators.Question;
 using QuizzArena.Quizzing.Application.Validators.Quiz;
@@ -33,13 +35,6 @@ public static class DependencyInjection
     {
         services.AddControllers()
             .AddApplicationPart(typeof(IQuizzingInfrastructureMarker).Assembly);
-
-        services.AddScoped<CreateQuizDtoValidator>();
-        services.AddScoped<CreateExamDtoValidator>();
-        services.AddScoped<CreateQuestionDtoValidator>();
-        services.AddScoped<CreateQuestionsDtoValidator>();
-        services.AddScoped<CreateOptionDtoValidator>();
-        services.AddScoped<CreateOptionsDtoValidator>();
 
         services.AddAutoMapper(cfg => { }, typeof(DependencyInjection).Assembly);
 
@@ -69,11 +64,19 @@ public static class DependencyInjection
         services.AddScoped<ICreateExamUseCase, CreateExamUseCase>();
         services.AddScoped<ITrackAnswerUseCase, TrackAnswerUseCase>();
         services.AddScoped<IFinishMatchTrackedUseCase, FinishMatchTrackedUseCase>();
+        services.AddScoped<ICreateMatchUseCase, CreateMatchUseCase>();
         #endregion
 
         #region Validators
         services.AddScoped<SubmitAnswersRequestValidator>();
         services.AddScoped<SubmitAnswerBodyValidator>();
+        services.AddScoped<CreateQuizDtoValidator>();
+        services.AddScoped<CreateExamDtoValidator>();
+        services.AddScoped<CreateQuestionDtoValidator>();
+        services.AddScoped<CreateQuestionsDtoValidator>();
+        services.AddScoped<CreateOptionDtoValidator>();
+        services.AddScoped<CreateOptionsDtoValidator>();
+        services.AddScoped<CreateMatchDtoValidator>();
         #endregion
 
         services.AddScoped<IValidator<MatchQueryParametersDto>, MatchQueryParametersValidator>();

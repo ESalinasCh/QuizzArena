@@ -7,7 +7,7 @@ using QuizzArena.Quizzing.Application.Validators.FiltersValidators;
 using QuizzArena.Quizzing.Domain.Entities;
 using Shared.Contracts;
 
-namespace QuizzArena.Quizzing.Application.UseCases.MatchUseCases;
+namespace QuizzArena.Quizzing.Application.UseCases.MatchAttemptUseCases;
 
 public class GetMatchAttemptsByStudent(
     ICurrentUser currentUser,

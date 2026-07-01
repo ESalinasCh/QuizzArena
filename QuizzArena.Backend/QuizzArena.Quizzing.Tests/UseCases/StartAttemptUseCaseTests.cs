@@ -2,7 +2,7 @@
 using QuizzArena.Quizzing.Application.DTOs.MatchAttempt;
 using QuizzArena.Quizzing.Application.DTOs.Question;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
-using QuizzArena.Quizzing.Application.UseCases.MatchUseCases;
+using QuizzArena.Quizzing.Application.UseCases.MatchAttemptUseCases;
 using QuizzArena.Quizzing.Domain.Entities;
 using QuizzArena.Quizzing.Domain.Enums;
 using Shared.Contracts;

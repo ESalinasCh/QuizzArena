@@ -8,7 +8,7 @@ using QuizzArena.Quizzing.Domain.Enums;
 using Shared.Contracts;
 using Shared.Contracts.DTOs;
 
-namespace QuizzArena.Quizzing.Application.UseCases.MatchUseCases;
+namespace QuizzArena.Quizzing.Application.UseCases.MatchAttemptUseCases;
 
 public sealed class StartAttemptUseCase(
     ICurrentUser currentUser,

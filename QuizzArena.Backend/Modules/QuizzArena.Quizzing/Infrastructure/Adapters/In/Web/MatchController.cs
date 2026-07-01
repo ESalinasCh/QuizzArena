@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using QuizzArena.Quizzing.Application.DTOs;
 using QuizzArena.Quizzing.Application.DTOs.Match;
-using QuizzArena.Quizzing.Application.Filters;
 using QuizzArena.Quizzing.Application.Ports.In;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Web;
@@ -11,8 +9,7 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Web;
 [Route("api/v{version:apiVersion}")]
 public class MatchController(
     IGetMatchesUseCase getMatchesUseCase,
-    IGetMatchAttemptsByStudent getMatchAttemptsByStudent,
-    IGetMatchAttemptDetail getMatchAttemptDetail
+    ICreateMatchUseCase createMatchUseCase
 ) : ControllerBase
 {
     [HttpGet("users/me/matches")]
@@ -25,19 +22,11 @@ public class MatchController(
         return Ok(matches);
     }
 
-    [HttpGet("users/me/match-attempts")]
-    [Authorize(Roles = "student")]
-    public async Task<ActionResult<List<GetMatchAttemptDTO>>> GetMyMatchAttempts([FromQuery] MatchAttemptFilters filters)
+    [HttpPost("matches")]
+    [Authorize(Roles = "teacher")]
+    public async Task<ActionResult<MatchCreatedResponseDto>> CreateMatch([FromBody] MatchCreateDto dto)
     {
-        var matchAttemptsDto = await getMatchAttemptsByStudent.Execute(filters);
-        return Ok(matchAttemptsDto);
-    }
-
-    [HttpGet("match-attempts/{attemptId}")]
-    [Authorize(Roles = "student,teacher")]
-    public async Task<ActionResult<GetMatchAttemptDetailDTO>> GetMatchAttemptDetail([FromRoute] Guid attemptId)
-    {
-        var matchAttemptDetail = await getMatchAttemptDetail.Execute(attemptId);
-        return Ok(matchAttemptDetail);
+        MatchCreatedResponseDto response = await createMatchUseCase.Execute(dto);
+        return Ok(response);
     }
 }
