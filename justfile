@@ -18,13 +18,13 @@ default:
 up:
     {{ compose }} up -d --build
 
-# Start core stack + Whisper (small model, 16GB+ RAM)
-up-high:
-    {{ compose }} --profile high up -d --build
+# Start core stack + Ollama GPU + Whisper GPU
+up-gpu:
+    {{ compose }} --profile gpu up -d --build
 
-# Start core stack + Whisper (tiny model, 8GB RAM)
-up-low:
-    {{ compose }} --profile low up -d --build
+# Start core stack + Ollama CPU + Whisper CPU
+up-cpu:
+    {{ compose }} --profile cpu up -d --build
 
 # Start only backing services (no backend rebuild)
 up-services:
@@ -32,11 +32,11 @@ up-services:
 
 # Stop all containers (keep volumes)
 down:
-    {{ compose }} down
+    {{ compose }} --profile gpu --profile cpu down
 
 # Stop all containers and remove volumes (clean slate)
 down-clean:
-    {{ compose }} down -v
+    {{ compose }} --profile gpu --profile cpu down -v
 
 # Show live logs for all services (Ctrl-C to exit)
 logs:

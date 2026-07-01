@@ -1,6 +1,6 @@
-# PERFILES DISPONIBLES:
-#   Alto rendimiento (16GB+ RAM):  docker compose --profile high up -d
-#   Bajo rendimiento (8GB RAM):    docker compose --profile low up -d
+# USAGE:
+# GPU Mode:   docker compose --profile gpu up -d
+# CPU Mode:   docker compose --profile cpu up -d
 
 services:
   backend:
@@ -28,6 +28,18 @@ services:
         condition: service_healthy
       azurite:
         condition: service_started
+      ollama-cpu:
+        condition: service_started
+        required: false
+      ollama-gpu:
+        condition: service_started
+        required: false
+      whisper-cpu:
+        condition: service_started
+        required: false
+      whisper-gpu:
+        condition: service_started
+        required: false
     restart: unless-stopped
 
   postgres:
@@ -62,13 +74,44 @@ services:
       retries: 5
     restart: unless-stopped
 
-  ollama:
+  ollama-cpu:
     image: ollama/ollama:latest
-    container_name: quizarena_ollama
+    container_name: quizarena_ollama_cpu
+    profiles: ["cpu"]
     ports:
       - "11434:11434"
     volumes:
       - ollama_models:/root/.ollama
+    networks:
+      default:
+        aliases:
+          - ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+  ollama-gpu:
+    image: ollama/ollama:latest
+    container_name: quizarena_ollama_gpu
+    profiles: ["gpu"]
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+    networks:
+      default:
+        aliases:
+          - ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: ${GPU_DRIVER:-nvidia}
+              count: all
+              capabilities: [gpu]
     healthcheck:
       test: ["CMD", "ollama", "list"]
       interval: 30s
@@ -88,12 +131,15 @@ services:
       - azurite_data:/data
     restart: unless-stopped
 
-  whisper-high:
+  whisper-cpu:
     image: onerahmet/openai-whisper-asr-webservice:latest
-    profiles: ["high"]
+    container_name: quizarena_whisper_cpu
+    profiles: ["cpu"]
     environment:
-      ASR_MODEL: small
+      ASR_MODEL: ${WHISPER_MODEL:-base}
       ASR_ENGINE: openai_whisper
+    volumes:
+      - whisper_models:/root/.cache/whisper
     ports:
       - "9000:9000"
     networks:
@@ -102,12 +148,22 @@ services:
           - whisper
     restart: unless-stopped
 
-  whisper-low:
-    image: onerahmet/openai-whisper-asr-webservice:latest
-    profiles: ["low"]
+  whisper-gpu:
+    image: onerahmet/openai-whisper-asr-webservice:latest-gpu
+    container_name: quizarena_whisper_gpu
+    profiles: ["gpu"]
     environment:
-      ASR_MODEL: tiny
+      ASR_MODEL: ${WHISPER_MODEL:-base}
       ASR_ENGINE: openai_whisper
+    volumes:
+      - whisper_models:/root/.cache/whisper
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: ${GPU_DRIVER:-nvidia}
+              count: all
+              capabilities: [gpu]
     ports:
       - "9000:9000"
     networks:
@@ -119,4 +175,5 @@ services:
 volumes:
   postgres_data:
   ollama_models:
+  whisper_models:
   azurite_data:
