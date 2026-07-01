@@ -70,7 +70,7 @@ public class SubmitAnswersUseCaseTests
             .Setup(repo => repo.GetMatchByIdAsync(matchId))
             .ReturnsAsync(new DomainMatch { Id = matchId, AttemptsAmount = 1 });
         _mockMatchAttemptRepository
-            .Setup(repo => repo.GetMatchAttemptCountByMatchIdAndUserIdAsync(matchId))
+            .Setup(repo => repo.GetMatchAttemptCountByMatchIdAndUserIdAsync(matchId, Guid.Parse(userId)))
             .ReturnsAsync(1);
 
         var dto = new SubmitAnswersRequestDto
@@ -179,7 +179,7 @@ public class SubmitAnswersUseCaseTests
             .Setup(repo => repo.GetMatchByIdAsync(matchId))
             .ReturnsAsync(new DomainMatch { Id = matchId, AttemptsAmount = 1 });
         _mockMatchAttemptRepository
-            .Setup(repo => repo.GetMatchAttemptCountByMatchIdAndUserIdAsync(matchId))
+            .Setup(repo => repo.GetMatchAttemptCountByMatchIdAndUserIdAsync(matchId, Guid.Parse(userId)))
             .ReturnsAsync(1);
 
         var dto = new SubmitAnswersRequestDto { Answers = [] };
@@ -210,7 +210,7 @@ public class SubmitAnswersUseCaseTests
             .Setup(repo => repo.GetMatchByIdAsync(matchId))
             .ReturnsAsync(new DomainMatch { Id = matchId, AttemptsAmount = 1 });
         _mockMatchAttemptRepository
-            .Setup(repo => repo.GetMatchAttemptCountByMatchIdAndUserIdAsync(matchId))
+            .Setup(repo => repo.GetMatchAttemptCountByMatchIdAndUserIdAsync(matchId, Guid.Parse(userId)))
             .ReturnsAsync(1);
 
         var dto = new SubmitAnswersRequestDto
@@ -288,7 +288,7 @@ public class SubmitAnswersUseCaseTests
             .Setup(repo => repo.GetMatchByIdAsync(matchId))
             .ReturnsAsync(new DomainMatch { Id = matchId, AttemptsAmount = 1 });
         _mockMatchAttemptRepository
-            .Setup(repo => repo.GetMatchAttemptCountByMatchIdAndUserIdAsync(matchId))
+            .Setup(repo => repo.GetMatchAttemptCountByMatchIdAndUserIdAsync(matchId, Guid.Parse(userId)))
             .ReturnsAsync(2);
 
         var dto = new SubmitAnswersRequestDto

@@ -9,7 +9,7 @@ using Shared.Contracts;
 
 namespace QuizzArena.Quizzing.Application.UseCases.SubmitAnswers;
 
-internal class FinishMatchTrackedUseCase(IMatchRepository matchRepository,
+public class FinishMatchTrackedUseCase(IMatchRepository matchRepository,
     IMatchAttemptRepository matchAttemptRepository,
     IQuestionRepository questionRepository,
     ICurrentUser currentUser) : IFinishMatchTrackedUseCase
@@ -44,13 +44,13 @@ internal class FinishMatchTrackedUseCase(IMatchRepository matchRepository,
         #endregion
 
 
-        List<Question> questions = await questionRepository.GetByIdsAsync(attempt.MatchAttemptQuestions.Select(x=> x.QuestionId));
+        List<Question> questions = await questionRepository.GetByIdsAsync(attempt.MatchAttemptQuestions.Select(x => x.QuestionId));
         var matchQuestionDictionary = attempt.MatchAttemptQuestions.ToDictionary(x => x.QuestionId);
         var answersDictionary = attempt.Answers.ToDictionary(x => x.QuestionId);
 
         decimal maxScore = 100;
         decimal defaultValue = maxScore / matchQuestionDictionary.Count;
-        var res = attempt.Answers.Sum(x => x.IsCorrect ? matchQuestionDictionary[x.QuestionId].ValueScore?? defaultValue : 0);
+        var res = attempt.Answers.Sum(x => x.IsCorrect ? matchQuestionDictionary[x.QuestionId].ValueScore ?? defaultValue : 0);
 
         attempt.Score = res;
         attempt.Status = QuizAttemptStatus.Completed;
@@ -63,12 +63,16 @@ internal class FinishMatchTrackedUseCase(IMatchRepository matchRepository,
             AttemptId = attemptId,
             AnsweredQuestions = attempt.Answers.Count,
             TotalQuestions = attempt.MatchAttemptQuestions.Count,
-            Answers = questions.Select((x, index) => new AnswerTrackedDto()
+            Answers = questions.Select((x, index) =>
             {
-                Id = x.Id,
-                Number = index+1,
-                Text = x.Content,
-                SelectedOptionId = answersDictionary[x.Id]?.OptionId ?? null,
+                answersDictionary.TryGetValue(x.Id, out var answer);
+                return new AnswerTrackedDto()
+                {
+                    Id = x.Id,
+                    Number = index + 1,
+                    Text = x.Content,
+                    SelectedOptionId = answer?.OptionId ?? null
+                };
             }
             ).ToList()
 
