@@ -33,8 +33,8 @@ public class EmbeddingService : IEmbeddingService
             return [];
         }
 
-        List<float[]> embeddings = [];
-
+        float[][] embeddings = new float[sentences.Count][];
+        int embeddingDimension = 0;
 
         // I need to loop through the sentences, batch by batch, to genereate their vectors
         for (int i = 0; i < sentences.Count; i += BatchSize)
@@ -44,16 +44,42 @@ public class EmbeddingService : IEmbeddingService
             try
             {
                 float[][] sentencesEmbeddings = await EmbedBatchAsync(currentBatch);
-                embeddings.AddRange(sentencesEmbeddings);
+                for (int j = 0; j < sentencesEmbeddings.Length; j++)
+                {
+                    embeddings[i + j] = sentencesEmbeddings[j];
+                    embeddingDimension = sentencesEmbeddings[j].Length;
+                }
             }
             catch
             {
-                // Embedding model could emit NaN vector for degenerate inputs. This catch is to check the batch sentence by sentence in case a part of the batch is corrupted.
-                foreach (string text in currentBatch)
+                // Ollama can emit a NaN vector for a degenerate input and reject the whole
+                // batch (500). Retry each input alone so one bad sentence doesn't sink the
+                // rest; a still-failing input is left null and zero-filled below.
+                for (int j = 0; j < currentBatch.Count; j++)
                 {
-                    embeddings.AddRange(await EmbedBatchAsync([text]));
+                    try
+                    {
+                        float[] single = (await EmbedBatchAsync([currentBatch[j]]))[0];
+                        embeddings[i + j] = single;
+                        embeddingDimension = single.Length;
+                    }
+                    catch
+                    {
+                        // Leave null; zero-filled once we know the dimension.
+                    }
                 }
             }
+        }
+
+        if (embeddingDimension == 0)
+        {
+            // Nothing embedded at all — the model or endpoint is genuinely broken.
+            throw new InvalidOperationException("Ollama returned no usable embeddings for any input.");
+        }
+
+        for (int i = 0; i < embeddings.Length; i++)
+        {
+            embeddings[i] ??= new float[embeddingDimension];
         }
 
         return embeddings;
@@ -65,7 +91,12 @@ public class EmbeddingService : IEmbeddingService
         // Sending the sentences in batches to the Embedding model to optimze the number of calls
         HttpResponseMessage response = await _httpClient.PostAsJsonAsync("api/embed", new OllamaEmbedsRequestBody(EmbeddingModel, currentBatch));
 
-        response.EnsureSuccessStatusCode();
+        if (!response.IsSuccessStatusCode)
+        {
+            string errorBody = await response.Content.ReadAsStringAsync();
+            throw new HttpRequestException(
+                $"Ollama embed failed ({(int)response.StatusCode}) for {currentBatch.Count} input(s): {errorBody}");
+        }
 
         OllamaEmbedsResponseBody? processedResponse = await response.Content.ReadFromJsonAsync<OllamaEmbedsResponseBody>();
 
