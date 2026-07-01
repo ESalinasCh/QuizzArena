@@ -48,6 +48,7 @@ public class MatchAttemptController(
     }
 
     [HttpPost("match-attempts/{attemptId}/complete")]
+    [Authorize(Roles = "student")]
     public async Task<ActionResult<FinishedMatchTrackedDto>> CompleteAttempt(Guid attemptId)
     {
         var response = await finishMatchTrackedUseCase.Execute(attemptId);
