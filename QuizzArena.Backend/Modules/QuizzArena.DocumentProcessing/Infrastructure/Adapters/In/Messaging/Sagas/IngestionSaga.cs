@@ -14,14 +14,9 @@ public class IngestionSaga : MassTransitStateMachine<IngestionSagaState>
     public State TranscriptionFailed { get; private set; } = null!;
 
 
-
     public Event<TranscriptionRequestEvent> TranscriptionRequest { get; private set; } = null!;
     public Event<TranscriptionCompletedEvent> TranscriptionCompleted { get; private set; } = null!;
     public Event<TranscriptionFailedEvent> TranscriptionError { get; private set; } = null!;
-
-    // Quiz generation is handled elsewhere for now — likely needs to move to its own saga.
-    // public Event<QuizGenerationCompletedEvent> QuizCompleted { get; private set; } = null!;
-    // public Event<QuizGenerationFailedEvent> QuizFailed { get; private set; } = null!;
 
 
     public IngestionSaga()
@@ -39,12 +34,6 @@ public class IngestionSaga : MassTransitStateMachine<IngestionSagaState>
 
         Event(() => TranscriptionError, e =>
             e.CorrelateBy(state => state.IngestionIdKey, ctx => ctx.Message.ClassSourceId.ToString()));
-
-        // Event(() => QuizCompleted, e =>
-        //     e.CorrelateBy(state => state.IngestionIdKey, ctx => ctx.Message.ClassSourceId.ToString()));
-
-        // Event(() => QuizFailed, e =>
-        //     e.CorrelateBy(state => state.IngestionIdKey, ctx => ctx.Message.ClassSourceId.ToString()));
 
 
         Initially(
@@ -77,24 +66,6 @@ public class IngestionSaga : MassTransitStateMachine<IngestionSagaState>
                 .TransitionTo(TranscriptionFailed)
                 .Finalize()
         );
-
-        // Quiz generation used to run here after transcription. Kept for reference until it
-        // is moved to its own saga; the IndexingSaga now picks up TranscriptionCompleted.
-        // During(GeneratingQuiz,
-        //     When(QuizCompleted)
-        //         .Then(ctx =>
-        //             Console.WriteLine(
-        //                 $"[Saga] Quiz generation for #{ctx.Saga.ClassSourceId} completed."))
-        //         .TransitionTo(TranscriptionSuccess)
-        //         .Finalize(),
-        //
-        //     When(QuizFailed)
-        //         .Then(ctx =>
-        //             Console.WriteLine(
-        //                 $"[Saga] Quiz generation for #{ctx.Saga.ClassSourceId} failed."))
-        //         .TransitionTo(TranscriptionFailed)
-        //         .Finalize()
-        // );
 
         SetCompletedWhenFinalized();
 
