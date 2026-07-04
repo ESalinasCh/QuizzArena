@@ -13,4 +13,9 @@ public class SqlDocumentChunkRepository(DocumentProcessingDbContext context) : I
             .ToListAsync();
         return chunks;
     }
+    public async Task SaveChunksAsync(IReadOnlyList<DocumentChunk> chunks)
+    {
+        context.DocumentChunk.AddRange(chunks);
+        await context.SaveChangesAsync();
+    }
 }
