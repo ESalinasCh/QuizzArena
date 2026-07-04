@@ -31,7 +31,7 @@ internal sealed class OllamaEmbeddingGeneration : IEmbeddingService
         [property: JsonPropertyName("embeddings")] float[][] Embeddings
     );
 
-    private const string EmbeddingModel = "bge-m3"; // could be an env variable
+    private const string EmbeddingModel = "bge-m3";
     private const int BatchSize = 32;
 
     public async Task<float[]> GenerateSingleEmbeddingAsync(string model, string prompt)

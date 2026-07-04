@@ -6,6 +6,7 @@ using QuizzArena.DocumentProcessing.Application.Messaging.Events;
 using QuizzArena.DocumentProcessing.Application.Ports.Out;
 using QuizzArena.DocumentProcessing.Domain.Entities;
 using QuizzArena.DocumentProcessing.Domain.Enums;
+using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Utils;
 using QuizzArena.DocumentProcessing.Infrastructure.Configuration;
 using Shared.Contracts;
 using Shared.Contracts.DTOs;
@@ -16,7 +17,6 @@ public class GenerationRequestConsumer(
     IDocumentChunkRepository documentChunkRepository,
     IEmbeddingService embeddingGenerationService,
     ITextGenerationService textGenerationService,
-    ICosineSimilarity cosineSimilarityService,
     IQuizContract quizContract,
     IQuestionContract questionContract,
     IOptions<QuizGenerationOptions> quizGenerationOptions
@@ -144,7 +144,7 @@ public class GenerationRequestConsumer(
             {
                 foreach (int acceptedIndex in acceptedQuestionsIndexes)
                 {
-                    double cosineSim = cosineSimilarityService.CalculateCosineSimilarity(
+                    double cosineSim = TensorCosineSimilarity.CalculateCosineSimilarity(
                         embeddedQuestions[candidateIndex],
                         embeddedQuestions[acceptedIndex]
                     );

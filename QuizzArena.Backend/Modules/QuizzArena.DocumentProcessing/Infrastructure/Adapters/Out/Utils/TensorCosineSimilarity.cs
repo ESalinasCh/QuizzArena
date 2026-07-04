@@ -1,17 +1,16 @@
 ﻿using System.Numerics.Tensors;
 using Pgvector;
-using QuizzArena.DocumentProcessing.Application.Ports.Out;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Utils;
 
-internal sealed class TensorCosineSimilarity : ICosineSimilarity
+internal static class TensorCosineSimilarity
 {
-    public double CalculateCosineSimilarity(Vector vectorA, Vector vectorB)
+    public static double CalculateCosineSimilarity(Vector vectorA, Vector vectorB)
     {
         return TensorPrimitives.CosineSimilarity(vectorA.ToArray(), vectorB.ToArray());
     }
 
-    public double CalculateCosineSimilarity(float[] vectorA, float[] vectorB)
+    public static double CalculateCosineSimilarity(float[] vectorA, float[] vectorB)
     {
         return TensorPrimitives.CosineSimilarity(vectorA, vectorB);
     }

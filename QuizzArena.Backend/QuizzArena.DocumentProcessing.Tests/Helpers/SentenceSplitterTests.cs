@@ -29,7 +29,6 @@ public class SentenceSplitterTests
     [Fact]
     public void SplitIntoSentences_FlushesAtWordCapWhenNoPunctuation()
     {
-        // 17 words, no punctuation -> first 15 form a sentence, remaining 2 flush at the end.
         string text = string.Join(' ', Enumerable.Range(1, 17).Select(i => $"w{i}"));
 
         List<string> result = SentenceSplitter.SplitIntoSentences(text);

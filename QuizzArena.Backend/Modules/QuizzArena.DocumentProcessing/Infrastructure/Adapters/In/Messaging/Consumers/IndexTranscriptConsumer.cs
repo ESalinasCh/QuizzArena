@@ -21,7 +21,6 @@ public partial class IndexTranscriptConsumer(
     ILogger<IndexTranscriptConsumer> logger
 ) : IConsumer<IndexTranscriptCommand>
 {
-    // Keep only chunks the classifier marks academic with at least this confidence.
     private const double MinConfidence = 0.7;
 
     public async Task Consume(ConsumeContext<IndexTranscriptCommand> context)
@@ -46,8 +45,6 @@ public partial class IndexTranscriptConsumer(
             List<string> chunks = SemanticChunker.GenerateChunk(sentences, sentenceEmbeddings);
             LogChunks(logger, chunks.Count, command.ClassSourceId);
 
-            // Classify each chunk and keep only the relevant ones. Category/confidence are used
-            // here purely to filter — they are not persisted.
             List<string> keptChunks = [];
             foreach (string chunk in chunks)
             {
