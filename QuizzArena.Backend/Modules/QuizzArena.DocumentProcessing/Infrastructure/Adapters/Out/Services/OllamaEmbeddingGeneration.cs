@@ -31,7 +31,7 @@ internal sealed class OllamaEmbeddingGeneration : IEmbeddingService
 
         float[][] result = await SendEmbeddingRequestAsync(model, [prompt]);
 
-        return result.Length == 0 ? throw new InvalidOperationException("Ollama returned an empty embedding array.") : result[0];
+        return result[0];
     }
 
     public async Task<float[][]> GenerateMultipleEmbeddingsAsync(string model, string[] prompts, int? batchSize = 32)
@@ -82,7 +82,37 @@ internal sealed class OllamaEmbeddingGeneration : IEmbeddingService
             throw new InvalidOperationException("Failed to extract embeddings from Ollama response.");
         }
 
+        ValidateEmbeddings(ollamaResponse.Embeddings);
+
         return ollamaResponse.Embeddings;
+    }
+
+    private static void ValidateEmbeddings(float[][] embeddings)
+    {
+        if (embeddings.Length == 0)
+        {
+            throw new InvalidOperationException("Ollama returned an empty embedding array.");
+        }
+
+        int? expectedDimension = null;
+
+        foreach (var embedding in embeddings)
+        {
+            if (embedding == null || embedding.Length == 0)
+            {
+                throw new InvalidOperationException("Ollama returned an invalid embedding: null or empty vector.");
+            }
+
+            if (expectedDimension is null)
+            {
+                expectedDimension = embedding.Length;
+            }
+            else if (embedding.Length != expectedDimension)
+            {
+                throw new InvalidOperationException(
+                    $"Inconsistent embedding dimensions: expected {expectedDimension}, got {embedding.Length}.");
+            }
+        }
     }
 
 }
