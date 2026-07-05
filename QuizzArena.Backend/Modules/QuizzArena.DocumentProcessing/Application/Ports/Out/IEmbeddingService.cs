@@ -3,6 +3,5 @@
 public interface IEmbeddingService
 {
     public Task<float[]> GenerateSingleEmbeddingAsync(string model, string prompt);
-    public Task<float[][]> GenerateMultipleEmbeddingsAsync(string model, string[] prompt);
-    Task<IReadOnlyList<float[]>> EmbedInBatchesAsync(IReadOnlyList<string> sentences);
+    public Task<float[][]> GenerateMultipleEmbeddingsAsync(string model, string[] prompts, int? batchSize = 32);
 }
