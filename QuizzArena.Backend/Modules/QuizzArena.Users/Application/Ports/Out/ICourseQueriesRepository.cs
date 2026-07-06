@@ -6,4 +6,5 @@ public interface ICourseQueriesRepository
 {
     Task<List<Course>> GetCoursesByUserId(Guid studentId);
     Task<List<Course>> GetCoursesByIds(List<Guid> coursesIds);
+    Task<Course?> GetCourseById(Guid courseId);
 }

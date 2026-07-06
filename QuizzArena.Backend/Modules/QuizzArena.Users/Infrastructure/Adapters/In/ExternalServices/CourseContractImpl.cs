@@ -43,4 +43,20 @@ internal sealed class CourseContractImpl(
 
         return courseSummaries;
     }
+
+    public async Task<CourseDto?> GetCourseById(Guid courseId)
+    {
+        Course? course = await courseQuerysRepository.GetCourseById(courseId);
+        return course == null ? null : new CourseDto()
+        {
+            Id = course.Id,
+            Name = course.Name,
+            Description = course.Description,
+            Deleted = course.Deleted,
+            CreatedAt = course.CreatedAt,
+            UpdatedAt = course.UpdatedAt,
+            DeletedAt = course.DeletedAt,
+            TeacherId = course.TeacherId
+        };
+    }
 }

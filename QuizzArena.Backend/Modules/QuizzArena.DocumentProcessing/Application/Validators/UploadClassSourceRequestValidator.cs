@@ -30,9 +30,6 @@ public class UploadClassSourceRequestValidator : AbstractValidator<UploadClassSo
             .NotEmpty()
             ;
 
-        RuleFor(x => x.UserId)
-            .NotEmpty();
-
         RuleFor(x => x.File)
             .Cascade(CascadeMode.Stop)
             .NotNull()
