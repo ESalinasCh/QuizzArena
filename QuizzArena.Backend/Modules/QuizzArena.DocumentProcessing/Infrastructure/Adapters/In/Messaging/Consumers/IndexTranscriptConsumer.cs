@@ -4,11 +4,11 @@ using Microsoft.Extensions.Options;
 using Pgvector;
 using QuizzArena.DocumentProcessing.Application.Helpers;
 using QuizzArena.DocumentProcessing.Application.Messaging.Commands;
+using QuizzArena.DocumentProcessing.Application.Messaging.Events;
 using QuizzArena.DocumentProcessing.Application.Ports.Out;
 using QuizzArena.DocumentProcessing.Domain.Entities;
 using QuizzArena.DocumentProcessing.Domain.Enums;
 using QuizzArena.DocumentProcessing.Infrastructure.Configuration;
-using Shared.Messaging.Events;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Consumers;
 
