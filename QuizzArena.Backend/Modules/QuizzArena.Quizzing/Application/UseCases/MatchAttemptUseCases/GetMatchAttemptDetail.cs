@@ -1,17 +1,18 @@
 ﻿using QuizzArena.Quizzing.Application.DTOs;
 using QuizzArena.Quizzing.Application.Ports.In;
+using QuizzArena.Quizzing.Application.Ports.Out;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Domain.Entities;
 using QuizzArena.Quizzing.Domain.Enums;
 
 namespace QuizzArena.Quizzing.Application.UseCases.MatchAttemptUseCases;
 
-public class GetMatchAttemptDetail(IMatchRepository matchRepository, IQuestionQueriesRepository questionQueriesRepository) : IGetMatchAttemptDetail
+public class GetMatchAttemptDetail(IMatchRepository matchRepository, IQuestionRepository questionRepository) : IGetMatchAttemptDetail
 {
     public async Task<GetMatchAttemptDetailDTO> Execute(Guid matchAttemptId)
     {
         MatchAttempt? matchAttempt = await matchRepository.GetMatchAttemptsDetailById(matchAttemptId) ?? throw new InvalidOperationException();
-        List<Question> questions = await questionQueriesRepository.GetQuestionsByIds(matchAttempt.MatchAttemptQuestions.Select(x => x.QuestionId).ToList());
+        List<Question> questions = await questionRepository.GetByIdsWithOptionsAsync(matchAttempt.MatchAttemptQuestions.Select(x => x.QuestionId).ToList());
         var answersDictionary = matchAttempt.Answers.ToDictionary(x => x.QuestionId);
 
         Match match = await matchRepository.GetMatchByIdAsync(matchAttempt.MatchId) ?? throw new InvalidOperationException();

@@ -80,11 +80,9 @@ public static class DependencyInjection
         #endregion
 
         services.AddScoped<IValidator<MatchQueryParametersDto>, MatchQueryParametersValidator>();
-        services.AddScoped<IMatchQueriesRepository, SqlMatchQueriesRepository>();
         services.AddScoped<IGetMatchAttemptsByStudent, GetMatchAttemptsByStudent>();
 
         services.AddScoped<IGetMatchAttemptDetail, GetMatchAttemptDetail>();
-        services.AddScoped<IQuestionQueriesRepository, SqlQuestionQueriesRepository>();
 
         services.AddScoped<MatchAttemptFiltersValidator>();
 

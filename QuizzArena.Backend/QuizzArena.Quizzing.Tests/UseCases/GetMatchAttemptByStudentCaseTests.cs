@@ -1,5 +1,4 @@
-﻿
-using FluentValidation;
+﻿using FluentValidation;
 using Moq;
 using QuizzArena.Quizzing.Application.DTOs;
 using QuizzArena.Quizzing.Application.Filters;
@@ -17,7 +16,8 @@ namespace QuizzArena.Quizzing.Tests.UseCases;
 public class GetMatchAttemptByStudentCaseTests
 {
     private readonly Mock<ICurrentUser> _mockCurrentUser;
-    private readonly Mock<IMatchQueriesRepository> _mockMatchRepository;
+    private readonly Mock<IMatchRepository> _mockMatchRepository;
+    private readonly Mock<IMatchAttemptRepository> _mockMatchAttemptRepository;
     private readonly Mock<ICourseContract> _mockCourseContract;
 
     private readonly GetMatchAttemptsByStudent _useCase;
@@ -25,12 +25,14 @@ public class GetMatchAttemptByStudentCaseTests
     public GetMatchAttemptByStudentCaseTests()
     {
         _mockCurrentUser = new Mock<ICurrentUser>();
-        _mockMatchRepository = new Mock<IMatchQueriesRepository>();
+        _mockMatchRepository = new Mock<IMatchRepository>();
+        _mockMatchAttemptRepository = new Mock<IMatchAttemptRepository>();
         _mockCourseContract = new Mock<ICourseContract>();
 
         _useCase = new GetMatchAttemptsByStudent(
             _mockCurrentUser.Object,
             _mockMatchRepository.Object,
+            _mockMatchAttemptRepository.Object,
             _mockCourseContract.Object,
             new MatchAttemptFiltersValidator()
         );
@@ -85,7 +87,7 @@ public class GetMatchAttemptByStudentCaseTests
             PageSize = 10
         };
 
-        _mockMatchRepository
+        _mockMatchAttemptRepository
             .Setup(x => x.GetAttemptsByStudentId(studentId, filters))
             .ReturnsAsync([]);
 
@@ -156,7 +158,7 @@ public class GetMatchAttemptByStudentCaseTests
             }
         };
 
-        _mockMatchRepository
+        _mockMatchAttemptRepository
             .Setup(x => x.GetAttemptsByStudentId(studentId, filters))
             .ReturnsAsync(attempts);
 

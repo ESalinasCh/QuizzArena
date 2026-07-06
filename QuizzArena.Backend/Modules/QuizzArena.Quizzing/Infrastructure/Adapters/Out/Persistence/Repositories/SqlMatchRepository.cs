@@ -13,6 +13,12 @@ internal sealed class SqlMatchRepository(QuizzingDbContext context) : IMatchRepo
         return await context.Matches.FindAsync(matchId);
     }
 
+    public async Task<List<Match>> GetMatchesByIds(List<Guid> matchIds)
+    {
+        List<Match> matches = await context.Matches.Where(x => matchIds.Contains(x.Id)).ToListAsync();
+        return matches;
+    }
+
     public async Task<List<Match>> GetMatchesAsync(List<Guid> courseIds, MatchQueryParametersDto? query = null)
     {
         IQueryable<Match> q = context.Matches.Where(m => courseIds.Contains(m.CourseId));
