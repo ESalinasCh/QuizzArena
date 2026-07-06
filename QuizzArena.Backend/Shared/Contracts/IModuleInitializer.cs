@@ -2,5 +2,5 @@
 
 public interface IModuleInitializer
 {
-    void Initialize(IServiceProvider serviceProvider);
+    Task Initialize(IServiceProvider serviceProvider);
 }
