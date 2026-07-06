@@ -45,13 +45,6 @@ public class UploadClassSourceValidatorTests
         result.ShouldHaveValidationErrorFor(x => x.CourseId);
     }
 
-    [Fact]
-    public async Task UserId_Empty_ShouldFailValidation()
-    {
-        var result = await _validator.TestValidateAsync(CreateDto(userId: Guid.Empty));
-        result.ShouldHaveValidationErrorFor(x => x.UserId);
-    }
-
     [Theory]
     [InlineData(".mp3")]
     [InlineData(".mp4")]
@@ -89,7 +82,6 @@ public class UploadClassSourceValidatorTests
     private static UploadClassSourceRequestDto CreateDto(
         string name = "Class Test",
         Guid? courseId = null,
-        Guid? userId = null,
         string fileName = "class.mp3",
         long fileLength = 1024)
     {
@@ -101,7 +93,6 @@ public class UploadClassSourceValidatorTests
         {
             Name = name,
             CourseId = courseId ?? Guid.NewGuid(),
-            UserId = userId ?? Guid.NewGuid(),
             File = mockFile.Object
         };
     }
