@@ -34,7 +34,7 @@ public class UploadSourceUseCase(
         CourseDto? course = await courseContract.GetCourseById(dto.CourseId) ?? throw new InvalidOperationException("Course not found");
         if (course.TeacherId != userId)
         {
-            throw new UnauthorizedAccessException("You are not authorized to upload sources for this course.");
+            throw new UnauthorizedAccessException("User is not authorized to upload sources for this course.");
         }
 
         using var stream = dto.File.OpenReadStream();
