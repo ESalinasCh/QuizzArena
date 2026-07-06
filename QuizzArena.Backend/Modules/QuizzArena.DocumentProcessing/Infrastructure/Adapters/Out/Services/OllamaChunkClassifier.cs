@@ -1,60 +1,34 @@
-﻿using System.Net.Http.Json;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using Microsoft.Extensions.Options;
 using QuizzArena.DocumentProcessing.Application.Ports.Out;
 using QuizzArena.DocumentProcessing.Domain.Enums;
+using QuizzArena.DocumentProcessing.Infrastructure.Configuration;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Services;
 
 /// <summary>
 /// Determines if a class chunk should be kept based on its classification (academic or not) and its confidence score.
 /// </summary>
-public class OllamaChunkClassifier : IChunkClassifier
+public class OllamaChunkClassifier(
+    IOptions<IndexingOptions> indexingConfig,
+    ITextGenerationService textGenerationService
+) : IChunkClassifier
 {
-    private const string LlmModel = "qwen2.5:7b-instruct";
-
+    private readonly IndexingOptions _indexingConfig = indexingConfig.Value;
     private static readonly ChunkClassification _fallback = new(ChunkCategory.Academic, 0.8);
-
-    private readonly HttpClient _httpClient;
-
-    public OllamaChunkClassifier(HttpClient httpClient)
-    {
-        _httpClient = httpClient;
-    }
 
     public async Task<ChunkClassification> ClassifyAsync(string content)
     {
-        try
-        {
-            OllamaChatRequest request = new(
-                LlmModel,
-                [new ChatMessage("user", BuildPrompt(content))],
-                Stream: false,
-                Format: "json");
+        string prompt = BuildPrompt(content);
 
-            HttpResponseMessage response = await _httpClient.PostAsJsonAsync("api/chat", request);
-            response.EnsureSuccessStatusCode();
+        ClassificationResult result = await textGenerationService.GenerateAsync<ClassificationResult>(_indexingConfig.ClassificationModel, prompt);
 
-            OllamaChatResponse? body = await response.Content.ReadFromJsonAsync<OllamaChatResponse>();
-
-            string? json = body?.Message?.Content;
-            if (string.IsNullOrWhiteSpace(json))
-            {
-                return _fallback;
-            }
-
-            ClassificationResult? result = JsonSerializer.Deserialize<ClassificationResult>(json);
-            if (result is null)
-            {
-                return _fallback;
-            }
-
-            return new ChunkClassification(MapCategory(result.Categoria), result.Confidence);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
+        if (result is null)
         {
             return _fallback;
         }
+
+        return new ChunkClassification(MapCategory(result.Categoria), result.Confidence);
     }
 
     private static ChunkCategory MapCategory(string categoria) =>
@@ -81,19 +55,6 @@ Categorías:
 
 Responde únicamente con un objeto JSON válido con este formato:
 {{""categoria"": ""ACADEMICO"", ""confidence"": 0.92, ""razon"": ""explicación sobre termodinámica""}}";
-
-    private sealed record OllamaChatRequest(
-        [property: JsonPropertyName("model")] string Model,
-        [property: JsonPropertyName("messages")] IReadOnlyList<ChatMessage> Messages,
-        [property: JsonPropertyName("stream")] bool Stream,
-        [property: JsonPropertyName("format")] string Format);
-
-    private sealed record ChatMessage(
-        [property: JsonPropertyName("role")] string Role,
-        [property: JsonPropertyName("content")] string Content);
-
-    private sealed record OllamaChatResponse(
-        [property: JsonPropertyName("message")] ChatMessage? Message);
 
     private sealed record ClassificationResult(
         [property: JsonPropertyName("categoria")] string Categoria,

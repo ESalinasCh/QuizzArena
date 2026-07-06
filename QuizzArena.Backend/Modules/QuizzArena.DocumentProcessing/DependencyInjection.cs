@@ -30,6 +30,7 @@ public static class DependencyInjection
         services.AddScoped<IProcessingJobRepository, SqlProcessingJobRepository>();
 
         services.Configure<QuizGenerationOptions>(configuration.GetSection(QuizGenerationOptions.SectionName));
+        services.Configure<IndexingOptions>(configuration.GetSection(IndexingOptions.SectionName));
 
         services.AddAutoMapper(cfg => { }, typeof(DependencyInjection).Assembly);
 
