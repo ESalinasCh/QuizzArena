@@ -24,6 +24,7 @@ public class QuestionContract(
                 Origin = QuestionOrigin.AiGenerated,
                 Type = QuestionType.SingleChoice,
                 Deleted = false,
+                ProcessingJobId = q.ProcessingJobId,
                 Options = q.Options.Select((option, index) => new Option
                 {
                     Id = Guid.NewGuid(),
