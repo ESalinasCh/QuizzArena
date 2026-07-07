@@ -13,7 +13,7 @@ namespace Host;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
@@ -71,7 +71,7 @@ public class Program
         if (app.Environment.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
-            app.ApplyMigrations();
+            await app.ApplyMigrations();
             app.UseSwagger();
             app.UseSwaggerUI();
         }
@@ -86,6 +86,6 @@ public class Program
 
         app.MapControllers();
 
-        app.Run();
+        await app.RunAsync();
     }
 }

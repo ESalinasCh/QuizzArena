@@ -284,7 +284,7 @@ BEGIN
                 NOW() - INTERVAL '70 days' + (i * INTERVAL '5 days') + (j * INTERVAL '1 hour'),
                 NOW(),
                 NULL,
-                NULL,
+                'aaaaaaaa-0000-0000-0000-000000000001'::uuid,
                 'manually_created',
                 'Pregunta creada para demo'
             );
@@ -487,7 +487,7 @@ VALUES
     NULL,
     '10000000-0000-0000-0000-000000000001'::uuid,
     '30000000-0000-0000-0000-000000000001'::uuid,
-    0,
+    10,
     8,
     FALSE,
     FALSE,
