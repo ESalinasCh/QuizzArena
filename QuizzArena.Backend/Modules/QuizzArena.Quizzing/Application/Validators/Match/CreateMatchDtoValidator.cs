@@ -9,7 +9,8 @@ public class CreateMatchDtoValidator : AbstractValidator<MatchCreateDto>
     {
         RuleFor(x => x.StartedAt)
             .NotEmpty()
-            .WithMessage("Start date is required");
+            .WithMessage("Start date is required")
+            .GreaterThan(DateTimeOffset.Now);
 
         RuleFor(x => x.FinishedAt)
             .NotEmpty()

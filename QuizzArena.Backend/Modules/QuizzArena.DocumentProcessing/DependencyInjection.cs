@@ -39,8 +39,12 @@ public static class DependencyInjection
         services.AddScoped<IStorageServiceRepository, BlobRepository>();
         services.AddSingleton(provider =>
         {
-            var storageConnectionString = configuration.GetConnectionString("AzureBlobStorage");
-            return new BlobServiceClient(storageConnectionString);
+            var cs = configuration.GetConnectionString("AzureBlobStorage")?.Trim();
+            if (string.IsNullOrEmpty(cs))
+                throw new InvalidOperationException(
+                    "ConnectionStrings:AzureBlobStorage is not configured. " +
+                    "Set it via appsettings or ConnectionStrings__AzureBlobStorage env var.");
+            return new BlobServiceClient(cs);
         });
 
         services.AddHttpClient<ITranscriptionService, WhisperTranscription>(client =>
