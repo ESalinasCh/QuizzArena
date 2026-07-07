@@ -48,8 +48,6 @@ public class Program
         {
             DocumentProcessingMassTransit.AddConsumers(x);
 
-            QuizzingMassTransit.AddConsumers(x);
-
             x.UsingRabbitMq((context, cfg) =>
             {
                 cfg.Host(
