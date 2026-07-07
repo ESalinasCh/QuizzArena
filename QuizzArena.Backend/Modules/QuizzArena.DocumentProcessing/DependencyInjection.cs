@@ -61,11 +61,7 @@ public static class DependencyInjection
             client.Timeout = TimeSpan.FromMinutes(60);
         });
 
-        services.AddHttpClient<IChunkClassifier, OllamaChunkClassifier>(client =>
-        {
-            client.BaseAddress = new Uri(ollamaUrl);
-            client.Timeout = TimeSpan.FromMinutes(30);
-        });
+        services.AddScoped<IChunkClassifier, OllamaChunkClassifier>();
 
         #region BDD
         var connectionString = configuration.GetConnectionString("DefaultConnection");
