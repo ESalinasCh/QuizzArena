@@ -77,7 +77,7 @@ services:
 
   ollama-cpu:
     image: ollama/ollama:latest
-    container_name: quizarena_ollama_cpu
+    container_name: quizarena_ollama
     profiles: ["cpu"]
     ports:
       - "11434:11434"
@@ -96,7 +96,7 @@ services:
 
   ollama-gpu:
     image: ollama/ollama:latest
-    container_name: quizarena_ollama_gpu
+    container_name: quizarena_ollama
     profiles: ["gpu"]
     ports:
       - "11434:11434"
@@ -134,7 +134,7 @@ services:
 
   whisper-cpu:
     image: onerahmet/openai-whisper-asr-webservice:latest
-    container_name: quizarena_whisper_cpu
+    container_name: quizarena_whisper
     profiles: ["cpu"]
     environment:
       ASR_MODEL: ${WHISPER_MODEL:-base}
@@ -151,7 +151,7 @@ services:
 
   whisper-gpu:
     image: onerahmet/openai-whisper-asr-webservice:latest-gpu
-    container_name: quizarena_whisper_gpu
+    container_name: quizarena_whisper
     profiles: ["gpu"]
     environment:
       ASR_MODEL: ${WHISPER_MODEL:-base}
@@ -165,20 +165,6 @@ services:
             - driver: ${GPU_DRIVER:-nvidia}
               count: all
               capabilities: [gpu]
-    ports:
-      - "9000:9000"
-    networks:
-      default:
-        aliases:
-          - whisper
-    restart: unless-stopped
-
-  whisper-medium:
-    image: onerahmet/openai-whisper-asr-webservice:latest
-    profiles: ["medium"]
-    environment:
-      ASR_MODEL: medium
-      ASR_ENGINE: openai_whisper
     ports:
       - "9000:9000"
     networks:

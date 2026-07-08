@@ -1,4 +1,4 @@
-﻿using System.Numerics.Tensors;
+﻿using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Utils;
 
 namespace QuizzArena.DocumentProcessing.Application.Helpers;
 
@@ -25,10 +25,9 @@ internal static class SemanticChunker
         List<string> currentSentences = [sentences[0]];
         int currentWordCount = WordCount(sentences[0]);
 
-        // Walk each adjacent pair. similarity[i] compares sentence i with sentence i+1.
         for (int i = 0; i < sentences.Count - 1; i++)
         {
-            float similarity = TensorPrimitives.CosineSimilarity(embeddings[i], embeddings[i + 1]);
+            double similarity = TensorCosineSimilarity.CalculateCosineSimilarity(embeddings[i], embeddings[i + 1]);
             string nextSentence = sentences[i + 1];
             int nextWordCount = WordCount(nextSentence);
 
@@ -57,7 +56,6 @@ internal static class SemanticChunker
             }
         }
 
-        // Flush the trailing chunk.
         if (currentSentences.Count > 0)
         {
             chunks.Add(string.Join(' ', currentSentences));

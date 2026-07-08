@@ -12,7 +12,6 @@ using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Web;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.Repositories;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Services;
-using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Utils;
 using QuizzArena.DocumentProcessing.Infrastructure.Configuration;
 using Shared.Contracts;
 
@@ -29,9 +28,9 @@ public static class DependencyInjection
         services.AddScoped<IClassSourceRepository, SqlClassSourceRepository>();
         services.AddScoped<IDocumentChunkRepository, SqlDocumentChunkRepository>();
         services.AddScoped<IProcessingJobRepository, SqlProcessingJobRepository>();
-        services.AddScoped<ICosineSimilarity, TensorCosineSimilarity>();
 
         services.Configure<QuizGenerationOptions>(configuration.GetSection(QuizGenerationOptions.SectionName));
+        services.Configure<IndexingOptions>(configuration.GetSection(IndexingOptions.SectionName));
 
         services.AddAutoMapper(cfg => { }, typeof(DependencyInjection).Assembly);
 
@@ -62,11 +61,7 @@ public static class DependencyInjection
             client.Timeout = TimeSpan.FromMinutes(60);
         });
 
-        services.AddHttpClient<IChunkClassifier, OllamaChunkClassifier>(client =>
-        {
-            client.BaseAddress = new Uri(ollamaUrl);
-            client.Timeout = TimeSpan.FromMinutes(30);
-        });
+        services.AddScoped<IChunkClassifier, OllamaChunkClassifier>();
 
         #region BDD
         var connectionString = configuration.GetConnectionString("DefaultConnection");

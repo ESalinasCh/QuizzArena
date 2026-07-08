@@ -1,4 +1,4 @@
-﻿namespace Shared.Messaging.Events;
+﻿namespace QuizzArena.DocumentProcessing.Application.Messaging.Events;
 
 public class IndexingCompletedEvent
 {

@@ -21,7 +21,6 @@ public class GenerationRequestConsumerTests
     private readonly Mock<IDocumentChunkRepository> _mockDocumentChunkRepository;
     private readonly Mock<IEmbeddingService> _mockEmbeddingService;
     private readonly Mock<ITextGenerationService> _mockTextGenerationService;
-    private readonly Mock<ICosineSimilarity> _mockCosineSimilarity;
     private readonly Mock<IQuizContract> _mockQuizContract;
     private readonly Mock<IQuestionContract> _mockQuestionContract;
     private readonly Mock<ConsumeContext<GenerationRequestCommand>> _mockContext;
@@ -36,7 +35,6 @@ public class GenerationRequestConsumerTests
         _mockDocumentChunkRepository = new Mock<IDocumentChunkRepository>();
         _mockEmbeddingService = new Mock<IEmbeddingService>();
         _mockTextGenerationService = new Mock<ITextGenerationService>();
-        _mockCosineSimilarity = new Mock<ICosineSimilarity>();
         _mockQuizContract = new Mock<IQuizContract>();
         _mockQuestionContract = new Mock<IQuestionContract>();
         _mockContext = new Mock<ConsumeContext<GenerationRequestCommand>>();
@@ -69,7 +67,6 @@ public class GenerationRequestConsumerTests
             _mockDocumentChunkRepository.Object,
             _mockEmbeddingService.Object,
             _mockTextGenerationService.Object,
-            _mockCosineSimilarity.Object,
             _mockQuizContract.Object,
             _mockQuestionContract.Object,
             _mockOptions.Object
@@ -238,10 +235,6 @@ public class GenerationRequestConsumerTests
         );
         SetupEmbeddings(_similarQuestionEmbeddings);
 
-        _mockCosineSimilarity
-            .Setup(c => c.CalculateCosineSimilarity(It.IsAny<float[]>(), It.IsAny<float[]>()))
-            .Returns(0.95d);
-
         _mockQuestionContract
             .Setup(q => q.CreateQuestions(It.IsAny<List<QuestionCreationRequestDTO>>()))
             .Callback<List<QuestionCreationRequestDTO>>(questions => createdQuestions = questions)
@@ -276,10 +269,6 @@ public class GenerationRequestConsumerTests
             })
         );
         SetupEmbeddings(_distinctQuestionEmbeddings);
-
-        _mockCosineSimilarity
-            .Setup(c => c.CalculateCosineSimilarity(It.IsAny<float[]>(), It.IsAny<float[]>()))
-            .Returns(0.1d);
 
         _mockQuestionContract
             .Setup(q => q.CreateQuestions(It.IsAny<List<QuestionCreationRequestDTO>>()))

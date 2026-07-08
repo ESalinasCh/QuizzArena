@@ -11,7 +11,7 @@ public class SentenceSplitterTests
     [InlineData(null)]
     public void SplitIntoSentences_EmptyOrWhitespace_ReturnsEmpty(string? text)
     {
-        List<string> result = SentenceSplitter.SplitIntoSentences(text!);
+        List<string> result = SentenceSplitter.SplitIntoSentences(text!, 15);
 
         result.Should().BeEmpty();
     }
@@ -21,7 +21,7 @@ public class SentenceSplitterTests
     {
         const string text = "Hello world. How are you? I am fine!";
 
-        List<string> result = SentenceSplitter.SplitIntoSentences(text);
+        List<string> result = SentenceSplitter.SplitIntoSentences(text, 15);
 
         result.Should().Equal("Hello world.", "How are you?", "I am fine!");
     }
@@ -29,10 +29,9 @@ public class SentenceSplitterTests
     [Fact]
     public void SplitIntoSentences_FlushesAtWordCapWhenNoPunctuation()
     {
-        // 17 words, no punctuation -> first 15 form a sentence, remaining 2 flush at the end.
         string text = string.Join(' ', Enumerable.Range(1, 17).Select(i => $"w{i}"));
 
-        List<string> result = SentenceSplitter.SplitIntoSentences(text);
+        List<string> result = SentenceSplitter.SplitIntoSentences(text, 15);
 
         result.Should().HaveCount(2);
         result[0].Split(' ').Should().HaveCount(15);
@@ -44,7 +43,7 @@ public class SentenceSplitterTests
     {
         const string text = "First sentence. Trailing words with no period";
 
-        List<string> result = SentenceSplitter.SplitIntoSentences(text);
+        List<string> result = SentenceSplitter.SplitIntoSentences(text, 15);
 
         result.Should().Equal("First sentence.", "Trailing words with no period");
     }
@@ -54,7 +53,7 @@ public class SentenceSplitterTests
     {
         const string text = "Too    many   spaces.";
 
-        List<string> result = SentenceSplitter.SplitIntoSentences(text);
+        List<string> result = SentenceSplitter.SplitIntoSentences(text, 15);
 
         result.Should().ContainSingle().Which.Should().Be("Too many spaces.");
     }

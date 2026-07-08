@@ -22,4 +22,10 @@ internal sealed class SqlCourseQueriesRepository(UserDbContext context) : ICours
 
         return courses;
     }
+
+    public async Task<Course?> GetCourseById(Guid courseId)
+    {
+        Course? course = await context.Courses.FirstOrDefaultAsync(x => x.Id == courseId && !x.Deleted);
+        return course;
+    }
 }

@@ -5,7 +5,6 @@ namespace QuizzArena.DocumentProcessing.Tests.Helpers;
 
 public class SemanticChunkerTests
 {
-    // Orthogonal vectors -> cosine similarity 0 (below the 0.45 threshold = topic shift).
     private static readonly float[] _topicA = [1f, 0f];
     private static readonly float[] _topicB = [0f, 1f];
 
@@ -41,8 +40,6 @@ public class SemanticChunkerTests
     [Fact]
     public void Chunk_TopicShift_ButChunkTooSmall_DoesNotSplit()
     {
-        // Different topics, but the first chunk is well under MinChunkWords (80),
-        // so the similarity drop must NOT trigger a split.
         string[] sentences = ["short here", "different topic"];
         float[][] embeddings = [_topicA, _topicB];
 
@@ -54,7 +51,6 @@ public class SemanticChunkerTests
     [Fact]
     public void Chunk_TopicShift_WhenChunkLargeEnough_Splits()
     {
-        // First sentence already meets MinChunkWords (80); the topic shift then splits.
         string[] sentences = [Words(80), "different topic"];
         float[][] embeddings = [_topicA, _topicB];
 
@@ -67,8 +63,6 @@ public class SemanticChunkerTests
     [Fact]
     public void Chunk_SameTopic_ButExceedsMaxWords_ForcesSplit()
     {
-        // Identical vectors => no topic shift, but the combined size (500) exceeds
-        // MaxChunkWords (400), forcing a hard split.
         string[] sentences = [Words(250), Words(250)];
         float[][] embeddings = [_topicA, _topicA];
 

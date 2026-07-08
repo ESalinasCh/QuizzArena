@@ -1,12 +1,14 @@
 ﻿using MassTransit;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Pgvector;
 using QuizzArena.DocumentProcessing.Application.Helpers;
 using QuizzArena.DocumentProcessing.Application.Messaging.Commands;
+using QuizzArena.DocumentProcessing.Application.Messaging.Events;
 using QuizzArena.DocumentProcessing.Application.Ports.Out;
 using QuizzArena.DocumentProcessing.Domain.Entities;
 using QuizzArena.DocumentProcessing.Domain.Enums;
-using Shared.Messaging.Events;
+using QuizzArena.DocumentProcessing.Infrastructure.Configuration;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Consumers;
 
@@ -18,11 +20,11 @@ public partial class IndexTranscriptConsumer(
     IEmbeddingService embeddingService,
     IChunkClassifier chunkClassifier,
     IDocumentChunkRepository documentChunkRepository,
-    ILogger<IndexTranscriptConsumer> logger
+    ILogger<IndexTranscriptConsumer> logger,
+    IOptions<IndexingOptions> indexingConfig
 ) : IConsumer<IndexTranscriptCommand>
 {
-    // Keep only chunks the classifier marks academic with at least this confidence.
-    private const double MinConfidence = 0.7;
+    private readonly IndexingOptions _indexingConfig = indexingConfig.Value;
 
     public async Task Consume(ConsumeContext<IndexTranscriptCommand> context)
     {
@@ -34,7 +36,7 @@ public partial class IndexTranscriptConsumer(
 
             string transcript = await storageServiceRepository.DownloadTextAsync(command.TranscriptUrl);
 
-            List<string> sentences = SentenceSplitter.SplitIntoSentences(transcript);
+            List<string> sentences = SentenceSplitter.SplitIntoSentences(transcript, 15);
             LogSentences(logger, sentences.Count, command.ClassSourceId);
             if (sentences.Count == 0)
             {
@@ -42,17 +44,15 @@ public partial class IndexTranscriptConsumer(
                 return;
             }
 
-            IReadOnlyList<float[]> sentenceEmbeddings = await embeddingService.EmbedInBatchesAsync(sentences);
+            IReadOnlyList<float[]> sentenceEmbeddings = await embeddingService.GenerateMultipleEmbeddingsAsync("bge-m3", sentences.ToArray());
             List<string> chunks = SemanticChunker.GenerateChunk(sentences, sentenceEmbeddings);
             LogChunks(logger, chunks.Count, command.ClassSourceId);
 
-            // Classify each chunk and keep only the relevant ones. Category/confidence are used
-            // here purely to filter — they are not persisted.
             List<string> keptChunks = [];
             foreach (string chunk in chunks)
             {
                 ChunkClassification classification = await chunkClassifier.ClassifyAsync(chunk);
-                if (classification.Category == ChunkCategory.Academic && classification.Confidence >= MinConfidence)
+                if (classification.Category == ChunkCategory.Academic && classification.Confidence >= _indexingConfig.MinConfidence)
                 {
                     keptChunks.Add(chunk);
                 }
@@ -65,7 +65,7 @@ public partial class IndexTranscriptConsumer(
                 return;
             }
 
-            IReadOnlyList<float[]> chunkEmbeddings = await embeddingService.EmbedInBatchesAsync(keptChunks);
+            float[][] chunkEmbeddings = await embeddingService.GenerateMultipleEmbeddingsAsync("bge-m3", keptChunks.ToArray());
 
             List<DocumentChunk> documentChunks = keptChunks
                 .Select((content, index) => new DocumentChunk
