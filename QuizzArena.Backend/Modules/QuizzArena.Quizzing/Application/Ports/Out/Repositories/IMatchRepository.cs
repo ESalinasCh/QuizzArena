@@ -10,4 +10,5 @@ public interface IMatchRepository
     Task<List<Match>> GetMatchesByIds(List<Guid> matchIds);
     Task<List<Match>> GetMatchesAsync(List<Guid> courseIds, MatchQueryParametersDto? query = null);
     Task<Match> CreateMatchAsync(Match match);
+    Task<Match> UpdateMatchAsync(Match match);
 }
