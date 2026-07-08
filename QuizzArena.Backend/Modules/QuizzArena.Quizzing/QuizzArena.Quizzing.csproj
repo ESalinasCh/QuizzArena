@@ -38,4 +38,10 @@
     <Folder Include="Application\Validators\MatchAttempt\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Infrastructure\Adapters\Out\Persistence\Seeds\Sql\**\*.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  
 </Project>
