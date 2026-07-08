@@ -10,5 +10,6 @@ internal sealed class OptionMapper : Profile
     {
         CreateMap<Option, OptionDto>().ReverseMap();
         CreateMap<Option, CreateOptionDto>().ReverseMap();
+        CreateMap<Option, ResponseOptionDto>().ReverseMap();
     }
 }

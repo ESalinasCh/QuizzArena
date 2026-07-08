@@ -30,6 +30,7 @@ public class SqlQuestionRepository(QuizzingDbContext context) : IQuestionReposit
     public async Task<List<Question>> GetByProcessingJobIdAsync(QuestionFilters filters)
     {
         IQueryable<Question> query = context.Questions
+            .Include(q => q.Options)
             .AsNoTracking()
             .Where(q =>
                 q.ProcessingJobId.HasValue &&

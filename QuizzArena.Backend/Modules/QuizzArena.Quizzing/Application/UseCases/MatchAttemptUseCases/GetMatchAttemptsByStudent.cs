@@ -11,7 +11,8 @@ namespace QuizzArena.Quizzing.Application.UseCases.MatchAttemptUseCases;
 
 public class GetMatchAttemptsByStudent(
     ICurrentUser currentUser,
-    IMatchQueriesRepository matchRepository,
+    IMatchRepository matchRepository,
+    IMatchAttemptRepository matchAttemptRepository,
     ICourseContract courseContract,
     MatchAttemptFiltersValidator filtersValidator
     ) : IGetMatchAttemptsByStudent
@@ -21,7 +22,7 @@ public class GetMatchAttemptsByStudent(
         Guid studentId = Guid.Parse(currentUser.UserId);
         await filtersValidator.ValidateAndThrowAsync(filters);
 
-        List<MatchAttempt> matchAttempts = await matchRepository.GetAttemptsByStudentId(studentId, filters);
+        List<MatchAttempt> matchAttempts = await matchAttemptRepository.GetAttemptsByStudentId(studentId, filters);
         var matches = await matchRepository.GetMatchesByIds(matchAttempts.Select(x => x.MatchId).Distinct().ToList());
         var courses = await courseContract.GetCoursesByIds(matches.Select(x => x.CourseId).Distinct().ToList());
 

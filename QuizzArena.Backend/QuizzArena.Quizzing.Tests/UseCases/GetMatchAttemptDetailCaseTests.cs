@@ -1,5 +1,6 @@
 ﻿using Moq;
 using QuizzArena.Quizzing.Application.DTOs;
+using QuizzArena.Quizzing.Application.Ports.Out;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Application.UseCases.MatchAttemptUseCases;
 using QuizzArena.Quizzing.Domain.Entities;
@@ -11,18 +12,18 @@ namespace QuizzArena.Quizzing.Tests.UseCases;
 public class GetMatchAttemptDetailCaseTests
 {
     private readonly Mock<IMatchRepository> _mockMatchRepository;
-    private readonly Mock<IQuestionQueriesRepository> _mockQuestionQueriesRepository;
+    private readonly Mock<IQuestionRepository> _mockQuestionRepository;
 
     private readonly GetMatchAttemptDetail _getMatchAttemptDetail;
 
     public GetMatchAttemptDetailCaseTests()
     {
         _mockMatchRepository = new Mock<IMatchRepository>();
-        _mockQuestionQueriesRepository = new Mock<IQuestionQueriesRepository>();
+        _mockQuestionRepository = new Mock<IQuestionRepository>();
 
         _getMatchAttemptDetail = new GetMatchAttemptDetail(
             _mockMatchRepository.Object,
-            _mockQuestionQueriesRepository.Object
+            _mockQuestionRepository.Object
         );
     }
 
@@ -104,8 +105,8 @@ public class GetMatchAttemptDetailCaseTests
            .Setup(x => x.GetMatchByIdAsync(matchId))
            .ReturnsAsync(match);
 
-        _mockQuestionQueriesRepository
-            .Setup(x => x.GetQuestionsByIds(It.IsAny<List<Guid>>()))
+        _mockQuestionRepository
+            .Setup(x => x.GetByIdsWithOptionsAsync(It.IsAny<List<Guid>>()))
             .ReturnsAsync(questions);
 
         GetMatchAttemptDetailDTO result =
@@ -182,8 +183,8 @@ public class GetMatchAttemptDetailCaseTests
           .Setup(x => x.GetMatchByIdAsync(matchId))
           .ReturnsAsync(match);
 
-        _mockQuestionQueriesRepository
-            .Setup(x => x.GetQuestionsByIds(It.IsAny<List<Guid>>()))
+        _mockQuestionRepository
+            .Setup(x => x.GetByIdsWithOptionsAsync(It.IsAny<List<Guid>>()))
             .ReturnsAsync(questions);
 
         GetMatchAttemptDetailDTO result =
@@ -285,8 +286,8 @@ public class GetMatchAttemptDetailCaseTests
             .Setup(x => x.GetMatchByIdAsync(matchId))
             .ReturnsAsync(match);
 
-        _mockQuestionQueriesRepository
-            .Setup(x => x.GetQuestionsByIds(It.IsAny<List<Guid>>()))
+        _mockQuestionRepository
+            .Setup(x => x.GetByIdsWithOptionsAsync(It.IsAny<List<Guid>>()))
             .ReturnsAsync(questions);
 
         var result = await _getMatchAttemptDetail.Execute(matchAttemptId);
