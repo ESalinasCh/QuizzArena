@@ -19,7 +19,7 @@ internal class PublishMatchUseCase(IMatchRepository matchRepository)
         {
             throw new InvalidOperationException("StartedAt must be greater than current date");
         }
-        if (match.StartedAt >= match.FinishedAt)
+        if ( match.FinishedAt != null && match.StartedAt >= match.FinishedAt)
         {
             throw new InvalidOperationException("StartedAt must be greater than finished date");
         }

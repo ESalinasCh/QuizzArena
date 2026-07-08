@@ -20,6 +20,10 @@ internal sealed class SqlMatchAttemptRepository(QuizzingDbContext context) : IMa
         return await context.MatchAttempts.CountAsync(ma => ma.MatchId == matchId && ma.UserId == userId);
     }
 
+    public async Task<int> GetMatchAttemptCountByMatchIdAndStatusAsync(Guid matchId, QuizAttemptStatus status)
+    {
+        return await context.MatchAttempts.CountAsync(ma => ma.MatchId == matchId && ma.Status == status);
+    }
     public async Task<bool> HasActiveAttemptByMatchIdAsync(Guid matchId, Guid userId)
     {
         return await context.MatchAttempts.AnyAsync(
