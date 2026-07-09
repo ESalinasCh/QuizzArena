@@ -1,4 +1,5 @@
-﻿using QuizzArena.Quizzing.Domain.Enums;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using QuizzArena.Quizzing.Domain.Enums;
 
 namespace QuizzArena.Quizzing.Domain.Entities;
 
@@ -18,5 +19,7 @@ public class MatchAttempt
     public ICollection<Answer> Answers { get; set; } = [];
     public ICollection<MatchAttemptQuestion> MatchAttemptQuestions { get; set; } = [];
 
+    [NotMapped]
+    public List<MatchAttempt> OtherAttempts { get; set; } = [];
 }
 

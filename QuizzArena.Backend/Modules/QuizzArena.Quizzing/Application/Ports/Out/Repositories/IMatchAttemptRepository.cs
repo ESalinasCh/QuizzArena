@@ -11,4 +11,6 @@ public interface IMatchAttemptRepository
     Task<MatchAttempt?> GetByIdAsync(Guid matchAttemptId);
     Task<MatchAttempt> UpdateAsync(MatchAttempt matchAttempt);
     Task<List<MatchAttempt>> GetAttemptsByStudentId(Guid studentId, MatchAttemptFilters filters);
+    Task<List<MatchAttempt>> GetAttemptsByMatchId(Guid matchId, MatchAttemptFilters filters);
+    Task<List<MatchAttempt>> GetAttemptsByUserIds(Guid matchId, List<Guid> userIds);
 }

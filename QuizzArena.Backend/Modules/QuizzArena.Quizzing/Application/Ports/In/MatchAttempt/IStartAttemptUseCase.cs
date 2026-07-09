@@ -1,6 +1,6 @@
 ﻿using QuizzArena.Quizzing.Application.DTOs.MatchAttempt;
 
-namespace QuizzArena.Quizzing.Application.Ports.In;
+namespace QuizzArena.Quizzing.Application.Ports.In.MatchAttempt;
 
 public interface IStartAttemptUseCase
 {

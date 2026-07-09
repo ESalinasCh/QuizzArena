@@ -9,6 +9,7 @@ public class MatchAttemptFilters
 
     public int? MinScore { get; set; }
     public int? MaxScore { get; set; }
+    public string? Nickname { get; set; }
 
     public Guid? MatchId { get; set; }
     public MatchMode? MatchMode { get; set; }

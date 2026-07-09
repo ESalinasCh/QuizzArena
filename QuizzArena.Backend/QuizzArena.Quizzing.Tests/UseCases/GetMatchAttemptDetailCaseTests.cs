@@ -1,5 +1,5 @@
 ﻿using Moq;
-using QuizzArena.Quizzing.Application.DTOs;
+using QuizzArena.Quizzing.Application.DTOs.MatchAttempt;
 using QuizzArena.Quizzing.Application.Ports.Out;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Application.UseCases.MatchAttemptUseCases;
