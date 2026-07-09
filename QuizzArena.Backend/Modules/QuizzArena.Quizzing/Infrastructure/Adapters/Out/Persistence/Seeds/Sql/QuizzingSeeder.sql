@@ -345,7 +345,7 @@ END $$;
 -- 6. MATCHES
 -- ============================================================
 
--- 5 matches de tipo EXAM: 3 expirados, 2 activos
+-- 5 matches de tipo EXAM:  5 activos
 -- 4 matches de tipo SINGLE: todos activos
 
 INSERT INTO quizzing."match"
@@ -370,11 +370,11 @@ INSERT INTO quizzing."match"
     "Title"
 )
 VALUES
--- EXAM expirados
+-- EXAM 
 (
     '40000000-0000-0000-0000-000000000001'::uuid,
     'EXAM-001',
-    'expired',
+    'active',
     NOW() - INTERVAL '45 days',
     NOW() - INTERVAL '45 days' + INTERVAL '60 minutes',
     'exam',
@@ -394,7 +394,7 @@ VALUES
 (
     '40000000-0000-0000-0000-000000000002'::uuid,
     'EXAM-002',
-    'expired',
+    'active',
     NOW() - INTERVAL '35 days',
     NOW() - INTERVAL '35 days' + INTERVAL '60 minutes',
     'exam',
@@ -414,7 +414,7 @@ VALUES
 (
     '40000000-0000-0000-0000-000000000003'::uuid,
     'EXAM-003',
-    'expired',
+    'active',
     NOW() - INTERVAL '25 days',
     NOW() - INTERVAL '25 days' + INTERVAL '60 minutes',
     'exam',
