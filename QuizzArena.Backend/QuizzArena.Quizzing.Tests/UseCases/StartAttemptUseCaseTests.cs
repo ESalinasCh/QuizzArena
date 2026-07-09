@@ -484,4 +484,66 @@ public class StartAttemptUseCaseTests
             Assert.Equal(o1, o2);
         }
     }
+    [Fact]
+    public async Task Execute_MatchNotAvailableYet_ThrowsException()
+    {
+        // Arrange
+        string userId = Guid.NewGuid().ToString();
+        _mockCurrentUser.Setup(c => c.UserId).Returns(userId);
+
+        var course = new CourseSummaryDTO { Id = Guid.NewGuid() };
+        _mockCourseImpl
+            .Setup(c => c.GetCoursesByStudent(Guid.Parse(userId)))
+            .ReturnsAsync(new List<CourseSummaryDTO> { course });
+
+        var match = new Domain.Entities.Match
+        {
+            Id = Guid.NewGuid(),
+            CourseId = course.Id,
+            Status = MatchStatus.Active,
+            StartedAt = DateTimeOffset.UtcNow.AddHours(1)
+        };
+
+        _mockMatchRepository
+            .Setup(m => m.GetMatchByIdAsync(It.IsAny<Guid>()))
+            .ReturnsAsync(match);
+
+        var request = new StartAttemptRequestDto { MatchId = match.Id };
+
+        // Act & Assert
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _useCase.Execute(request));
+        Assert.Equal("Match is not available yet", ex.Message);
+    }
+
+    [Fact]
+    public async Task Execute_MatchExpired_ThrowsException()
+    {
+        // Arrange
+        string userId = Guid.NewGuid().ToString();
+        _mockCurrentUser.Setup(c => c.UserId).Returns(userId);
+
+        var course = new CourseSummaryDTO { Id = Guid.NewGuid() };
+        _mockCourseImpl
+            .Setup(c => c.GetCoursesByStudent(Guid.Parse(userId)))
+            .ReturnsAsync(new List<CourseSummaryDTO> { course });
+
+        var match = new Domain.Entities.Match
+        {
+            Id = Guid.NewGuid(),
+            CourseId = course.Id,
+            Status = MatchStatus.Active,
+            StartedAt = DateTimeOffset.UtcNow.AddHours(-2),
+            FinishedAt = DateTimeOffset.UtcNow.AddHours(-1)
+        };
+
+        _mockMatchRepository
+            .Setup(m => m.GetMatchByIdAsync(It.IsAny<Guid>()))
+            .ReturnsAsync(match);
+
+        var request = new StartAttemptRequestDto { MatchId = match.Id };
+
+        // Act & Assert
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _useCase.Execute(request));
+        Assert.Equal("Match has expired", ex.Message);
+    }
 }
