@@ -145,7 +145,7 @@ public class GetMatchAttemptDetailCaseTests
         var match = new Domain.Entities.Match
         {
             Id = matchId,
-            Status = MatchStatus.Expired,
+            Status = MatchStatus.Active,
             Mode = MatchMode.Solo
         };
 
@@ -231,7 +231,8 @@ public class GetMatchAttemptDetailCaseTests
         var match = new Domain.Entities.Match
         {
             Id = matchId,
-            Status = MatchStatus.Active,
+            StartedAt = DateTimeOffset.UtcNow.AddMinutes(-60),
+            FinishedAt = DateTimeOffset.UtcNow.AddMinutes(10),
             Mode = MatchMode.Exam
         };
 

@@ -16,7 +16,7 @@ public class GetMatchAttemptDetail(IMatchRepository matchRepository, IQuestionRe
         var answersDictionary = matchAttempt.Answers.ToDictionary(x => x.QuestionId);
 
         Match match = await matchRepository.GetMatchByIdAsync(matchAttempt.MatchId) ?? throw new InvalidOperationException();
-        bool showResults = match.Status != MatchStatus.Active || match.Mode != MatchMode.Exam; ;
+        bool showResults = match.FinishedAt == null || DateTimeOffset.UtcNow > match.FinishedAt || match.Mode != MatchMode.Exam; 
 
         var matchAttemptDetail = new GetMatchAttemptDetailDTO()
         {
