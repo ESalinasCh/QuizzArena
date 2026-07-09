@@ -1,11 +1,12 @@
 ﻿using QuizzArena.Quizzing.Application.DTOs.Match;
+using QuizzArena.Quizzing.Application.Ports.In;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Domain.Entities;
 using QuizzArena.Quizzing.Domain.Enums;
 
 namespace QuizzArena.Quizzing.Application.UseCases.MatchUseCases;
 
-internal class UnpublishMatchUseCase(IMatchRepository matchRepository, IMatchAttemptRepository matchAttemptRepository)
+public class UnpublishMatchUseCase(IMatchRepository matchRepository, IMatchAttemptRepository matchAttemptRepository) : IUnpublishMatchUseCase
 {
     public async Task<MatchPublicationResponseDto> Execute(Guid matchId)
     {
@@ -16,7 +17,7 @@ internal class UnpublishMatchUseCase(IMatchRepository matchRepository, IMatchAtt
             throw new InvalidOperationException("Match already is pending");
         }
         int activeAttemptsQuantity = await matchAttemptRepository.GetMatchAttemptCountByMatchIdAndStatusAsync(matchId, QuizAttemptStatus.InProgress);
-        if(activeAttemptsQuantity > 0)
+        if (activeAttemptsQuantity > 0)
         {
             throw new InvalidOperationException("One or more attempts are in progress");
         }

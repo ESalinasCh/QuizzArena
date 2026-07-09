@@ -1,11 +1,12 @@
 ﻿using QuizzArena.Quizzing.Application.DTOs.Match;
+using QuizzArena.Quizzing.Application.Ports.In;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Domain.Entities;
 using QuizzArena.Quizzing.Domain.Enums;
 
 namespace QuizzArena.Quizzing.Application.UseCases.MatchUseCases;
 
-internal class PublishMatchUseCase(IMatchRepository matchRepository)
+public class PublishMatchUseCase(IMatchRepository matchRepository) : IPublishMatchUseCase
 {
     public async Task<MatchPublicationResponseDto> Execute(Guid matchId)
     {
@@ -19,7 +20,7 @@ internal class PublishMatchUseCase(IMatchRepository matchRepository)
         {
             throw new InvalidOperationException("StartedAt must be greater than current date");
         }
-        if ( match.FinishedAt != null && match.StartedAt >= match.FinishedAt)
+        if (match.FinishedAt != null && match.StartedAt >= match.FinishedAt)
         {
             throw new InvalidOperationException("StartedAt must be greater than finished date");
         }
