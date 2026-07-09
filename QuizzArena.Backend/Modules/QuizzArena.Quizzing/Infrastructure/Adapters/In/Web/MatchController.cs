@@ -33,7 +33,7 @@ public class MatchController(
     }
 
     [HttpPost("matches/{matchId:guid}/publish")]
-    //[Authorize(Roles = "teacher")]
+    [Authorize(Roles = "teacher")]
     public async Task<ActionResult<MatchPublicationResponseDto>> PublishMatch(Guid matchId)
     {
         MatchPublicationResponseDto response = await publishMatchUseCase.Execute(matchId);
@@ -41,7 +41,7 @@ public class MatchController(
     }
 
     [HttpPost("matches/{matchId:guid}/unpublish")]
-    //[Authorize(Roles = "teacher")]
+    [Authorize(Roles = "teacher")]
     public async Task<ActionResult<MatchPublicationResponseDto>> UnpublishMatch(Guid matchId)
     {
         MatchPublicationResponseDto response = await unpublishMatchUseCase.Execute(matchId);
