@@ -1,8 +1,6 @@
-﻿
+﻿using QuizzArena.Quizzing.Domain.Enums;
 
-using QuizzArena.Quizzing.Domain.Enums;
-
-namespace QuizzArena.Quizzing.Application.DTOs;
+namespace QuizzArena.Quizzing.Application.DTOs.MatchAttempt;
 
 public record GetMatchAttemptDTO
 {

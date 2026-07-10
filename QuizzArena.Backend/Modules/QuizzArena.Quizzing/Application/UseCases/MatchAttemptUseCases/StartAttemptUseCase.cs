@@ -1,7 +1,7 @@
 ﻿using QuizzArena.Quizzing.Application.DTOs.MatchAttempt;
 using QuizzArena.Quizzing.Application.DTOs.Option;
 using QuizzArena.Quizzing.Application.DTOs.Question;
-using QuizzArena.Quizzing.Application.Ports.In;
+using QuizzArena.Quizzing.Application.Ports.In.MatchAttempt;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Domain.Entities;
 using QuizzArena.Quizzing.Domain.Enums;

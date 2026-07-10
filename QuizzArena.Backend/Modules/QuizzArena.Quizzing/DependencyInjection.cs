@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using QuizzArena.Quizzing.Application.DTOs.Match;
 using QuizzArena.Quizzing.Application.Ports.In;
+using QuizzArena.Quizzing.Application.Ports.In.MatchAttempt;
 using QuizzArena.Quizzing.Application.Ports.In.Question;
 using QuizzArena.Quizzing.Application.Ports.Out;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
@@ -65,6 +66,7 @@ public static class DependencyInjection
         services.AddScoped<ITrackAnswerUseCase, TrackAnswerUseCase>();
         services.AddScoped<IFinishMatchTrackedUseCase, FinishMatchTrackedUseCase>();
         services.AddScoped<ICreateMatchUseCase, CreateMatchUseCase>();
+        services.AddScoped<IGetMatchAttemptGradesUseCase, GetMatchAttemptGradesUseCase>();
         services.AddScoped<IPublishMatchUseCase, PublishMatchUseCase>();
         services.AddScoped<IUnpublishMatchUseCase, UnpublishMatchUseCase>();
         #endregion

@@ -97,6 +97,41 @@ internal sealed class SqlMatchAttemptRepository(QuizzingDbContext context) : IMa
             .Take(filters.PageSize)
             .Select(x => x.MatchAttempt)
             .ToListAsync();
+    }
 
+    public async Task<List<MatchAttempt>> GetAttemptsByMatchId(Guid matchId, MatchAttemptFilters filters)
+    {
+        IQueryable<MatchAttempt> query = context.MatchAttempts
+            .AsNoTracking()
+            .Where(x => x.MatchId == matchId);
+
+        if (filters.Status.HasValue)
+        {
+            query = query.Where(x => x.Status == filters.Status);
+        }
+
+        IQueryable<Guid> bestAttemptIds = query
+            .GroupBy(x => x.UserId)
+            .Select(g => g
+                .OrderByDescending(x => x.Score)
+                .Select(x => x.Id)
+                .First());
+
+        return await query
+            .Where(x => bestAttemptIds.Contains(x.Id))
+            .OrderBy(x => x.Nickname)
+            .Skip((filters.Page - 1) * filters.PageSize)
+            .Take(filters.PageSize)
+            .ToListAsync();
+    }
+
+    public async Task<List<MatchAttempt>> GetAttemptsByUserIds(Guid matchId, List<Guid> userIds)
+    {
+        return await context.MatchAttempts
+            .AsNoTracking()
+            .Where(x =>
+                x.MatchId == matchId &&
+                userIds.Contains(x.UserId))
+            .ToListAsync();
     }
 }
