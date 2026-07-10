@@ -1,5 +1,6 @@
 ﻿using QuizzArena.Quizzing.Application.Filters;
 using QuizzArena.Quizzing.Domain.Entities;
+using QuizzArena.Quizzing.Domain.Enums;
 
 namespace QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 
@@ -13,4 +14,5 @@ public interface IMatchAttemptRepository
     Task<List<MatchAttempt>> GetAttemptsByStudentId(Guid studentId, MatchAttemptFilters filters);
     Task<List<MatchAttempt>> GetAttemptsByMatchId(Guid matchId, MatchAttemptFilters filters);
     Task<List<MatchAttempt>> GetAttemptsByUserIds(Guid matchId, List<Guid> userIds);
+    Task<int> GetMatchAttemptCountByMatchIdAndStatusAsync(Guid matchId, QuizAttemptStatus status);
 }

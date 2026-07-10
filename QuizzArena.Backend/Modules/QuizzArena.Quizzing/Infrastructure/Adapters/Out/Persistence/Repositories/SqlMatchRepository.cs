@@ -66,4 +66,10 @@ internal sealed class SqlMatchRepository(QuizzingDbContext context) : IMatchRepo
         await context.SaveChangesAsync();
         return entry.Entity;
     }
+    public async Task<Match> UpdateMatchAsync(Match match)
+    {
+        context.Matches.Update(match);
+        await context.SaveChangesAsync();
+        return match;
+    }
 }

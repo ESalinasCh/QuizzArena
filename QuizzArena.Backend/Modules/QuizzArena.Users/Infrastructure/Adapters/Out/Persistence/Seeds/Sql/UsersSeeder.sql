@@ -26,10 +26,10 @@ INSERT INTO users."user"
 )
 SELECT
     '959d0300-4473-4198-b551-6c1c6fb214dc'::uuid,
-    'prof.ai',
-    'Alejandro',
-    'Martínez',
-    'alejandro.martinez@demo.ai',
+    'backend-teacher-test1-paigeblank',
+    'Paige',
+    'Blank',
+    'backend.teacher.test1.paige@test.com',
     'keycloak',
     FALSE,
     'teacher',
@@ -62,10 +62,10 @@ INSERT INTO users."user"
 )
 SELECT
     '37976960-c868-45d4-b3c2-4967cb46f4b0'::uuid,
-    'student.demo',
-    'Carlos',
-    'Ruiz',
-    'carlos.ruiz@student.demo',
+    'backend-student-test3-maxmaximus',
+    'Max',
+    'Maximus',
+    'backend.student.test3.max@test.com',
     'keycloak',
     FALSE,
     'student',

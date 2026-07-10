@@ -22,6 +22,8 @@ public sealed class StartAttemptUseCase(
 {
     public async Task<StartAttemptResponseDto> Execute(StartAttemptRequestDto request)
     {
+        var now = DateTimeOffset.UtcNow;
+
         Guid userId = Guid.Parse(currentUser.UserId);
         List<CourseSummaryDTO> courses = await courseImpl.GetCoursesByStudent(userId);
         List<Guid> coursesIds = courses.Select(c => c.Id).ToList();
@@ -35,6 +37,16 @@ public sealed class StartAttemptUseCase(
         if (match.Status != MatchStatus.Active)
         {
             throw new InvalidOperationException("Match is not active.");
+        }
+
+        if (match.StartedAt > now)
+        {
+            throw new InvalidOperationException("Match is not available yet");
+        }
+
+        if (match.FinishedAt != null && match.FinishedAt < now)
+        {
+            throw new InvalidOperationException("Match has expired");
         }
 
         int totalAttempts = await matchAttemptRepository.GetMatchAttemptCountByMatchIdAndUserIdAsync(match.Id, userId);
