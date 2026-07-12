@@ -6,6 +6,7 @@ using Npgsql;
 using QuizzArena.DocumentProcessing.Application.Ports.In;
 using QuizzArena.DocumentProcessing.Application.Ports.Out;
 using QuizzArena.DocumentProcessing.Application.UseCases;
+using QuizzArena.DocumentProcessing.Application.UseCases.ClassSources;
 using QuizzArena.DocumentProcessing.Application.Validators;
 using QuizzArena.DocumentProcessing.Domain.Enums;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Web;
@@ -24,6 +25,7 @@ public static class DependencyInjection
         services.AddControllers().AddApplicationPart(typeof(IDocumentProcessingInfrastructureMarker).Assembly);
 
         services.AddScoped<IUploadSourceUseCase, UploadSourceUseCase>();
+        services.AddScoped<IGetClassSourcesUseCase, GetClassSourcesUseCase>();
         services.AddScoped<UploadClassSourceRequestValidator>();
         services.AddScoped<IClassSourceRepository, SqlClassSourceRepository>();
         services.AddScoped<IDocumentChunkRepository, SqlDocumentChunkRepository>();
