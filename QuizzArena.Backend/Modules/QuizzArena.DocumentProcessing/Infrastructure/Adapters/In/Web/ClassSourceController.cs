@@ -7,13 +7,13 @@ using QuizzArena.DocumentProcessing.Application.Ports.In;
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Web;
 
 [ApiController]
-[Route("api/v{version:apiVersion}/class-sources")]
+[Route("api/v{version:apiVersion}")]
 public class ClassSourceController(
     IUploadSourceUseCase uploadSourceUseCase,
     IGetClassSourcesUseCase getClassSourcesUseCase
 ) : ControllerBase
 {
-    [HttpPost]
+    [HttpPost("class-sources")]
     [Authorize(Roles = "teacher")]
     [RequestSizeLimit(500_000_000)]
     [RequestFormLimits(MultipartBodyLengthLimit = 500_000_000)]
@@ -23,7 +23,7 @@ public class ClassSourceController(
         return Ok(response);
     }
 
-    [HttpGet("/api/v{version:apiVersion}/users/me/class-sources")]
+    [HttpGet("users/me/class-sources")]
     [Authorize(Roles = "teacher")]
     public async Task<ActionResult<List<GetClassSourceResponseDto>>> GetMyClassSources()
     {
