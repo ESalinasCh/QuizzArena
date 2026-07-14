@@ -5,13 +5,13 @@ using QuizzArena.DocumentProcessing.Application.DTOs.ClassSource;
 using QuizzArena.DocumentProcessing.Application.Helpers;
 using QuizzArena.DocumentProcessing.Application.Messaging.Events;
 using QuizzArena.DocumentProcessing.Application.Ports.In;
-using QuizzArena.DocumentProcessing.Domain.Enums;
-using Shared.Messaging.Events;
 using QuizzArena.DocumentProcessing.Application.Ports.Out;
 using QuizzArena.DocumentProcessing.Application.Validators;
 using QuizzArena.DocumentProcessing.Domain.Entities;
+using QuizzArena.DocumentProcessing.Domain.Enums;
 using Shared.Contracts;
 using Shared.Contracts.DTOs;
+using Shared.Messaging.Events;
 
 namespace QuizzArena.DocumentProcessing.Application.UseCases;
 
