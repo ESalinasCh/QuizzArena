@@ -1,6 +1,6 @@
 ﻿namespace Host.ExceptionHandling.Handlers;
 
-internal class ErrorHandlerContext
+internal sealed class ErrorHandlerContext
 {
     public Exception Exception { get; }
     public bool Handled { get; set; }

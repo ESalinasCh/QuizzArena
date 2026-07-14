@@ -2,7 +2,7 @@
 
 namespace Host.ExceptionHandling.Handlers;
 
-internal class DomainExceptionHandler : ErrorHandler
+internal sealed class DomainExceptionHandler : ErrorHandler
 {
     public override async Task HandleAsync(ErrorHandlerContext context)
     {

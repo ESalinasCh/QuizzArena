@@ -1,6 +1,6 @@
 ﻿namespace Host.ExceptionHandling.Handlers;
 
-internal class InvalidOperationExceptionHandler : ErrorHandler
+internal sealed class InvalidOperationExceptionHandler : ErrorHandler
 {
     public override async Task HandleAsync(ErrorHandlerContext context)
     {

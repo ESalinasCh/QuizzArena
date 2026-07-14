@@ -1,6 +1,6 @@
 ﻿namespace Host.ExceptionHandling.Handlers;
 
-internal class UnauthorizedAccessExceptionHandler : ErrorHandler
+internal sealed class UnauthorizedAccessExceptionHandler : ErrorHandler
 {
     public override async Task HandleAsync(ErrorHandlerContext context)
     {

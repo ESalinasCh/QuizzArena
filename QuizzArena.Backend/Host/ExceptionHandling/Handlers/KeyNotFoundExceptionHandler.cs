@@ -1,6 +1,6 @@
 ﻿namespace Host.ExceptionHandling.Handlers;
 
-internal class KeyNotFoundExceptionHandler : ErrorHandler
+internal sealed class KeyNotFoundExceptionHandler : ErrorHandler
 {
     public override async Task HandleAsync(ErrorHandlerContext context)
     {

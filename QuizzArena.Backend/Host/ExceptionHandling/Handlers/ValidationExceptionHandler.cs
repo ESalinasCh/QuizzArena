@@ -2,7 +2,7 @@
 
 namespace Host.ExceptionHandling.Handlers;
 
-internal class ValidationExceptionHandler : ErrorHandler
+internal sealed class ValidationExceptionHandler : ErrorHandler
 {
     public override async Task HandleAsync(ErrorHandlerContext context)
     {
