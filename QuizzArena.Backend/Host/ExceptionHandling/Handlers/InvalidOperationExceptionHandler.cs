@@ -1,4 +1,4 @@
-namespace Host.ExceptionHandling.Handlers;
+﻿namespace Host.ExceptionHandling.Handlers;
 
 internal class InvalidOperationExceptionHandler : ErrorHandler
 {
@@ -6,8 +6,7 @@ internal class InvalidOperationExceptionHandler : ErrorHandler
     {
         if (context.Exception is InvalidOperationException)
         {
-            context.ErrorMessages.Add(context.Exception.Message);
-            await BadRequest(context, context.ErrorMessages);
+            await BadRequest(context, "INVALID_OPERATION", context.Exception.Message);
             context.Handled = true;
         }
     }

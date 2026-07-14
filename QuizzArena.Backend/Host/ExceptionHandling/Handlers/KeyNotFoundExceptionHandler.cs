@@ -1,4 +1,4 @@
-namespace Host.ExceptionHandling.Handlers;
+﻿namespace Host.ExceptionHandling.Handlers;
 
 internal class KeyNotFoundExceptionHandler : ErrorHandler
 {
@@ -6,7 +6,6 @@ internal class KeyNotFoundExceptionHandler : ErrorHandler
     {
         if (context.Exception is KeyNotFoundException)
         {
-            context.ErrorMessages.Add(context.Exception.Message);
             await NotFound(context);
             context.Handled = true;
         }

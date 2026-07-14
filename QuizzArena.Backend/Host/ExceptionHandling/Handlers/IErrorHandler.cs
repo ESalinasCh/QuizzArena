@@ -1,4 +1,4 @@
-namespace Host.ExceptionHandling.Handlers;
+﻿namespace Host.ExceptionHandling.Handlers;
 
 internal interface IErrorHandler
 {

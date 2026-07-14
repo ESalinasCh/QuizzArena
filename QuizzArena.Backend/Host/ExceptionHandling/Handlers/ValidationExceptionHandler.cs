@@ -1,4 +1,4 @@
-using FluentValidation;
+﻿using FluentValidation;
 
 namespace Host.ExceptionHandling.Handlers;
 
@@ -8,10 +8,8 @@ internal class ValidationExceptionHandler : ErrorHandler
     {
         if (context.Exception is ValidationException validationEx)
         {
-            context.ErrorMessages = validationEx.Errors
-                .Select(e => e.ErrorMessage)
-                .ToList();
-            await BadRequest(context, context.ErrorMessages);
+            string message = string.Join("; ", validationEx.Errors.Select(e => e.ErrorMessage));
+            await BadRequest(context, "VALIDATION_ERROR", message);
             context.Handled = true;
         }
     }

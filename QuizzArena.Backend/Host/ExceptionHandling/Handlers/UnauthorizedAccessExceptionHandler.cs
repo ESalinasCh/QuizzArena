@@ -1,4 +1,4 @@
-namespace Host.ExceptionHandling.Handlers;
+﻿namespace Host.ExceptionHandling.Handlers;
 
 internal class UnauthorizedAccessExceptionHandler : ErrorHandler
 {
@@ -6,7 +6,6 @@ internal class UnauthorizedAccessExceptionHandler : ErrorHandler
     {
         if (context.Exception is UnauthorizedAccessException)
         {
-            context.ErrorMessages.Add(context.Exception.Message);
             await Forbidden(context);
             context.Handled = true;
         }
