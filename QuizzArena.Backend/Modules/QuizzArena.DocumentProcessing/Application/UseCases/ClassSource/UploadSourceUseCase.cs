@@ -5,6 +5,8 @@ using QuizzArena.DocumentProcessing.Application.DTOs.ClassSource;
 using QuizzArena.DocumentProcessing.Application.Helpers;
 using QuizzArena.DocumentProcessing.Application.Messaging.Events;
 using QuizzArena.DocumentProcessing.Application.Ports.In;
+using QuizzArena.DocumentProcessing.Domain.Enums;
+using Shared.Messaging.Events;
 using QuizzArena.DocumentProcessing.Application.Ports.Out;
 using QuizzArena.DocumentProcessing.Application.Validators;
 using QuizzArena.DocumentProcessing.Domain.Entities;
@@ -42,13 +44,29 @@ public class UploadSourceUseCase(
         string fileUrl = await storageServiceRepository.UploadFileAsync(stream, blobPath, "quiz-sources");
         classSource.FileUrl = fileUrl;
 
+        if (classSource.Type == SourceType.Text)
+        {
+            classSource.TranscriptUrl = fileUrl;
+        }
+
         ClassSource createdClass = await classSourceRepository.CreateAsync(classSource);
 
-        await publishEnpoint.Publish(new TranscriptionRequestEvent
+        if (createdClass.Type == SourceType.Text)
         {
-            ClassSourceId = createdClass.Id,
-            FileUrl = createdClass.FileUrl!
-        });
+            await publishEnpoint.Publish(new TranscriptionCompletedEvent
+            {
+                ClassSourceId = createdClass.Id,
+                TranscriptUrl = createdClass.TranscriptUrl!
+            });
+        }
+        else
+        {
+            await publishEnpoint.Publish(new TranscriptionRequestEvent
+            {
+                ClassSourceId = createdClass.Id,
+                FileUrl = createdClass.FileUrl!
+            });
+        }
 
         var createdClaseRespose = mapper.Map<UploadClassSourceResponseDto>(createdClass);
         return createdClaseRespose;

@@ -19,7 +19,6 @@ public class DocumentProcessingMassTransit
         x.AddSagaStateMachine<IndexingSaga, IndexingSagaState>()
             .InMemoryRepository();
 
-        x.AddConsumer<TranscriptionRequestConsumer>();
         x.AddConsumer<IndexTranscriptConsumer>();
     }
 }

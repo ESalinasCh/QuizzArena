@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http.Features;
 using QuizzArena.DocumentProcessing;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Messaging.Configuration;
 using QuizzArena.Quizzing;
+using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Messaging.Configuration;
 using QuizzArena.Users;
 
 namespace Host;
@@ -46,6 +47,7 @@ public class Program
         builder.Services.AddMassTransit(x =>
         {
             DocumentProcessingMassTransit.AddConsumers(x);
+            QuizzingMassTransit.AddConsumers(x);
 
             x.UsingRabbitMq((context, cfg) =>
             {
