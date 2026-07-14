@@ -1,4 +1,5 @@
-﻿using Azure.Storage.Blobs;
+﻿using System.Net.Http.Headers;
+using Azure.Storage.Blobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -63,6 +64,20 @@ public static class DependencyInjection
             client.BaseAddress = new Uri(ollamaUrl);
             client.Timeout = TimeSpan.FromMinutes(60);
         });
+
+        #region OpenAI
+        //var apiKey = configuration["OpenAISettings:ApiKey"];
+        //var openAIBAseUrl = configuration["OpenAISettings:BaseUrl"] ?? "https://api.groq.com/openai/v1/";
+        //services.AddHttpClient<ITextGenerationService, OpenAICompatibleTextGeneration>(client =>
+        //{
+        //    client.BaseAddress = new Uri(openAIBAseUrl);
+        //    client.DefaultRequestHeaders.Authorization =
+        //        new AuthenticationHeaderValue("Bearer", apiKey);
+
+        //    client.Timeout = TimeSpan.FromMinutes(60);
+        //});
+        #endregion
+
 
         services.AddHttpClient<IEmbeddingService, OllamaEmbeddingGeneration>(client =>
         {
