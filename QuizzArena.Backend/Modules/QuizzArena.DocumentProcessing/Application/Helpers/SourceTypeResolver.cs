@@ -14,6 +14,7 @@ internal static class SourceTypeResolver
             ".mp3" => SourceType.Audio,
             ".wav" => SourceType.Audio,
             ".mp4" => SourceType.Video,
+            ".txt" => SourceType.Text,
 
             _ => throw new ArgumentException(
                 "Unsupported file type"

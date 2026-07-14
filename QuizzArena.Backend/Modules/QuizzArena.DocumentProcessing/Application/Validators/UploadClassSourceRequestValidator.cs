@@ -10,12 +10,14 @@ public class UploadClassSourceRequestValidator : AbstractValidator<UploadClassSo
     private const string Mp3Extension = ".mp3";
     private const string Mp4Extension = ".mp4";
     private const string WavExtension = ".wav";
+    private const string TxtExtension = ".txt";
 
     private static readonly string[] _allowedExtensions =
     [
         Mp3Extension,
         Mp4Extension,
-        WavExtension
+        WavExtension,
+        TxtExtension
     ];
 
     public UploadClassSourceRequestValidator()

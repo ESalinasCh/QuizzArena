@@ -9,8 +9,10 @@ using QuizzArena.DocumentProcessing.Application.Ports.Out;
 using QuizzArena.DocumentProcessing.Application.UseCases;
 using QuizzArena.DocumentProcessing.Application.Validators;
 using QuizzArena.DocumentProcessing.Domain.Entities;
+using QuizzArena.DocumentProcessing.Domain.Enums;
 using Shared.Contracts;
 using Shared.Contracts.DTOs;
+using Shared.Messaging.Events;
 
 namespace QuizzArena.DocumentProcessing.Tests.UseCases;
 
@@ -78,14 +80,50 @@ public class DocumentProcessingUseCasesTests
         // Assert
         _mockClassSourceRepository.Verify(r => r.CreateAsync(It.IsAny<ClassSource>()), Times.Once);
         _mockPublishEndpoint.Verify(p => p.Publish(It.IsAny<TranscriptionRequestEvent>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mockPublishEndpoint.Verify(p => p.Publish(It.IsAny<TranscriptionCompletedEvent>(), It.IsAny<CancellationToken>()), Times.Never);
+        result.Id.Should().Be(classSource.Id);
+    }
+
+    [Fact]
+    public async Task Execute_TextClassSource_SetsTranscriptUrlAndPublishesTranscriptionCompletedEvent()
+    {
+        // Arrange
+        var teacherId = Guid.NewGuid();
+        var dto = ValidClassSourceDto(fileName: "class.txt");
+        var classSource = new ClassSource { Id = Guid.NewGuid() };
+        var response = new UploadClassSourceResponseDto { Id = classSource.Id };
+        const string fileUrl = "https://storage/class.txt";
+
+        _mockCurrentUser.Setup(u => u.UserId).Returns(teacherId.ToString());
+        _mockCourseContract
+            .Setup(c => c.GetCourseById(dto.CourseId))
+            .ReturnsAsync(new CourseDto { Id = dto.CourseId, TeacherId = teacherId });
+        _mockMapper.Setup(m => m.Map<ClassSource>(dto)).Returns(classSource);
+        _mockStorageServiceRepository
+            .Setup(s => s.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<string>()))
+            .ReturnsAsync(fileUrl);
+        _mockClassSourceRepository
+            .Setup(r => r.CreateAsync(It.IsAny<ClassSource>()))
+            .ReturnsAsync((ClassSource cs) => cs);
+        _mockMapper.Setup(m => m.Map<UploadClassSourceResponseDto>(It.IsAny<ClassSource>())).Returns(response);
+
+        // Act
+        var result = await _uploadClassSource.Execute(dto);
+
+        // Assert
+        classSource.Type.Should().Be(SourceType.Text);
+        classSource.TranscriptUrl.Should().Be(fileUrl);
+        _mockClassSourceRepository.Verify(r => r.CreateAsync(It.IsAny<ClassSource>()), Times.Once);
+        _mockPublishEndpoint.Verify(p => p.Publish(It.IsAny<TranscriptionCompletedEvent>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mockPublishEndpoint.Verify(p => p.Publish(It.IsAny<TranscriptionRequestEvent>(), It.IsAny<CancellationToken>()), Times.Never);
         result.Id.Should().Be(classSource.Id);
     }
 
 
-    private static UploadClassSourceRequestDto ValidClassSourceDto()
+    private static UploadClassSourceRequestDto ValidClassSourceDto(string fileName = "class.mp3")
     {
         var mockFile = new Mock<IFormFile>();
-        mockFile.Setup(f => f.FileName).Returns("class.mp3");
+        mockFile.Setup(f => f.FileName).Returns(fileName);
         mockFile.Setup(f => f.Length).Returns(1024);
         mockFile.Setup(f => f.OpenReadStream()).Returns(new MemoryStream(new byte[1024]));
 
