@@ -49,6 +49,7 @@ public class UploadClassSourceValidatorTests
     [InlineData(".mp3")]
     [InlineData(".mp4")]
     [InlineData(".wav")]
+    [InlineData(".txt")]
     public async Task File_ValidExtension_ShouldPassValidation(string extension)
     {
         var result = await _validator.TestValidateAsync(CreateDto(fileName: $"class{extension}"));
@@ -57,7 +58,6 @@ public class UploadClassSourceValidatorTests
 
     [Theory]
     [InlineData(".pdf")]
-    [InlineData(".txt")]
     [InlineData(".docx")]
     public async Task File_InvalidExtension_ShouldFailValidation(string extension)
     {
