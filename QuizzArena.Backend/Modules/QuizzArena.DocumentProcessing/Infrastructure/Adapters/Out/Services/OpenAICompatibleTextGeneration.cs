@@ -92,7 +92,7 @@ internal class OpenAICompatibleTextGeneration : ITextGenerationService
                     type = "json_schema",
                     json_schema = new
                     {
-                        name = typeof(object).Name.ToLower(),
+                        name = typeof(object).Name.ToLowerInvariant(),
                         strict = true,
                         schema
                     }
