@@ -8,7 +8,7 @@ public class GlobalExceptionMiddleware(RequestDelegate next)
 {
     private static readonly DomainExceptionHandler _domainHandler = new();
 
-    private static readonly Dictionary<Type, IErrorHandler> Handlers = new()
+    private static readonly Dictionary<Type, IErrorHandler> _handlers = new()
     {
         [typeof(InvalidOperationException)] = new InvalidOperationExceptionHandler(),
         [typeof(UnauthorizedAccessException)] = new UnauthorizedAccessExceptionHandler(),
@@ -26,7 +26,7 @@ public class GlobalExceptionMiddleware(RequestDelegate next)
         {
             ErrorHandlerContext errorContext = new(ex, context);
 
-            if (Handlers.TryGetValue(ex.GetType(), out IErrorHandler? handler))
+            if (_handlers.TryGetValue(ex.GetType(), out IErrorHandler? handler))
             {
                 await handler.HandleAsync(errorContext);
             }
@@ -38,7 +38,7 @@ public class GlobalExceptionMiddleware(RequestDelegate next)
             {
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                 await context.Response.WriteAsJsonAsync(
-                    new Handlers.ErrorResponse("INTERNAL_ERROR", "An unexpected error occurred.", StatusCodes.Status500InternalServerError));
+                    new Handlers.ErrorResponse([new Handlers.ErrorEntry("INTERNAL_ERROR", "An unexpected error occurred.")], StatusCodes.Status500InternalServerError));
             }
         }
     }

@@ -8,8 +8,10 @@ internal sealed class ValidationExceptionHandler : ErrorHandler
     {
         if (context.Exception is ValidationException validationEx)
         {
-            string message = string.Join("; ", validationEx.Errors.Select(e => e.ErrorMessage));
-            await BadRequest(context, "VALIDATION_ERROR", message);
+            IReadOnlyList<ErrorEntry> errors = validationEx.Errors
+                .Select(e => new ErrorEntry("VALIDATION_ERROR", e.ErrorMessage))
+                .ToList();
+            await BadRequest(context, errors);
             context.Handled = true;
         }
     }
