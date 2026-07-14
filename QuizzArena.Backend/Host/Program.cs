@@ -27,6 +27,14 @@ public class Program
 
         builder.Services.AddJwtAuthentication(builder.Configuration);
 
+        string[] corsAllowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+
+        builder.Services.AddCors(options =>
+            options.AddPolicy("Frontend", policy =>
+                policy.WithOrigins(corsAllowedOrigins)
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()));
+
         builder.Services.AddUsersModule(builder.Configuration);
         builder.Services.AddQuizzingModule(builder.Configuration);
         builder.Services.AddDocumentProcessingModule(builder.Configuration);
@@ -37,11 +45,11 @@ public class Program
         .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
         builder.Services.Configure<FormOptions>(options =>
-            {
-                options.MultipartHeadersLengthLimit = int.MaxValue;
-                options.MultipartBodyLengthLimit = long.MaxValue;
-                options.ValueLengthLimit = int.MaxValue;
-            });
+        {
+            options.MultipartHeadersLengthLimit = int.MaxValue;
+            options.MultipartBodyLengthLimit = long.MaxValue;
+            options.ValueLengthLimit = int.MaxValue;
+        });
 
         builder.Services.AddMassTransit(x =>
         {
@@ -74,6 +82,8 @@ public class Program
         }
 
         app.UseHttpsRedirection();
+
+        app.UseCors("Frontend");
 
         app.UseAuthentication();
 
