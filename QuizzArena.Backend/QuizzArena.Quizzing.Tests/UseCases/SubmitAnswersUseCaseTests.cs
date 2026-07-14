@@ -8,6 +8,7 @@ using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Application.UseCases.SubmitAnswers;
 using QuizzArena.Quizzing.Application.Validators;
 using QuizzArena.Quizzing.Domain.Entities;
+using QuizzArena.Quizzing.Domain.Exceptions;
 using Shared.Contracts;
 using DomainMatch = QuizzArena.Quizzing.Domain.Entities.Match;
 
@@ -273,7 +274,7 @@ public class SubmitAnswersUseCaseTests
     }
 
     [Fact]
-    public async Task SubmitAnswer_AttemptCountExceedsMatchLimit_ThrowsInvalidOperationException()
+    public async Task SubmitAnswer_AttemptCountExceedsMatchLimit_ThrowsMaxAttemptsReachedException()
     {
         // Arrange
         string userId = Guid.NewGuid().ToString();
@@ -297,7 +298,7 @@ public class SubmitAnswersUseCaseTests
         };
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        await Assert.ThrowsAsync<MaxAttemptsReachedException>(
             () => _submitAnswersUseCase.Execute(matchAttemptId, dto)
         );
 

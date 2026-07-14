@@ -5,6 +5,7 @@ using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Application.UseCases.SubmitAnswers;
 using QuizzArena.Quizzing.Domain.Entities;
 using QuizzArena.Quizzing.Domain.Enums;
+using QuizzArena.Quizzing.Domain.Exceptions;
 using Shared.Contracts;
 using Match = QuizzArena.Quizzing.Domain.Entities.Match;
 
@@ -168,7 +169,7 @@ public class FinishMatchTrackedUseCaseTests
     }
 
     [Fact]
-    public async Task Execute_AttemptAlreadyCompleted_ThrowsUnauthorizedAccessException()
+    public async Task Execute_AttemptAlreadyCompleted_ThrowsAttemptAlreadyCompletedException()
     {
         Guid userId = Guid.NewGuid();
 
@@ -186,12 +187,12 @@ public class FinishMatchTrackedUseCaseTests
             .Setup(x => x.GetMatchAttemptsDetailById(It.IsAny<Guid>()))
             .ReturnsAsync(attempt);
 
-        await Assert.ThrowsAsync<UnauthorizedAccessException>(
+        await Assert.ThrowsAsync<AttemptAlreadyCompletedException>(
             () => _useCase.Execute(Guid.NewGuid()));
     }
 
     [Fact]
-    public async Task Execute_MaximumAttemptsReached_ThrowsInvalidOperationException()
+    public async Task Execute_MaximumAttemptsReached_ThrowsMaxAttemptsReachedException()
     {
         Guid userId = Guid.NewGuid();
         Guid attemptId = Guid.NewGuid();
@@ -224,7 +225,7 @@ public class FinishMatchTrackedUseCaseTests
             .Setup(x => x.GetMatchAttemptCountByMatchIdAndUserIdAsync(matchId, userId))
             .ReturnsAsync(2);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        await Assert.ThrowsAsync<MaxAttemptsReachedException>(
             () => _useCase.Execute(attemptId));
     }
 
