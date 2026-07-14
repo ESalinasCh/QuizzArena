@@ -16,18 +16,18 @@ public class UserValidationMiddleware
 
     public async Task InvokeAsync(HttpContext context, IUserUseCase userUseCase)
     {
-        try
+        Endpoint? endpoint = context.GetEndpoint();
+        bool hasAuthorize = endpoint?.Metadata.GetMetadata<IAuthorizeData>() != null;
+        if (!hasAuthorize)
         {
-            Endpoint? endpoint = context.GetEndpoint();
-            bool hasAuthorize = endpoint?.Metadata.GetMetadata<IAuthorizeData>() != null;
-            if (!hasAuthorize)
-            {
-                await _next(context);
-                return;
-            }
+            await _next(context);
+            return;
+        }
 
-            AuthorizeAttribute? authorize = endpoint?.Metadata.GetMetadata<AuthorizeAttribute>();
-            if (authorize is not null && context.User.Identity?.IsAuthenticated == true)
+        AuthorizeAttribute? authorize = endpoint?.Metadata.GetMetadata<AuthorizeAttribute>();
+        if (authorize is not null && context.User.Identity?.IsAuthenticated == true)
+        {
+            try
             {
                 string? sub = context.User.FindFirst("sub")?.Value;
                 if (sub is null)
@@ -43,14 +43,14 @@ public class UserValidationMiddleware
                     Console.WriteLine(newUser);
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in UserValidationMiddleware: {ex.Message}");
+                context.Response.StatusCode = 500;
+                return;
+            }
+        }
 
-            await _next(context);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error in UserValidationMiddleware: {ex.Message}");
-            context.Response.StatusCode = 500;
-            return;
-        }
+        await _next(context);
     }
 }
