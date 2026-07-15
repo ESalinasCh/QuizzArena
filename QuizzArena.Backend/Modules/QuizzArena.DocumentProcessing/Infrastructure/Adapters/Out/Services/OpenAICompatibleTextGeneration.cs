@@ -35,27 +35,45 @@ internal class OpenAICompatibleTextGeneration : ITextGenerationService
 
     public async Task<T> GenerateAsync<T>(string model, string prompt)
     {
+        if (typeof(T) == typeof(string))
+        {
+            var response = await GetCompletionAsync(model, prompt, schema: null);
+            var content = response.Choices.First().Message.Content.Trim();
+            return (T)(object)content;
+        }
+
+        var exporterOptions = new JsonSchemaExporterOptions
+        {
+            TreatNullObliviousAsNonNullable = true,
+            TransformSchemaNode = (context, node) =>
+            {
+                if (node is JsonObject jsonObject && jsonObject.ContainsKey("properties"))
+                {
+                    jsonObject["additionalProperties"] = false;
+                }
+                return node;
+            }
+        };
+
         var schema = JsonSerializerOptions.Default
-                    .GetJsonSchemaAsNode(typeof(T))
+                    .GetJsonSchemaAsNode(typeof(T), exporterOptions)
                     .AsObject();
 
         schema["type"] = "object";
-
-        schema["required"] = new JsonArray(
-            schema["properties"]!
-                .AsObject()
-                .Select(p => JsonValue.Create(p.Key))
-                .ToArray()
-        );
-
         schema["additionalProperties"] = false;
 
-        var response = await GetCompletionAsync(model, prompt, schema);
+        if (schema.ContainsKey("properties") && schema["properties"] is JsonObject properties)
+        {
+            schema["required"] = new JsonArray(
+                properties.Select(p => JsonValue.Create(p.Key)).ToArray()
+            );
+        }
 
-        var content = response.Choices.First().Message.Content;
+        var baseResponse = await GetCompletionAsync(model, prompt, schema);
+        var baseContent = baseResponse.Choices.First().Message.Content;
 
         var result = JsonSerializer.Deserialize<T>(
-            content,
+            baseContent,
             _caseInsensitiveOptions
         );
 
@@ -98,7 +116,7 @@ internal class OpenAICompatibleTextGeneration : ITextGenerationService
                     }
                 }
         };
-        Console.WriteLine(schema!.ToJsonString());
+
         var response = await _httpClient.PostAsync(
             "chat/completions",
             new StringContent(
@@ -112,11 +130,10 @@ internal class OpenAICompatibleTextGeneration : ITextGenerationService
 
         var rawContent = await response.Content.ReadAsStringAsync();
 
-        var completionResponse =
-            JsonSerializer.Deserialize<GroqChatCompletionResponse>(
-                rawContent,
-                _caseInsensitiveOptions
-            );
+        var completionResponse = JsonSerializer.Deserialize<GroqChatCompletionResponse>(
+            rawContent,
+            _caseInsensitiveOptions
+        );
 
         if (completionResponse == null ||
             completionResponse.Choices.Count == 0 ||
