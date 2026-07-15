@@ -6,6 +6,7 @@ using QuizzArena.Quizzing.Application.Ports.Out;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Application.Validators;
 using QuizzArena.Quizzing.Domain.Entities;
+using QuizzArena.Quizzing.Domain.Exceptions;
 using Shared.Contracts;
 
 namespace QuizzArena.Quizzing.Application.UseCases.SubmitAnswers;
@@ -39,7 +40,7 @@ public class SubmitAnswersUseCase(
 
         if (matchAttempt.Status == Domain.Enums.QuizAttemptStatus.Completed)
         {
-            throw new UnauthorizedAccessException("User already completed this match attempt.");
+            throw new AttemptAlreadyCompletedException();
         }
 
         Guid matchId = matchAttempt.MatchId;
@@ -48,7 +49,7 @@ public class SubmitAnswersUseCase(
         int totalAttempts = await matchAttemptRepository.GetMatchAttemptCountByMatchIdAndUserIdAsync(matchId, userId);
         if (totalAttempts > match.AttemptsAmount)
         {
-            throw new InvalidOperationException("Maximum number of attempts reached for this match.");
+            throw new MaxAttemptsReachedException();
         }
 
         // Validate incoming object

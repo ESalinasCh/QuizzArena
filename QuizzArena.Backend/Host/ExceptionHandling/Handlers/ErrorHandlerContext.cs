@@ -1,0 +1,14 @@
+﻿namespace Host.ExceptionHandling.Handlers;
+
+internal sealed class ErrorHandlerContext
+{
+    public Exception Exception { get; }
+    public bool Handled { get; set; }
+    public HttpContext HttpContext { get; }
+
+    public ErrorHandlerContext(Exception exception, HttpContext httpContext)
+    {
+        Exception = exception;
+        HttpContext = httpContext;
+    }
+}

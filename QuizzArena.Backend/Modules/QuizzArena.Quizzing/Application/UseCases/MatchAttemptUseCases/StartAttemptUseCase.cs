@@ -5,6 +5,7 @@ using QuizzArena.Quizzing.Application.Ports.In.MatchAttempt;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Domain.Entities;
 using QuizzArena.Quizzing.Domain.Enums;
+using QuizzArena.Quizzing.Domain.Exceptions;
 using Shared.Contracts;
 using Shared.Contracts.DTOs;
 
@@ -36,7 +37,7 @@ public sealed class StartAttemptUseCase(
 
         if (match.Status != MatchStatus.Active)
         {
-            throw new InvalidOperationException("Match is not active.");
+            throw new MatchNotActiveException();
         }
 
         if (match.StartedAt > now)
@@ -52,13 +53,13 @@ public sealed class StartAttemptUseCase(
         int totalAttempts = await matchAttemptRepository.GetMatchAttemptCountByMatchIdAndUserIdAsync(match.Id, userId);
         if (totalAttempts >= match.AttemptsAmount)
         {
-            throw new InvalidOperationException("Maximum number of attempts reached for this match.");
+            throw new MaxAttemptsReachedException();
         }
 
         bool isAnyOtherAttemptInProgress = await matchAttemptRepository.HasActiveAttemptByMatchIdAsync(match.Id, userId);
         if (isAnyOtherAttemptInProgress)
         {
-            throw new InvalidOperationException("User already have an active attempt for this match.");
+            throw new ActiveAttemptExistsException();
         }
 
         Quiz quiz = await quizRepository.GetByIdAsync(match.QuizId) ?? throw new InvalidOperationException("No quiz and questions were found for this match.");

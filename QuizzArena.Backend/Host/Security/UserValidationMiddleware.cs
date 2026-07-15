@@ -46,8 +46,7 @@ public class UserValidationMiddleware
             catch (Exception ex)
             {
                 Console.WriteLine($"Error in UserValidationMiddleware: {ex.Message}");
-                context.Response.StatusCode = 500;
-                return;
+                throw;
             }
         }
 

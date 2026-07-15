@@ -5,6 +5,7 @@ using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Application.UseCases.MatchAttemptUseCases;
 using QuizzArena.Quizzing.Domain.Entities;
 using QuizzArena.Quizzing.Domain.Enums;
+using QuizzArena.Quizzing.Domain.Exceptions;
 using Shared.Contracts;
 using Shared.Contracts.DTOs;
 
@@ -84,7 +85,7 @@ public class StartAttemptUseCaseTests
         var request = new StartAttemptRequestDto { MatchId = match.Id };
 
         // Act & Assert
-        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _useCase.Execute(request));
+        var ex = await Assert.ThrowsAsync<MatchNotActiveException>(() => _useCase.Execute(request));
         Assert.Equal("Match is not active.", ex.Message);
     }
 
@@ -104,7 +105,7 @@ public class StartAttemptUseCaseTests
         var request = new StartAttemptRequestDto { MatchId = match.Id };
 
         // Act & Assert
-        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _useCase.Execute(request));
+        var ex = await Assert.ThrowsAsync<MaxAttemptsReachedException>(() => _useCase.Execute(request));
         Assert.Equal("Maximum number of attempts reached for this match.", ex.Message);
     }
 
@@ -125,8 +126,8 @@ public class StartAttemptUseCaseTests
         var request = new StartAttemptRequestDto { MatchId = match.Id };
 
         // Act & Assert
-        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _useCase.Execute(request));
-        Assert.Equal("User already have an active attempt for this match.", ex.Message);
+        var ex = await Assert.ThrowsAsync<ActiveAttemptExistsException>(() => _useCase.Execute(request));
+        Assert.Equal("User already has an active attempt for this match.", ex.Message);
     }
 
     [Fact]

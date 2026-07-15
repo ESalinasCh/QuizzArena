@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Host.ExceptionHandling;
 using Host.Extensions;
 using Host.Security;
 using MassTransit;
@@ -72,6 +73,8 @@ public class Program
             app.UseSwagger();
             app.UseSwaggerUI();
         }
+
+        app.UseMiddleware<GlobalExceptionMiddleware>();
 
         app.UseHttpsRedirection();
 
