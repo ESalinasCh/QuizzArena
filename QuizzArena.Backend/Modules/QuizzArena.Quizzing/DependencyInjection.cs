@@ -60,6 +60,7 @@ public static class DependencyInjection
         services.AddScoped<ISubmitAnswersUseCase, SubmitAnswersUseCase>();
         services.AddScoped<ICreateQuizUseCase, CreateQuizUseCase>();
         services.AddScoped<ICreateQuestionsUseCase, CreateQuestionsUseCase>();
+        services.AddScoped<ICreateManualQuestionUseCase, CreateManualQuestionUseCase>();
         services.AddScoped<IGetQuestionsUseCase, GetQuestionsUseCase>();
         services.AddScoped<IUpdateQuestionUseCase, UpdateQuestionUseCase>();
         services.AddScoped<IDeleteQuestionUseCase, DeleteQuestionUseCase>();
@@ -80,6 +81,7 @@ public static class DependencyInjection
         services.AddScoped<CreateExamDtoValidator>();
         services.AddScoped<CreateQuestionDtoValidator>();
         services.AddScoped<CreateQuestionsDtoValidator>();
+        services.AddScoped<CreateManualQuestionDtoValidator>();
         services.AddScoped<UpdateQuestionDtoValidator>();
         services.AddScoped<UpdateOptionDtoValidator>();
         services.AddScoped<CreateOptionDtoValidator>();
