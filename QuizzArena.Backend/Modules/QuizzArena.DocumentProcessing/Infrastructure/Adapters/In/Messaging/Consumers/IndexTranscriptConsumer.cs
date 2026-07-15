@@ -36,7 +36,7 @@ public partial class IndexTranscriptConsumer(
 
             string transcript = await storageServiceRepository.DownloadTextAsync(command.TranscriptUrl);
 
-            List<string> sentences = SentenceSplitter.SplitIntoSentences(transcript, 15, _indexingConfig.MinSentenceWords);
+            List<string> sentences = SentenceSplitter.SplitIntoSentences(transcript, _indexingConfig.MaxSentenceWords, _indexingConfig.MinSentenceWords);
             LogSentences(logger, sentences.Count, command.ClassSourceId);
             if (sentences.Count == 0)
             {
@@ -44,7 +44,7 @@ public partial class IndexTranscriptConsumer(
                 return;
             }
 
-            EmbeddingBatchResult sentenceEmbeddingResult = await embeddingService.GenerateMultipleEmbeddingsAsync("bge-m3", sentences.ToArray());
+            EmbeddingBatchResult sentenceEmbeddingResult = await embeddingService.GenerateMultipleEmbeddingsAsync(_indexingConfig.EmbeddingModel, sentences.ToArray());
             if (sentenceEmbeddingResult.SkippedIndices.Count > 0)
             {
                 sentences = sentences.Where((_, index) => !sentenceEmbeddingResult.SkippedIndices.Contains(index)).ToList();
@@ -72,7 +72,7 @@ public partial class IndexTranscriptConsumer(
                 return;
             }
 
-            EmbeddingBatchResult chunkEmbeddingResult = await embeddingService.GenerateMultipleEmbeddingsAsync("bge-m3", keptChunks.ToArray());
+            EmbeddingBatchResult chunkEmbeddingResult = await embeddingService.GenerateMultipleEmbeddingsAsync(_indexingConfig.EmbeddingModel, keptChunks.ToArray());
             if (chunkEmbeddingResult.SkippedIndices.Count > 0)
             {
                 keptChunks = keptChunks.Where((_, index) => !chunkEmbeddingResult.SkippedIndices.Contains(index)).ToList();

@@ -74,7 +74,7 @@ internal sealed partial class OllamaEmbeddingGeneration : IEmbeddingService
                 else
                 {
                     skippedIndices.Add(i + j);
-                    LogSkippedInput(_logger, i + j, model);
+                    LogSkippedInput(_logger, i + j, model, batch[j]);
                 }
             }
         }
@@ -141,6 +141,6 @@ internal sealed partial class OllamaEmbeddingGeneration : IEmbeddingService
         }
     }
 
-    [LoggerMessage(Level = LogLevel.Warning, Message = "Ollama could not produce an embedding for input at index {Index} using model '{Model}'; skipping it.")]
-    private static partial void LogSkippedInput(ILogger logger, int index, string model);
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Ollama could not produce an embedding for input at index {Index} using model '{Model}'; skipping it. Content: {Input}")]
+    private static partial void LogSkippedInput(ILogger logger, int index, string model, string input);
 }

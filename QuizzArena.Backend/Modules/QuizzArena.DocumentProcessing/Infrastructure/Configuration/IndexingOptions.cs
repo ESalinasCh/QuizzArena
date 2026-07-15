@@ -19,4 +19,5 @@ public record IndexingOptions
     public string ClassificationModel { get; set; } = "qwen2.5:7b-instruct";
     public double MinConfidence { get; set; } = 0.7;
     public int MinSentenceWords { get; set; } = 4;
+    public int MaxSentenceWords { get; set; } = 15;
 }
