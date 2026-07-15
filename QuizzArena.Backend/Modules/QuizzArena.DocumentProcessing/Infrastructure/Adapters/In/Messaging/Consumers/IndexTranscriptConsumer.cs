@@ -44,7 +44,7 @@ public partial class IndexTranscriptConsumer(
                 return;
             }
 
-            IReadOnlyList<float[]> sentenceEmbeddings = await embeddingService.GenerateMultipleEmbeddingsAsync("bge-m3", sentences.ToArray());
+            IReadOnlyList<float[]> sentenceEmbeddings = await embeddingService.GenerateMultipleEmbeddingsAsync(_indexingConfig.EmbeddingModel, sentences.ToArray());
             List<string> chunks = SemanticChunker.GenerateChunk(sentences, sentenceEmbeddings);
             LogChunks(logger, chunks.Count, command.ClassSourceId);
 
@@ -65,7 +65,7 @@ public partial class IndexTranscriptConsumer(
                 return;
             }
 
-            float[][] chunkEmbeddings = await embeddingService.GenerateMultipleEmbeddingsAsync("bge-m3", keptChunks.ToArray());
+            float[][] chunkEmbeddings = await embeddingService.GenerateMultipleEmbeddingsAsync(_indexingConfig.EmbeddingModel, keptChunks.ToArray());
 
             List<DocumentChunk> documentChunks = keptChunks
                 .Select((content, index) => new DocumentChunk

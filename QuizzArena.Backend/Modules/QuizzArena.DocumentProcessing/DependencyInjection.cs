@@ -119,6 +119,12 @@ public static class DependencyInjection
 
         if (embeddingProvider == "Gemini")
         {
+            /*
+                to use this service, Change EmbeddingSettings:Provider  to Gemini provider.
+                When enabling this registration:
+                - Ensure GeminiSettings:ApiKey (user secret) and GeminiSettings:BaseUrl are configured.
+                - To add API key to local user secret use: dotnet user-secrets set "GeminiSettings:ApiKey" "apikey"
+            */
             services.AddHttpClient<IEmbeddingService, GeminiEmbeddingGeneration>(client =>
             {
                 var geminiEmbeddingUrl = configuration["GeminiSettings:BaseUrl"]!;
@@ -129,7 +135,7 @@ public static class DependencyInjection
                 client.DefaultRequestHeaders.Add("x-goog-api-key", apiKey);
             });
         }
-        else if (embeddingProvider == "Ollama")
+        else
         {
             services.AddHttpClient<IEmbeddingService, OllamaEmbeddingGeneration>(client =>
             {
