@@ -64,7 +64,16 @@ public static class DependencyInjection
             client.Timeout = TimeSpan.FromMinutes(60);
         });
 
+
         #region OpenAI
+        /*
+            Uncomment this section to use an OpenAI-compatible provider (e.g., Groq).
+
+            When enabling this registration:
+            - Comment out any other ITextGenerationService registrations.
+            - Ensure OpenAISettings:ApiKey and OpenAISettings:BaseUrl are configured.
+        */
+
         //var apiKey = configuration["OpenAISettings:ApiKey"];
         //var openAIBAseUrl = configuration["OpenAISettings:BaseUrl"] ?? "https://api.groq.com/openai/v1/";
         //services.AddHttpClient<ITextGenerationService, OpenAICompatibleTextGeneration>(client =>

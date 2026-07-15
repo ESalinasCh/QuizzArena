@@ -2,6 +2,8 @@
 
 public record QuizGenerationOptions
 {
+    // If you switch the ITextGenerationService implementation (e.g., Ollama -> Groq),
+    // update these model identifiers to match the selected provider.
     public const string SectionName = "QuizGeneration";
     public float CosineSimilarityThreshold { get; set; } = 0.92f;
     public float JudgementThreshold { get; set; } = 0.75f;
