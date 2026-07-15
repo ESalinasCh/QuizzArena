@@ -51,12 +51,38 @@ public static class DependencyInjection
             return new BlobServiceClient(cs);
         });
 
-        services.AddHttpClient<ITranscriptionService, WhisperTranscription>(client =>
+        var transcriptionProvider = configuration["TranscriptionSettings:Provider"];
+        if (transcriptionProvider == "Groq")
+        {
+
+            /*
+                Change app.settings file to Groq provider.
+                When enabling this registration:
+                - Ensure GroqWhisperSettings:ApiKey (user secret) and GroqWhisperSettings:BaseUrl are configured.
+                - To add API key to local user secret use: dotnet user-secrets set "GroqWhisperSettings:ApiKey" "apikey"
+            */
+
+            var apiKey = configuration["GroqWhisperSettings:ApiKey"];
+            var openAIBAseUrl = configuration["GroqWhisperSettings:BaseUrl"] ?? "https://api.groq.com/openai/v1/";
+
+            services.AddHttpClient<ITranscriptionService, WhisperGroqTranscription>(client =>
+            {
+                client.BaseAddress = new Uri(openAIBAseUrl);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+                client.Timeout = TimeSpan.FromMinutes(60);
+            });
+        }
+        else
         {
             var whisperUrl = configuration["WhisperSettings:BaseUrl"] ?? "http://localhost:9000/";
-            client.BaseAddress = new Uri(whisperUrl);
-            client.Timeout = TimeSpan.FromMinutes(60);
-        });
+
+            services.AddHttpClient<ITranscriptionService, WhisperTranscription>(client =>
+            {
+                client.BaseAddress = new Uri(whisperUrl);
+                client.Timeout = TimeSpan.FromMinutes(60);
+            });
+        }
+
 
         var ollamaUrl = configuration["OllamaSettings:BaseUrl"] ?? "http://localhost:11434/";
         var textGenerationProvider = configuration["TextGenerationSettings:Provider"];
