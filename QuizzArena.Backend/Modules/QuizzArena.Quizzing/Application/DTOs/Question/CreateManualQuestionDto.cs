@@ -1,4 +1,4 @@
-using QuizzArena.Quizzing.Application.DTOs.Option;
+﻿using QuizzArena.Quizzing.Application.DTOs.Option;
 
 namespace QuizzArena.Quizzing.Application.DTOs.Question;
 

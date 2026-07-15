@@ -1,4 +1,4 @@
-using FluentValidation;
+﻿using FluentValidation;
 using QuizzArena.Quizzing.Application.DTOs.Option;
 using QuizzArena.Quizzing.Application.DTOs.Question;
 using QuizzArena.Quizzing.Application.Validators.Option;

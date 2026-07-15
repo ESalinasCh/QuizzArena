@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using FluentValidation;
 using Moq;
 using QuizzArena.Quizzing.Application.DTOs.Option;
