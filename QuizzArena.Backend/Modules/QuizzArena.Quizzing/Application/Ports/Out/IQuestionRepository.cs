@@ -9,4 +9,6 @@ public interface IQuestionRepository
     Task<List<Question>> GetByIdsAsync(IEnumerable<Guid> questionIds);
     Task<List<Question>> GetByIdsWithOptionsAsync(List<Guid> questionIds);
     Task<List<Question>> GetByProcessingJobIdAsync(QuestionFilters filters);
+    Task<Question?> GetByIdWithOptionsAsync(Guid questionId);
+    Task<Question> UpdateAsync(Question question);
 }

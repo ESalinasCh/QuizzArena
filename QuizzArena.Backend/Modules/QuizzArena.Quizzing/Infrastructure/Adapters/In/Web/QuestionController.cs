@@ -9,7 +9,9 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.In.Web;
 [ApiController]
 [Route("api/v{version:apiVersion}")]
 public class QuestionController(
-    IGetQuestionsUseCase getQuestionsUseCase
+    IGetQuestionsUseCase getQuestionsUseCase,
+    IUpdateQuestionUseCase updateQuestionUseCase,
+    IDeleteQuestionUseCase deleteQuestionUseCase
 ) : ControllerBase
 {
     [HttpGet("questions")]
@@ -18,5 +20,21 @@ public class QuestionController(
     {
         List<ResponseQuestionDto> questions = await getQuestionsUseCase.Execute(filters);
         return Ok(questions);
+    }
+
+    [HttpPatch("questions")]
+    [Authorize(Roles = "teacher")]
+    public async Task<ActionResult<ResponseQuestionDto>> UpdateQuestion([FromBody] UpdateQuestionDto dto)
+    {
+        ResponseQuestionDto question = await updateQuestionUseCase.Execute(dto);
+        return Ok(question);
+    }
+
+    [HttpDelete("questions/{questionId:guid}")]
+    [Authorize(Roles = "teacher")]
+    public async Task<ActionResult<ResponseQuestionDto>> DeleteQuestion(Guid questionId)
+    {
+        ResponseQuestionDto question = await deleteQuestionUseCase.Execute(questionId);
+        return Ok(question);
     }
 }
