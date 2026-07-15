@@ -11,4 +11,10 @@ internal sealed class SqlUserQueriesRepository(UserDbContext context) : IUserQue
         List<User> reponse = await context.Users.Where(x => userIds.Contains(x.Id)).ToListAsync();
         return reponse;
     }
+
+    public async Task<User?> GetUserById(Guid userId)
+    {
+        User? user = await context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+        return user;
+    }
 }

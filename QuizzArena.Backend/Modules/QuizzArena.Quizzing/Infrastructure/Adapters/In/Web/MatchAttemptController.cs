@@ -64,7 +64,7 @@ public class MatchAttemptController(
     [Authorize(Roles = "teacher")]
     public async Task<ActionResult<MatchAttemptGradesResponseDto>> GetMatchAttemptGrades(
         [FromRoute] Guid matchId,
-        [FromBody] MatchAttemptFilters filters
+        [FromQuery] MatchAttemptFilters filters
         )
     {
         List<MatchAttemptGradesResponseDto> response = await getMatchAttemptGradesUseCase.Execute(matchId, filters);

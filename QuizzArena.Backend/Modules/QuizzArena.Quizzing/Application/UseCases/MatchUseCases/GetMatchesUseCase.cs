@@ -21,7 +21,16 @@ public class GetMatchesUseCase(
         await queryValidator.ValidateAndThrowAsync(query);
 
         string userId = currentUser.UserId;
-        List<CourseSummaryDTO> courses = await courseImpl.GetCoursesByStudent(Guid.Parse(userId));
+        string role = currentUser.Role;
+        List<CourseSummaryDTO> courses = new List<CourseSummaryDTO>();
+        if (role == "Student")
+        {
+            courses = await courseImpl.GetCoursesByStudent(Guid.Parse(userId));
+        }
+        else if (role == "Teacher")
+        {
+            courses = await courseImpl.GetCoursesByTeacherId(Guid.Parse(userId));
+        }
         List<Guid> coursesIds = courses.Select(c => c.Id).ToList();
         List<Match> matches = await matchRepository.GetMatchesAsync(coursesIds, query);
 
