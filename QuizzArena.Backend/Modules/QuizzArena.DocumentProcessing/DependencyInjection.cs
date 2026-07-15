@@ -115,11 +115,28 @@ public static class DependencyInjection
             });
         }
 
-        services.AddHttpClient<IEmbeddingService, OllamaEmbeddingGeneration>(client =>
+        var embeddingProvider = configuration["EmbeddingSettings:Provider"];
+
+        if (embeddingProvider == "Gemini")
         {
-            client.BaseAddress = new Uri(ollamaUrl);
-            client.Timeout = TimeSpan.FromMinutes(60);
-        });
+            services.AddHttpClient<IEmbeddingService, GeminiEmbeddingGeneration>(client =>
+            {
+                var geminiEmbeddingUrl = configuration["GeminiSettings:BaseUrl"]!;
+                var apiKey = configuration["GeminiSettings:ApiKey"]!;
+
+                client.BaseAddress = new Uri(geminiEmbeddingUrl);
+                client.Timeout = TimeSpan.FromMinutes(60);
+                client.DefaultRequestHeaders.Add("x-goog-api-key", apiKey);
+            });
+        }
+        else if (embeddingProvider == "Ollama")
+        {
+            services.AddHttpClient<IEmbeddingService, OllamaEmbeddingGeneration>(client =>
+            {
+                client.BaseAddress = new Uri(ollamaUrl);
+                client.Timeout = TimeSpan.FromMinutes(60);
+            });
+        }
 
         services.AddScoped<IChunkClassifier, OllamaChunkClassifier>();
 

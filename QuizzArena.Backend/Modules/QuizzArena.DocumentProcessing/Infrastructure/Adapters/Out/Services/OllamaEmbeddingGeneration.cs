@@ -64,7 +64,7 @@ internal sealed class OllamaEmbeddingGeneration : IEmbeddingService
         var payload = new
         {
             model = model,
-            input = inputs
+            input = inputs 
         };
 
         using var response = await _httpClient.PostAsJsonAsync("/api/embed", payload);
