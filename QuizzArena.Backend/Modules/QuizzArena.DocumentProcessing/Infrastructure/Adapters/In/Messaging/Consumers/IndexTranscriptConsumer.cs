@@ -36,7 +36,7 @@ public partial class IndexTranscriptConsumer(
 
             string transcript = await storageServiceRepository.DownloadTextAsync(command.TranscriptUrl);
 
-            List<string> sentences = SentenceSplitter.SplitIntoSentences(transcript, 15);
+            List<string> sentences = SentenceSplitter.SplitIntoSentences(transcript, _indexingConfig.MaxSentenceWords, _indexingConfig.MinSentenceWords);
             LogSentences(logger, sentences.Count, command.ClassSourceId);
             if (sentences.Count == 0)
             {
@@ -44,7 +44,14 @@ public partial class IndexTranscriptConsumer(
                 return;
             }
 
-            IReadOnlyList<float[]> sentenceEmbeddings = await embeddingService.GenerateMultipleEmbeddingsAsync(_indexingConfig.EmbeddingModel, sentences.ToArray());
+            EmbeddingBatchResult sentenceEmbeddingResult = await embeddingService.GenerateMultipleEmbeddingsAsync(_indexingConfig.EmbeddingModel, sentences.ToArray());
+            if (sentenceEmbeddingResult.SkippedIndices.Count > 0)
+            {
+                sentences = sentences.Where((_, index) => !sentenceEmbeddingResult.SkippedIndices.Contains(index)).ToList();
+                LogSkippedInputs(logger, sentenceEmbeddingResult.SkippedIndices.Count, command.ClassSourceId);
+            }
+
+            IReadOnlyList<float[]> sentenceEmbeddings = sentenceEmbeddingResult.Embeddings;
             List<string> chunks = SemanticChunker.GenerateChunk(sentences, sentenceEmbeddings);
             LogChunks(logger, chunks.Count, command.ClassSourceId);
 
@@ -65,7 +72,14 @@ public partial class IndexTranscriptConsumer(
                 return;
             }
 
-            float[][] chunkEmbeddings = await embeddingService.GenerateMultipleEmbeddingsAsync(_indexingConfig.EmbeddingModel, keptChunks.ToArray());
+            EmbeddingBatchResult chunkEmbeddingResult = await embeddingService.GenerateMultipleEmbeddingsAsync(_indexingConfig.EmbeddingModel, keptChunks.ToArray());
+            if (chunkEmbeddingResult.SkippedIndices.Count > 0)
+            {
+                keptChunks = keptChunks.Where((_, index) => !chunkEmbeddingResult.SkippedIndices.Contains(index)).ToList();
+                LogSkippedInputs(logger, chunkEmbeddingResult.SkippedIndices.Count, command.ClassSourceId);
+            }
+
+            float[][] chunkEmbeddings = chunkEmbeddingResult.Embeddings;
 
             List<DocumentChunk> documentChunks = keptChunks
                 .Select((content, index) => new DocumentChunk
@@ -116,6 +130,9 @@ public partial class IndexTranscriptConsumer(
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Stored {StoredCount} chunks for ClassSource {ClassSourceId}.")]
     private static partial void LogStored(ILogger logger, int storedCount, Guid classSourceId);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Skipped {SkippedCount} input(s) that could not be embedded for ClassSource {ClassSourceId}.")]
+    private static partial void LogSkippedInputs(ILogger logger, int skippedCount, Guid classSourceId);
 
     [LoggerMessage(Level = LogLevel.Error, Message = "Indexing failed for ClassSource {ClassSourceId}.")]
     private static partial void LogFailed(ILogger logger, Exception exception, Guid classSourceId);

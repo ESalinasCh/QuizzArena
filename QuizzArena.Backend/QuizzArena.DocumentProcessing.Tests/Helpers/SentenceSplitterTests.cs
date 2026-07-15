@@ -21,7 +21,7 @@ public class SentenceSplitterTests
     {
         const string text = "Hello world. How are you? I am fine!";
 
-        List<string> result = SentenceSplitter.SplitIntoSentences(text, 15);
+        List<string> result = SentenceSplitter.SplitIntoSentences(text, 15, minWords: 1);
 
         result.Should().Equal("Hello world.", "How are you?", "I am fine!");
     }
@@ -31,7 +31,7 @@ public class SentenceSplitterTests
     {
         string text = string.Join(' ', Enumerable.Range(1, 17).Select(i => $"w{i}"));
 
-        List<string> result = SentenceSplitter.SplitIntoSentences(text, 15);
+        List<string> result = SentenceSplitter.SplitIntoSentences(text, 15, minWords: 1);
 
         result.Should().HaveCount(2);
         result[0].Split(' ').Should().HaveCount(15);
@@ -43,7 +43,7 @@ public class SentenceSplitterTests
     {
         const string text = "First sentence. Trailing words with no period";
 
-        List<string> result = SentenceSplitter.SplitIntoSentences(text, 15);
+        List<string> result = SentenceSplitter.SplitIntoSentences(text, 15, minWords: 1);
 
         result.Should().Equal("First sentence.", "Trailing words with no period");
     }
@@ -53,8 +53,51 @@ public class SentenceSplitterTests
     {
         const string text = "Too    many   spaces.";
 
-        List<string> result = SentenceSplitter.SplitIntoSentences(text, 15);
+        List<string> result = SentenceSplitter.SplitIntoSentences(text, 15, minWords: 1);
 
         result.Should().ContainSingle().Which.Should().Be("Too many spaces.");
+    }
+
+    [Fact]
+    public void SplitIntoSentences_MergesShortSentenceForwardIntoNextSentence()
+    {
+        const string text = "And set that value. Okay. So the first method we will implement is append.";
+
+        List<string> result = SentenceSplitter.SplitIntoSentences(text, 15, minWords: 4);
+
+        result.Should().Equal(
+            "And set that value.",
+            "Okay. So the first method we will implement is append."
+        );
+    }
+
+    [Fact]
+    public void SplitIntoSentences_MergesTrailingShortSentenceIntoPreviousSentence()
+    {
+        const string text = "So the first method we will implement is append. Okay.";
+
+        List<string> result = SentenceSplitter.SplitIntoSentences(text, 15, minWords: 4);
+
+        result.Should().Equal("So the first method we will implement is append. Okay.");
+    }
+
+    [Fact]
+    public void SplitIntoSentences_WholeTextBelowMinWords_ReturnsItAsIs()
+    {
+        const string text = "Okay.";
+
+        List<string> result = SentenceSplitter.SplitIntoSentences(text, 15, minWords: 4);
+
+        result.Should().Equal("Okay.");
+    }
+
+    [Fact]
+    public void SplitIntoSentences_DefaultMinWords_MergesSingleWordFragment()
+    {
+        const string text = "And set that value. Okay. So the first method we will implement is append.";
+
+        List<string> result = SentenceSplitter.SplitIntoSentences(text, 15);
+
+        result.Should().NotContain("Okay.");
     }
 }
