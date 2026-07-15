@@ -13,6 +13,10 @@ internal sealed class QuestionMapping : Profile
             .ForMember(
             dest => dest.Options,
             opt => opt.Ignore());
+        CreateMap<Question, CreateManualQuestionDto>().ReverseMap()
+            .ForMember(
+            dest => dest.Options,
+            opt => opt.Ignore());
         CreateMap<Question, ResponseQuestionDto>().ReverseMap();
     }
 }

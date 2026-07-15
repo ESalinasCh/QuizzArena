@@ -10,6 +10,7 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.In.Web;
 [Route("api/v{version:apiVersion}")]
 public class QuestionController(
     IGetQuestionsUseCase getQuestionsUseCase,
+    ICreateManualQuestionUseCase createManualQuestionUseCase,
     IUpdateQuestionUseCase updateQuestionUseCase,
     IDeleteQuestionUseCase deleteQuestionUseCase
 ) : ControllerBase
@@ -20,6 +21,14 @@ public class QuestionController(
     {
         List<ResponseQuestionDto> questions = await getQuestionsUseCase.Execute(filters);
         return Ok(questions);
+    }
+
+    [HttpPost("questions")]
+    [Authorize(Roles = "teacher")]
+    public async Task<ActionResult<ResponseQuestionDto>> CreateQuestion([FromBody] CreateManualQuestionDto dto)
+    {
+        ResponseQuestionDto question = await createManualQuestionUseCase.Execute(dto);
+        return Ok(question);
     }
 
     [HttpPatch("questions")]
