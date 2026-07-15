@@ -1,4 +1,5 @@
-﻿using Azure.Storage.Blobs;
+﻿using System.Net.Http.Headers;
+using Azure.Storage.Blobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -58,34 +59,35 @@ public static class DependencyInjection
         });
 
         var ollamaUrl = configuration["OllamaSettings:BaseUrl"] ?? "http://localhost:11434/";
-        services.AddHttpClient<ITextGenerationService, OllamaTextGeneration>(client =>
+        var textGenerationProvider = configuration["TextGenerationSettings:Provider"];
+        if (textGenerationProvider == "OpenAI")
         {
-            client.BaseAddress = new Uri(ollamaUrl);
-            client.Timeout = TimeSpan.FromMinutes(60);
-        });
+            /*
+                Change app.settings file to OpenAI provider.
+                When enabling this registration:
+                - Ensure OpenAISettings:ApiKey (user secret) and OpenAISettings:BaseUrl are configured.
+                - To add API key to local user secret use: dotnet user-secrets set "OpenAISettings:ApiKey" "apikey"
+            */
 
+            var apiKey = configuration["OpenAISettings:ApiKey"];
+            var openAIBAseUrl = configuration["OpenAISettings:BaseUrl"] ?? "https://api.groq.com/openai/v1/";
+            services.AddHttpClient<ITextGenerationService, OpenAICompatibleTextGeneration>(client =>
+            {
+                client.BaseAddress = new Uri(openAIBAseUrl);
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", apiKey);
 
-        #region OpenAI
-        /*
-            Uncomment this section to use an OpenAI-compatible provider (e.g., Groq).
-
-            When enabling this registration:
-            - Comment out any other ITextGenerationService registrations.
-            - Ensure OpenAISettings:ApiKey and OpenAISettings:BaseUrl are configured.
-        */
-
-        //var apiKey = configuration["OpenAISettings:ApiKey"];
-        //var openAIBAseUrl = configuration["OpenAISettings:BaseUrl"] ?? "https://api.groq.com/openai/v1/";
-        //services.AddHttpClient<ITextGenerationService, OpenAICompatibleTextGeneration>(client =>
-        //{
-        //    client.BaseAddress = new Uri(openAIBAseUrl);
-        //    client.DefaultRequestHeaders.Authorization =
-        //        new AuthenticationHeaderValue("Bearer", apiKey);
-
-        //    client.Timeout = TimeSpan.FromMinutes(60);
-        //});
-        #endregion
-
+                client.Timeout = TimeSpan.FromMinutes(60);
+            });
+        }
+        else
+        {
+            services.AddHttpClient<ITextGenerationService, OllamaTextGeneration>(client =>
+            {
+                client.BaseAddress = new Uri(ollamaUrl);
+                client.Timeout = TimeSpan.FromMinutes(60);
+            });
+        }
 
         services.AddHttpClient<IEmbeddingService, OllamaEmbeddingGeneration>(client =>
         {
