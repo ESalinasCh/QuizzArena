@@ -28,4 +28,13 @@ internal sealed class SqlCourseQueriesRepository(UserDbContext context) : ICours
         Course? course = await context.Courses.FirstOrDefaultAsync(x => x.Id == courseId && !x.Deleted);
         return course;
     }
+
+    public async Task<List<Course>> GetCoursesByTeacherId(Guid teacherId)
+    {
+        List<Course> courses = await context.Courses.Where(
+            x => x.TeacherId == teacherId && !x.Deleted
+        ).ToListAsync();
+
+        return courses;
+    }
 }

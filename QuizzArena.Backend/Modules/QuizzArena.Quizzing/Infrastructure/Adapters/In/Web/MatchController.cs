@@ -15,7 +15,7 @@ public class MatchController(
 ) : ControllerBase
 {
     [HttpGet("users/me/matches")]
-    [Authorize(Roles = "student")]
+    [Authorize(Roles = "student,teacher")]
     public async Task<ActionResult<List<MatchResponseDto>>> GetMatches(
         [FromQuery] MatchQueryParametersDto query
     )

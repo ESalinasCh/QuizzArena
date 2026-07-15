@@ -41,6 +41,7 @@ public class GetMatchesUseCaseTests
         // Arrange
         string userId = Guid.NewGuid().ToString();
         _mockCurrentUser.Setup(c => c.UserId).Returns(userId);
+        _mockCurrentUser.Setup(c => c.Role).Returns("Student");
         var courses = new List<CourseSummaryDTO>();
         _mockCourseImpl.Setup(c => c.GetCoursesByStudent(Guid.Parse(userId))).ReturnsAsync(courses);
         var matches = new List<Domain.Entities.Match>();
@@ -64,6 +65,7 @@ public class GetMatchesUseCaseTests
         // Arrange
         string userId = Guid.NewGuid().ToString();
         _mockCurrentUser.Setup(c => c.UserId).Returns(userId);
+        _mockCurrentUser.Setup(c => c.Role).Returns("Student");
         var courses = new List<CourseSummaryDTO>
         {
             new CourseSummaryDTO { Id = Guid.NewGuid(), CourseName = "Electricity", ProfessorName = "Nikola Tesla" }
@@ -88,6 +90,7 @@ public class GetMatchesUseCaseTests
     {
         // Arrange
         _mockCurrentUser.Setup(c => c.UserId).Returns("not-a-guid");
+        _mockCurrentUser.Setup(c => c.Role).Returns("Student");
         var query = new MatchQueryParametersDto();
 
         // Act & Assert
@@ -100,11 +103,43 @@ public class GetMatchesUseCaseTests
         // Arrange
         string userId = Guid.NewGuid().ToString();
         _mockCurrentUser.Setup(c => c.UserId).Returns(userId);
+        _mockCurrentUser.Setup(c => c.Role).Returns("Student");
         var courses = new List<CourseSummaryDTO>
         {
             new CourseSummaryDTO { Id = Guid.NewGuid(), CourseName = "Electricity", ProfessorName = "Nikola Tesla" }
         };
         _mockCourseImpl.Setup(c => c.GetCoursesByStudent(Guid.Parse(userId))).ReturnsAsync(courses);
+        var matches = new List<Domain.Entities.Match>
+        {
+            new Domain.Entities.Match { Id = Guid.NewGuid(), Title = "My Match", CourseId = courses[0].Id}
+        };
+        _mockMatchRepository.Setup(m => m.GetMatchesAsync(
+            It.IsAny<List<Guid>>(),
+            It.IsAny<MatchQueryParametersDto>())
+        ).ReturnsAsync(matches);
+        var query = new MatchQueryParametersDto();
+
+        // Act
+        List<MatchResponseDto> result = await _getMatchesUseCase.Execute(query);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Single(result);
+        Assert.Equal("My Match", result[0].Title);
+        Assert.Equal("Electricity", result[0].CourseName);
+    }
+    [Fact]
+    public async Task GetMatches_MatchesMappedCorrectlyForTheachers_ReturnsCorrectDtos()
+    {
+        // Arrange
+        string userId = Guid.NewGuid().ToString();
+        _mockCurrentUser.Setup(c => c.UserId).Returns(userId);
+        _mockCurrentUser.Setup(c => c.Role).Returns("Teacher");
+        var courses = new List<CourseSummaryDTO>
+        {
+            new CourseSummaryDTO { Id = Guid.NewGuid(), CourseName = "Electricity", ProfessorName = "Nikola Tesla" }
+        };
+        _mockCourseImpl.Setup(c => c.GetCoursesByTeacherId(Guid.Parse(userId))).ReturnsAsync(courses);
         var matches = new List<Domain.Entities.Match>
         {
             new Domain.Entities.Match { Id = Guid.NewGuid(), Title = "My Match", CourseId = courses[0].Id}
@@ -132,6 +167,7 @@ public class GetMatchesUseCaseTests
         string userId = Guid.NewGuid().ToString();
         Guid quizId = Guid.NewGuid();
         _mockCurrentUser.Setup(c => c.UserId).Returns(userId);
+        _mockCurrentUser.Setup(c => c.Role).Returns("Student");
         var courses = new List<CourseSummaryDTO>
         {
             new CourseSummaryDTO { Id = Guid.NewGuid(), CourseName = "Electricity", ProfessorName = "Nikola Tesla" }
@@ -164,6 +200,7 @@ public class GetMatchesUseCaseTests
         // Arrange
         string userId = Guid.NewGuid().ToString();
         _mockCurrentUser.Setup(c => c.UserId).Returns(userId);
+        _mockCurrentUser.Setup(c => c.Role).Returns("Student");
         var courses = new List<CourseSummaryDTO>
         {
             new CourseSummaryDTO { Id = Guid.NewGuid(), CourseName = "Electricity", ProfessorName = "Nikola Tesla" }
@@ -194,6 +231,7 @@ public class GetMatchesUseCaseTests
         // Arrange
         string userId = Guid.NewGuid().ToString();
         _mockCurrentUser.Setup(c => c.UserId).Returns(userId);
+        _mockCurrentUser.Setup(c => c.Role).Returns("Student");
         var courses = new List<CourseSummaryDTO>
         {
             new CourseSummaryDTO { Id = Guid.NewGuid(), CourseName = "Electricity", ProfessorName = "Nikola Tesla" },
