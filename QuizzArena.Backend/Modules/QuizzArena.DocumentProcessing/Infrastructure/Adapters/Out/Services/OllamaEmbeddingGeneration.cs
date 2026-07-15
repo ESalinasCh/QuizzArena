@@ -5,7 +5,7 @@ using QuizzArena.DocumentProcessing.Application.Ports.Out;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Services;
 
-internal sealed class OllamaEmbeddingGeneration : IEmbeddingService
+internal sealed partial class OllamaEmbeddingGeneration : IEmbeddingService
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger<OllamaEmbeddingGeneration> _logger;
@@ -32,13 +32,7 @@ internal sealed class OllamaEmbeddingGeneration : IEmbeddingService
             throw new ArgumentException("Prompt cannot be empty.", nameof(prompt));
         }
 
-        float[][]? result = await TrySendEmbeddingRequestAsync(model, [prompt]);
-
-        if (result is null)
-        {
-            throw new InvalidOperationException($"Ollama failed to generate an embedding for the given prompt using model '{model}'.");
-        }
-
+        float[][]? result = await TrySendEmbeddingRequestAsync(model, [prompt]) ?? throw new InvalidOperationException($"Ollama failed to generate an embedding for the given prompt using model '{model}'.");
         return result[0];
     }
 
@@ -80,10 +74,7 @@ internal sealed class OllamaEmbeddingGeneration : IEmbeddingService
                 else
                 {
                     skippedIndices.Add(i + j);
-                    _logger.LogWarning(
-                        "Ollama could not produce an embedding for input at index {Index} using model '{Model}'; skipping it.",
-                        i + j,
-                        model);
+                    LogSkippedInput(_logger, i + j, model);
                 }
             }
         }
@@ -150,4 +141,6 @@ internal sealed class OllamaEmbeddingGeneration : IEmbeddingService
         }
     }
 
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Ollama could not produce an embedding for input at index {Index} using model '{Model}'; skipping it.")]
+    private static partial void LogSkippedInput(ILogger logger, int index, string model);
 }

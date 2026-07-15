@@ -1,4 +1,4 @@
-namespace QuizzArena.DocumentProcessing.Application.Ports.Out;
+﻿namespace QuizzArena.DocumentProcessing.Application.Ports.Out;
 
 public sealed record EmbeddingBatchResult(float[][] Embeddings, IReadOnlySet<int> SkippedIndices);
 
