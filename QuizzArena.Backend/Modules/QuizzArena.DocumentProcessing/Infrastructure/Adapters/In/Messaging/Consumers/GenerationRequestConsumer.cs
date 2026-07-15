@@ -131,10 +131,21 @@ public class GenerationRequestConsumer(
                 .ToList()
         );
 
-        float[][] embeddedQuestions = await embeddingGenerationService.GenerateMultipleEmbeddingsAsync(
+        EmbeddingBatchResult embeddedQuestionsResult = await embeddingGenerationService.GenerateMultipleEmbeddingsAsync(
             _quizGenerationConfig.QuestionEmbeddingModel,
             llmQuiz.Questions.Select(qs => $"Question: {qs.Question}\nAnswer: {qs.Options[qs.CorrectAnswer]}").ToArray()
         );
+
+        if (embeddedQuestionsResult.SkippedIndices.Count > 0)
+        {
+            llmQuiz = new QuizGenerationFormat(
+                llmQuiz.Title,
+                llmQuiz.Description,
+                llmQuiz.Questions.Where((_, index) => !embeddedQuestionsResult.SkippedIndices.Contains(index)).ToList()
+            );
+        }
+
+        float[][] embeddedQuestions = embeddedQuestionsResult.Embeddings;
 
         List<int> acceptedQuestionsIndexes = [];
         llmQuiz = new QuizGenerationFormat(

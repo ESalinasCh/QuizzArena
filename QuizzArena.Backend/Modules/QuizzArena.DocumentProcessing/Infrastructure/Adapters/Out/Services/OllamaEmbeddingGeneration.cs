@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Json;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using QuizzArena.DocumentProcessing.Application.Ports.Out;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Services;
@@ -7,14 +8,16 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Services;
 internal sealed class OllamaEmbeddingGeneration : IEmbeddingService
 {
     private readonly HttpClient _httpClient;
+    private readonly ILogger<OllamaEmbeddingGeneration> _logger;
     private readonly JsonSerializerOptions _caseInsensitiveOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
 
-    public OllamaEmbeddingGeneration(HttpClient httpClient)
+    public OllamaEmbeddingGeneration(HttpClient httpClient, ILogger<OllamaEmbeddingGeneration> logger)
     {
         _httpClient = httpClient;
+        _logger = logger;
     }
 
     private sealed record OllamaEmbeddingResponse(
@@ -29,12 +32,17 @@ internal sealed class OllamaEmbeddingGeneration : IEmbeddingService
             throw new ArgumentException("Prompt cannot be empty.", nameof(prompt));
         }
 
-        float[][] result = await SendEmbeddingRequestAsync(model, [prompt]);
+        float[][]? result = await TrySendEmbeddingRequestAsync(model, [prompt]);
+
+        if (result is null)
+        {
+            throw new InvalidOperationException($"Ollama failed to generate an embedding for the given prompt using model '{model}'.");
+        }
 
         return result[0];
     }
 
-    public async Task<float[][]> GenerateMultipleEmbeddingsAsync(string model, string[] prompts, int? batchSize = 32)
+    public async Task<EmbeddingBatchResult> GenerateMultipleEmbeddingsAsync(string model, string[] prompts, int? batchSize = 32)
     {
         if (prompts == null || prompts.Length == 0)
         {
@@ -48,18 +56,42 @@ internal sealed class OllamaEmbeddingGeneration : IEmbeddingService
 
         int actualBatchSize = batchSize ?? prompts.Length;
         List<float[]> allEmbeddings = new List<float[]>(prompts.Length);
+        HashSet<int> skippedIndices = [];
 
         for (int i = 0; i < prompts.Length; i += actualBatchSize)
         {
             string[] batch = prompts.Skip(i).Take(actualBatchSize).ToArray();
-            float[][] batchResult = await SendEmbeddingRequestAsync(model, batch);
-            allEmbeddings.AddRange(batchResult);
+            float[][]? batchResult = await TrySendEmbeddingRequestAsync(model, batch);
+
+            if (batchResult is not null)
+            {
+                allEmbeddings.AddRange(batchResult);
+                continue;
+            }
+
+            for (int j = 0; j < batch.Length; j++)
+            {
+                float[][]? singleResult = await TrySendEmbeddingRequestAsync(model, [batch[j]]);
+
+                if (singleResult is not null)
+                {
+                    allEmbeddings.Add(singleResult[0]);
+                }
+                else
+                {
+                    skippedIndices.Add(i + j);
+                    _logger.LogWarning(
+                        "Ollama could not produce an embedding for input at index {Index} using model '{Model}'; skipping it.",
+                        i + j,
+                        model);
+                }
+            }
         }
 
-        return allEmbeddings.ToArray();
+        return new EmbeddingBatchResult(allEmbeddings.ToArray(), skippedIndices);
     }
 
-    private async Task<float[][]> SendEmbeddingRequestAsync(string model, string[] inputs)
+    private async Task<float[][]?> TrySendEmbeddingRequestAsync(string model, string[] inputs)
     {
         var payload = new
         {
@@ -69,7 +101,10 @@ internal sealed class OllamaEmbeddingGeneration : IEmbeddingService
 
         using var response = await _httpClient.PostAsJsonAsync("/api/embed", payload);
 
-        response.EnsureSuccessStatusCode();
+        if (!response.IsSuccessStatusCode)
+        {
+            return null;
+        }
 
         using var responseStream = await response.Content.ReadAsStreamAsync();
         var ollamaResponse = await JsonSerializer.DeserializeAsync<OllamaEmbeddingResponse>(

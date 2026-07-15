@@ -315,7 +315,7 @@ public class GenerationRequestConsumerTests
     {
         _mockEmbeddingService
             .Setup(s => s.GenerateMultipleEmbeddingsAsync(It.IsAny<string>(), It.IsAny<string[]>()))
-            .ReturnsAsync(embeddings);
+            .ReturnsAsync(new EmbeddingBatchResult(embeddings, new HashSet<int>()));
     }
 
     private static GenerationRequestConsumer.QuizGenerationFormat CreateValidQuiz()

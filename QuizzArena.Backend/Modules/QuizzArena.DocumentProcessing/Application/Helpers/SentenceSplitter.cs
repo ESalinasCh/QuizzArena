@@ -2,7 +2,7 @@
 
 internal static class SentenceSplitter
 {
-    public static List<string> SplitIntoSentences(string text, int maxWords)
+    public static List<string> SplitIntoSentences(string text, int maxWords, int minWords = 4)
     {
         List<string> sentences = [];
 
@@ -20,7 +20,7 @@ internal static class SentenceSplitter
 
             bool endsWithPunc = word.EndsWith('.') || word.EndsWith('?') || word.EndsWith('!');
 
-            if (endsWithPunc || currentWords.Count >= maxWords)
+            if ((endsWithPunc && currentWords.Count >= minWords) || currentWords.Count >= maxWords)
             {
                 sentences.Add(string.Join(' ', currentWords));
                 currentWords.Clear();
@@ -29,7 +29,14 @@ internal static class SentenceSplitter
 
         if (currentWords.Count > 0)
         {
-            sentences.Add(string.Join(' ', currentWords));
+            if (currentWords.Count < minWords && sentences.Count > 0)
+            {
+                sentences[^1] = $"{sentences[^1]} {string.Join(' ', currentWords)}";
+            }
+            else
+            {
+                sentences.Add(string.Join(' ', currentWords));
+            }
         }
 
         return sentences;
