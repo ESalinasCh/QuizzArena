@@ -15,6 +15,7 @@ public class Program
 {
     public static async Task Main(string[] args)
     {
+        DotNetEnv.Env.TraversePath().Load();
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Services.AddControllers()
@@ -44,6 +45,17 @@ public class Program
                 options.ValueLengthLimit = int.MaxValue;
             });
 
+        var rabbitHost = builder.Configuration["RabbitMq:Host"];
+        var rabbitUsername = builder.Configuration["RabbitMq:Username"];
+        var rabbitPassword = builder.Configuration["RabbitMq:Password"];
+
+        if (string.IsNullOrWhiteSpace(rabbitHost))
+            throw new InvalidOperationException("Configuration 'RabbitMq:Host' is required but was not found.");
+        if (string.IsNullOrWhiteSpace(rabbitUsername))
+            throw new InvalidOperationException("Configuration 'RabbitMq:Username' is required but was not found.");
+        if (string.IsNullOrWhiteSpace(rabbitPassword))
+            throw new InvalidOperationException("Configuration 'RabbitMq:Password' is required but was not found.");
+
         builder.Services.AddMassTransit(x =>
         {
             DocumentProcessingMassTransit.AddConsumers(x);
@@ -51,16 +63,15 @@ public class Program
             x.UsingRabbitMq((context, cfg) =>
             {
                 cfg.Host(
-                    builder.Configuration["RabbitMq:Host"] ?? "localhost",
+                    rabbitHost,
                     "/",
                     h =>
                     {
-                        h.Username(builder.Configuration["RabbitMq:Username"] ?? "guest");
-                        h.Password(builder.Configuration["RabbitMq:Password"] ?? "guest");
-                    });
-
-                cfg.ConfigureEndpoints(
-                    context);
+                        h.Username(rabbitUsername);
+                        h.Password(rabbitPassword);
+                    }
+                );
+                cfg.ConfigureEndpoints(context);
             });
         });
 

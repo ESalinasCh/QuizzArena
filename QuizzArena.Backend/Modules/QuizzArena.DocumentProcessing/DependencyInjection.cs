@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Headers;
+using System.Net.Http.Headers;
 using Azure.Storage.Blobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -52,54 +52,45 @@ public static class DependencyInjection
         });
 
         var transcriptionProvider = configuration["TranscriptionSettings:Provider"];
+        var transcriptionBaseUrl = configuration["TranscriptionSettings:BaseUrl"] ?? "http://localhost:9000/";
         if (transcriptionProvider == "Groq")
         {
-
             /*
-                Change app.settings file to Groq provider.
-                When enabling this registration:
-                - Ensure GroqWhisperSettings:ApiKey (user secret) and GroqWhisperSettings:BaseUrl are configured.
-                - To add API key to local user secret use: dotnet user-secrets set "GroqWhisperSettings:ApiKey" "apikey"
+                When using Groq:
+                - Ensure TranscriptionSettings:ApiKey (user secret or env var) is configured.
+                - To add API key to local user secret use: dotnet user-secrets set "TranscriptionSettings:ApiKey" "apikey"
             */
-
-            var apiKey = configuration["GroqWhisperSettings:ApiKey"];
-            var openAIBAseUrl = configuration["GroqWhisperSettings:BaseUrl"] ?? "https://api.groq.com/openai/v1/";
-
+            var apiKey = configuration["TranscriptionSettings:ApiKey"];
             services.AddHttpClient<ITranscriptionService, WhisperGroqTranscription>(client =>
             {
-                client.BaseAddress = new Uri(openAIBAseUrl);
+                client.BaseAddress = new Uri(transcriptionBaseUrl);
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
-                client.Timeout = TimeSpan.FromMinutes(60);
+                client.Timeout = TimeSpan.FromMinutes(30);
             });
         }
         else
         {
-            var whisperUrl = configuration["WhisperSettings:BaseUrl"] ?? "http://localhost:9000/";
-
             services.AddHttpClient<ITranscriptionService, WhisperTranscription>(client =>
             {
-                client.BaseAddress = new Uri(whisperUrl);
-                client.Timeout = TimeSpan.FromMinutes(60);
+                client.BaseAddress = new Uri(transcriptionBaseUrl);
+                client.Timeout = TimeSpan.FromMinutes(30);
             });
         }
 
 
-        var ollamaUrl = configuration["OllamaSettings:BaseUrl"] ?? "http://localhost:11434/";
         var textGenerationProvider = configuration["TextGenerationSettings:Provider"];
-        if (textGenerationProvider == "OpenAI")
+        var textGenBaseUrl = configuration["TextGenerationSettings:BaseUrl"] ?? "http://localhost:11434/";
+        if (textGenerationProvider == "OpenAiApi")
         {
             /*
-                Change app.settings file to OpenAI provider.
-                When enabling this registration:
-                - Ensure OpenAISettings:ApiKey (user secret) and OpenAISettings:BaseUrl are configured.
-                - To add API key to local user secret use: dotnet user-secrets set "OpenAISettings:ApiKey" "apikey"
+                When using OpenAiApi (e.g. Groq):
+                - Ensure TextGenerationSettings:ApiKey (user secret or env var) is configured.
+                - To add API key to local user secret use: dotnet user-secrets set "TextGenerationSettings:ApiKey" "apikey"
             */
-
-            var apiKey = configuration["OpenAISettings:ApiKey"];
-            var openAIBAseUrl = configuration["OpenAISettings:BaseUrl"] ?? "https://api.groq.com/openai/v1/";
+            var apiKey = configuration["TextGenerationSettings:ApiKey"];
             services.AddHttpClient<ITextGenerationService, OpenAICompatibleTextGeneration>(client =>
             {
-                client.BaseAddress = new Uri(openAIBAseUrl);
+                client.BaseAddress = new Uri(textGenBaseUrl);
                 client.DefaultRequestHeaders.Authorization =
                     new AuthenticationHeaderValue("Bearer", apiKey);
 
@@ -110,27 +101,26 @@ public static class DependencyInjection
         {
             services.AddHttpClient<ITextGenerationService, OllamaTextGeneration>(client =>
             {
-                client.BaseAddress = new Uri(ollamaUrl);
+                client.BaseAddress = new Uri(textGenBaseUrl);
                 client.Timeout = TimeSpan.FromMinutes(60);
             });
         }
 
         var embeddingProvider = configuration["EmbeddingSettings:Provider"];
+        var embeddingBaseUrl = configuration["EmbeddingSettings:BaseUrl"] ?? "http://localhost:11434/";
 
-        if (embeddingProvider == "Gemini")
+        if (embeddingProvider == "GoogleGemini")
         {
             /*
-                to use this service, Change EmbeddingSettings:Provider  to Gemini provider.
-                When enabling this registration:
-                - Ensure GeminiSettings:ApiKey (user secret) and GeminiSettings:BaseUrl are configured.
-                - To add API key to local user secret use: dotnet user-secrets set "GeminiSettings:ApiKey" "apikey"
+                When using GoogleGemini:
+                - Ensure EmbeddingSettings:ApiKey (user secret or env var) is configured.
+                - To add API key to local user secret use: dotnet user-secrets set "EmbeddingSettings:ApiKey" "apikey"
             */
             services.AddHttpClient<IEmbeddingService, GeminiEmbeddingGeneration>(client =>
             {
-                var geminiEmbeddingUrl = configuration["GeminiSettings:BaseUrl"]!;
-                var apiKey = configuration["GeminiSettings:ApiKey"]!;
+                var apiKey = configuration["EmbeddingSettings:ApiKey"];
 
-                client.BaseAddress = new Uri(geminiEmbeddingUrl);
+                client.BaseAddress = new Uri(embeddingBaseUrl);
                 client.Timeout = TimeSpan.FromMinutes(60);
                 client.DefaultRequestHeaders.Add("x-goog-api-key", apiKey);
             });
@@ -139,7 +129,7 @@ public static class DependencyInjection
         {
             services.AddHttpClient<IEmbeddingService, OllamaEmbeddingGeneration>(client =>
             {
-                client.BaseAddress = new Uri(ollamaUrl);
+                client.BaseAddress = new Uri(embeddingBaseUrl);
                 client.Timeout = TimeSpan.FromMinutes(60);
             });
         }
