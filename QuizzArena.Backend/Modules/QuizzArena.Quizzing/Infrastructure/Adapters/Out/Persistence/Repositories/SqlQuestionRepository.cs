@@ -27,6 +27,20 @@ public class SqlQuestionRepository(QuizzingDbContext context) : IQuestionReposit
             .Where(q => questionIds.Contains(q.Id))
             .ToListAsync();
     }
+    public async Task<Question?> GetByIdWithOptionsAsync(Guid questionId)
+    {
+        return await context.Questions
+            .Include(q => q.Options.Where(o => !o.Deleted))
+            .FirstOrDefaultAsync(q => q.Id == questionId && !q.Deleted);
+    }
+
+    public async Task<Question> UpdateAsync(Question question)
+    {
+        context.Questions.Update(question);
+        await context.SaveChangesAsync();
+        return question;
+    }
+
     public async Task<List<Question>> GetByProcessingJobIdAsync(QuestionFilters filters)
     {
         IQueryable<Question> query = context.Questions
