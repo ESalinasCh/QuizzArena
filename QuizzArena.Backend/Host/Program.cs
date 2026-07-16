@@ -90,11 +90,19 @@ public class Program
         if (string.IsNullOrWhiteSpace(rabbitMqConnectionString))
         {
             if (string.IsNullOrWhiteSpace(rabbitHost))
+            {
                 throw new InvalidOperationException("Configuration 'RabbitMq:Host' is required but was not found.");
+            }
+
             if (string.IsNullOrWhiteSpace(rabbitUsername))
+            {
                 throw new InvalidOperationException("Configuration 'RabbitMq:Username' is required but was not found.");
+            }
+
             if (string.IsNullOrWhiteSpace(rabbitPassword))
+            {
                 throw new InvalidOperationException("Configuration 'RabbitMq:Password' is required but was not found.");
+            }
         }
 
         builder.Services.AddMassTransit(x =>

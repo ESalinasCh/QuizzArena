@@ -1,5 +1,4 @@
-﻿using System.Net.Http;
-using System.Text.Json;
+﻿using System.Text.Json;
 using QuizzArena.DocumentProcessing.Application.Ports.Out;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Services;
