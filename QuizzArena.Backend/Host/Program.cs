@@ -70,6 +70,16 @@ public class Program
 
         builder.Services.AddJwtAuthentication(builder.Configuration);
 
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAll", policy =>
+            {
+                policy.AllowAnyOrigin()
+                      .AllowAnyHeader()
+                      .AllowAnyMethod();
+            });
+        });
+
         builder.Services.AddUsersModule(builder.Configuration);
         builder.Services.AddQuizzingModule(builder.Configuration);
         builder.Services.AddDocumentProcessingModule(builder.Configuration);
@@ -151,6 +161,8 @@ public class Program
         app.UseHttpsRedirection();
 
         app.UseAuthentication();
+
+        app.UseCors("AllowAll");
 
         app.UseAuthorization();
 
