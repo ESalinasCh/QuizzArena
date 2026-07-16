@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Schema;
+using Microsoft.Extensions.Logging;
 using QuizzArena.DocumentProcessing.Application.Ports.Out;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Services;
@@ -9,15 +10,17 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Services;
 internal class OpenAICompatibleTextGeneration : ITextGenerationService
 {
     private readonly HttpClient _httpClient;
+    private readonly ILogger<OpenAICompatibleTextGeneration> _logger;
 
     private readonly JsonSerializerOptions _caseInsensitiveOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
 
-    public OpenAICompatibleTextGeneration(HttpClient httpClient)
+    public OpenAICompatibleTextGeneration(HttpClient httpClient, ILogger<OpenAICompatibleTextGeneration> logger)
     {
         _httpClient = httpClient;
+        _logger = logger;
     }
 
     private sealed record GroqChatCompletionResponse(
@@ -35,12 +38,16 @@ internal class OpenAICompatibleTextGeneration : ITextGenerationService
 
     public async Task<T> GenerateAsync<T>(string model, string prompt)
     {
+        _logger.LogInformation("[LLM-Gen] Iniciando generación con modelo: '{Model}' para el tipo '{Type}'", model, typeof(T).Name);
+
         if (typeof(T) == typeof(string))
         {
             var response = await GetCompletionAsync(model, prompt, schema: null);
             var content = response.Choices.First().Message.Content.Trim();
             return (T)(object)content;
         }
+
+        _logger.LogDebug("[LLM-Gen] Generando esquema JSON estricto para tipo '{Type}'", typeof(T).Name);
 
         var exporterOptions = new JsonSchemaExporterOptions
         {
@@ -69,8 +76,12 @@ internal class OpenAICompatibleTextGeneration : ITextGenerationService
             );
         }
 
+        _logger.LogDebug("[LLM-Gen] Esquema estructurado construido: {Schema}", schema.ToJsonString());
+
         var baseResponse = await GetCompletionAsync(model, prompt, schema);
         var baseContent = baseResponse.Choices.First().Message.Content;
+
+        _logger.LogDebug("[LLM-Gen] Intentando deserializar respuesta JSON a '{Type}'", typeof(T).Name);
 
         var result = JsonSerializer.Deserialize<T>(
             baseContent,
@@ -117,18 +128,31 @@ internal class OpenAICompatibleTextGeneration : ITextGenerationService
                 }
         };
 
+        var serializedPayload = JsonSerializer.Serialize(payload);
+        _logger.LogInformation("[LLM-Gen] Enviando POST a {Uri} con Payload: {Payload}",
+            _httpClient.BaseAddress != null ? new Uri(_httpClient.BaseAddress, "chat/completions") : "chat/completions",
+            serializedPayload);
+
         var response = await _httpClient.PostAsync(
             "chat/completions",
             new StringContent(
-                JsonSerializer.Serialize(payload),
+                serializedPayload,
                 Encoding.UTF8,
                 "application/json"
             )
         );
 
-        response.EnsureSuccessStatusCode();
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync();
+            _logger.LogError("[LLM-Gen] Falló la petición. Código: {StatusCode} ({Reason}). Respuesta del servidor: {ErrorBody}",
+                response.StatusCode, response.ReasonPhrase, errorContent);
+
+            response.EnsureSuccessStatusCode(); // Lanzará el HttpRequestException
+        }
 
         var rawContent = await response.Content.ReadAsStringAsync();
+        _logger.LogDebug("[LLM-Gen] Respuesta cruda exitosa recibida del proveedor.");
 
         var completionResponse = JsonSerializer.Deserialize<GroqChatCompletionResponse>(
             rawContent,
@@ -144,5 +168,4 @@ internal class OpenAICompatibleTextGeneration : ITextGenerationService
 
         return completionResponse;
     }
-
 }
