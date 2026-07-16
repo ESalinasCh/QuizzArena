@@ -84,8 +84,8 @@ public class Program
 
         var rabbitMqConnectionString = builder.Configuration["RabbitMQ:ConnectionStrings"];
         var rabbitHost = builder.Configuration["RabbitMq:Host"];
-        var rabbitUsername = builder.Configuration["RabbitMq:Username"];
-        var rabbitPassword = builder.Configuration["RabbitMq:Password"];
+        var rabbitUsername = builder.Configuration["RabbitMq:Username"] ?? "guest";
+        var rabbitPassword = builder.Configuration["RabbitMq:Password"] ?? "guest";
 
         if (string.IsNullOrWhiteSpace(rabbitMqConnectionString))
         {
