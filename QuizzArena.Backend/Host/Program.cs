@@ -19,16 +19,24 @@ public class Program
         DotNetEnv.Env.TraversePath().Load();
         var builder = WebApplication.CreateBuilder(args);
 
-        // Configure Azure Key Vault and map secrets if not running in Development environment
+        Console.WriteLine($"Environment: {builder.Environment.EnvironmentName}");
+        Console.WriteLine($"Is Development: {builder.Environment.IsDevelopment()}");
+
         if (!builder.Environment.IsDevelopment())
         {
             var vaultUri = builder.Configuration["AzureKeyVault:VaultUri"];
             if (!string.IsNullOrEmpty(vaultUri))
             {
-                builder.Configuration.AddAzureKeyVault(new Uri(vaultUri), new DefaultAzureCredential());
+
+                var options = new DefaultAzureCredentialOptions
+                {
+                    ExcludeVisualStudioCredential = true,
+                };
+
+                var credential = new DefaultAzureCredential(options);
+                builder.Configuration.AddAzureKeyVault(new Uri(vaultUri), credential);
             }
 
-            // Map production Key Vault secrets to standard application configuration keys
             if (!string.IsNullOrEmpty(builder.Configuration["DbSettings:ConnectionString"]))
             {
                 builder.Configuration["ConnectionStrings:DefaultConnection"] = builder.Configuration["DbSettings:ConnectionString"];
@@ -37,10 +45,6 @@ public class Program
             {
                 builder.Configuration["ConnectionStrings:AzureBlobStorage"] = builder.Configuration["AzureStorage:BlobConnectionString"];
             }
-            // if (!string.IsNullOrEmpty(builder.Configuration["WhisperService:Url"]))
-            // {
-            //     builder.Configuration["TranscriptionSettings:BaseUrl"] = builder.Configuration["WhisperService:Url"];
-            // }
             if (!string.IsNullOrEmpty(builder.Configuration["WhisperService:ApiKey"]))
             {
                 builder.Configuration["TranscriptionSettings:ApiKey"] = builder.Configuration["WhisperService:ApiKey"];
