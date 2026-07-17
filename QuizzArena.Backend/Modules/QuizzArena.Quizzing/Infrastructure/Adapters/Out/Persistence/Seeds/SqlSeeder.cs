@@ -6,6 +6,11 @@ internal sealed class SqlSeeder
 {
     public static async Task SeedAsync(QuizzingDbContext context)
     {
+        if (await context.Matches.CountAsync() >= 3)
+        {
+            return;
+        }
+
         var scriptPath = Path.Combine(
             AppContext.BaseDirectory,
             "Infrastructure",
