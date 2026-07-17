@@ -5,6 +5,7 @@ using Host.Extensions;
 using Host.Security;
 using MassTransit;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.OpenApi;
 using QuizzArena.DocumentProcessing;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Messaging.Configuration;
 using QuizzArena.Quizzing;
@@ -84,7 +85,24 @@ public class Program
         builder.Services.AddQuizzingModule(builder.Configuration);
         builder.Services.AddDocumentProcessingModule(builder.Configuration);
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        
+        builder.Services.AddSwaggerGen(options =>
+        {
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT",
+                In = ParameterLocation.Header,
+                Description = "Enter JWT token"
+            });
+        
+            options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+            {
+                [new OpenApiSecuritySchemeReference("Bearer", document)] = []
+            });
+        });
 
         builder.Services.AddControllers()
         .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
@@ -148,12 +166,12 @@ public class Program
         WebApplication app = builder.Build();
 
         await app.ApplyMigrations();
+        app.UseSwagger();
+        app.UseSwaggerUI();
 
         if (app.Environment.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
-            app.UseSwagger();
-            app.UseSwaggerUI();
         }
 
         app.UseMiddleware<GlobalExceptionMiddleware>();
