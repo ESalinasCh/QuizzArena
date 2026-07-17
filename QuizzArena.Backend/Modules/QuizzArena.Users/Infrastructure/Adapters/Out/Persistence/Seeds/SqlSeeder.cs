@@ -6,7 +6,7 @@ internal sealed class SqlSeeder
 {
     public static async Task SeedAsync(UserDbContext context)
     {
-        if (await context.Users.CountAsync() >= 3)
+        if (await context.Users.CountAsync() >= 5)
         {
             return;
         }
