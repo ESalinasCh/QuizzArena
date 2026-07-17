@@ -45,7 +45,7 @@ VALUES
     '30000000-0000-0000-0000-000000000003'::uuid,
     'IA Generativa',
     'Modelos generativos, LLM y aplicaciones.',
-    'published',
+    'archived',
     FALSE,
     NOW() - INTERVAL '60 days',
     NOW(),
@@ -56,7 +56,7 @@ VALUES
     '30000000-0000-0000-0000-000000000004'::uuid,
     'Ética en Inteligencia Artificial',
     'Privacidad, sesgos y uso responsable de la IA.',
-    'published',
+    'draft',
     FALSE,
     NOW() - INTERVAL '55 days',
     NOW(),
@@ -377,7 +377,7 @@ VALUES
 (
     '40000000-0000-0000-0000-000000000001'::uuid,
     'EXAM-001',
-    'active',
+    'expired',
     NOW() - INTERVAL '45 days',
     NOW() - INTERVAL '45 days' + INTERVAL '60 minutes',
     'exam',
@@ -397,7 +397,7 @@ VALUES
 (
     '40000000-0000-0000-0000-000000000002'::uuid,
     'EXAM-002',
-    'active',
+    'expired',
     NOW() - INTERVAL '35 days',
     NOW() - INTERVAL '35 days' + INTERVAL '60 minutes',
     'exam',
@@ -417,7 +417,7 @@ VALUES
 (
     '40000000-0000-0000-0000-000000000003'::uuid,
     'EXAM-003',
-    'active',
+    'expired',
     NOW() - INTERVAL '25 days',
     NOW() - INTERVAL '25 days' + INTERVAL '60 minutes',
     'exam',
@@ -458,8 +458,8 @@ VALUES
 (
     '40000000-0000-0000-0000-000000000005'::uuid,
     'EXAM-005',
-    'active',
-    NOW() - INTERVAL '2 days',
+    'pending',
+    NOW() + INTERVAL '3 days',
     NULL,
     'exam',
     60,
@@ -479,7 +479,7 @@ VALUES
 (
     '40000000-0000-0000-0000-000000000006'::uuid,
     'SINGLE-001',
-    'active',
+    'expired',
     NOW() - INTERVAL '7 days',
     NULL,
     'single',
@@ -558,7 +558,7 @@ VALUES
 );
 
 -- ============================================================
--- 7. MATCH_ATTEMPTS (3 completados para los exámenes expirados)
+-- 7. MATCH_ATTEMPTS
 -- ============================================================
 
 INSERT INTO quizzing.match_attempt
@@ -574,12 +574,13 @@ INSERT INTO quizzing.match_attempt
     "MatchId"
 )
 VALUES
+-- Max: 3 exams completed
 (
     '50000000-0000-0000-0000-000000000001'::uuid,
     NOW() - INTERVAL '45 days' + INTERVAL '5 minutes',
     NOW() - INTERVAL '45 days' + INTERVAL '55 minutes',
     NOW() - INTERVAL '45 days' + INTERVAL '3 minutes',
-    'carlos.ruiz',
+    'max.maximus',
     'completed',
     100.00,
     '37976960-c868-45d4-b3c2-4967cb46f4b0'::uuid,
@@ -590,7 +591,7 @@ VALUES
     NOW() - INTERVAL '35 days' + INTERVAL '7 minutes',
     NOW() - INTERVAL '35 days' + INTERVAL '57 minutes',
     NOW() - INTERVAL '35 days' + INTERVAL '4 minutes',
-    'carlos.ruiz',
+    'max.maximus',
     'completed',
     87.50,
     '37976960-c868-45d4-b3c2-4967cb46f4b0'::uuid,
@@ -601,11 +602,104 @@ VALUES
     NOW() - INTERVAL '25 days' + INTERVAL '3 minutes',
     NOW() - INTERVAL '25 days' + INTERVAL '52 minutes',
     NOW() - INTERVAL '25 days' + INTERVAL '2 minutes',
-    'carlos.ruiz',
+    'max.maximus',
     'completed',
     75.00,
     '37976960-c868-45d4-b3c2-4967cb46f4b0'::uuid,
     '40000000-0000-0000-0000-000000000003'::uuid
+),
+-- Max: 4 single/quiz attempts (completed, completed, timeout, in_progress)
+(
+    '50000000-0000-0000-0000-000000000004'::uuid,
+    NOW() - INTERVAL '7 days' + INTERVAL '10 minutes',
+    NOW() - INTERVAL '7 days' + INTERVAL '23 minutes',
+    NOW() - INTERVAL '7 days' + INTERVAL '8 minutes',
+    'max.maximus',
+    'completed',
+    75.00,
+    '37976960-c868-45d4-b3c2-4967cb46f4b0'::uuid,
+    '40000000-0000-0000-0000-000000000006'::uuid
+),
+(
+    '50000000-0000-0000-0000-000000000005'::uuid,
+    NOW() - INTERVAL '6 days' + INTERVAL '5 minutes',
+    NOW() - INTERVAL '6 days' + INTERVAL '19 minutes',
+    NOW() - INTERVAL '6 days' + INTERVAL '3 minutes',
+    'max.maximus',
+    'completed',
+    62.50,
+    '37976960-c868-45d4-b3c2-4967cb46f4b0'::uuid,
+    '40000000-0000-0000-0000-000000000007'::uuid
+),
+(
+    '50000000-0000-0000-0000-000000000006'::uuid,
+    NOW() - INTERVAL '4 days' + INTERVAL '2 minutes',
+    NOW() - INTERVAL '4 days' + INTERVAL '17 minutes',
+    NOW() - INTERVAL '4 days' + INTERVAL '1 minute',
+    'max.maximus',
+    'timeout',
+    37.50,
+    '37976960-c868-45d4-b3c2-4967cb46f4b0'::uuid,
+    '40000000-0000-0000-0000-000000000008'::uuid
+),
+(
+    '50000000-0000-0000-0000-000000000007'::uuid,
+    NOW() - INTERVAL '3 days' + INTERVAL '1 minute',
+    NULL,
+    NOW() - INTERVAL '3 days',
+    'max.maximus',
+    'in_progress',
+    0.00,
+    '37976960-c868-45d4-b3c2-4967cb46f4b0'::uuid,
+    '40000000-0000-0000-0000-000000000009'::uuid
+);
+
+-- student01: 1 completed exam, 1 timeout exam, 1 in_progress exam
+INSERT INTO quizzing.match_attempt
+(
+    "Id",
+    "StartDateTime",
+    "EndDateTime",
+    "JoinedAt",
+    "Nickname",
+    "Status",
+    "Score",
+    "UserId",
+    "MatchId"
+)
+VALUES
+(
+    '50000000-0000-0000-0000-000000000008'::uuid,
+    NOW() - INTERVAL '44 days' + INTERVAL '10 minutes',
+    NOW() - INTERVAL '44 days' + INTERVAL '58 minutes',
+    NOW() - INTERVAL '44 days' + INTERVAL '8 minutes',
+    'student01',
+    'completed',
+    62.50,
+    '33333333-3333-3333-3333-333333333333'::uuid,
+    '40000000-0000-0000-0000-000000000001'::uuid
+),
+(
+    '50000000-0000-0000-0000-000000000009'::uuid,
+    NOW() - INTERVAL '34 days' + INTERVAL '5 minutes',
+    NOW() - INTERVAL '34 days' + INTERVAL '65 minutes',
+    NOW() - INTERVAL '34 days' + INTERVAL '3 minutes',
+    'student01',
+    'timeout',
+    37.50,
+    '33333333-3333-3333-3333-333333333333'::uuid,
+    '40000000-0000-0000-0000-000000000002'::uuid
+),
+(
+    '50000000-0000-0000-0000-000000000010'::uuid,
+    NOW() - INTERVAL '5 days' + INTERVAL '2 minutes',
+    NULL,
+    NOW() - INTERVAL '5 days',
+    'student01',
+    'in_progress',
+    0.00,
+    '33333333-3333-3333-3333-333333333333'::uuid,
+    '40000000-0000-0000-0000-000000000004'::uuid
 );
 
 -- ============================================================
