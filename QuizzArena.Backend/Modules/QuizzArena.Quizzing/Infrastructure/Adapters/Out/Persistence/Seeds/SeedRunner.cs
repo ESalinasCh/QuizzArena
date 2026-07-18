@@ -1,4 +1,4 @@
-namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Seeds;
+﻿namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Seeds;
 
 internal sealed class SeedRunner
 {
