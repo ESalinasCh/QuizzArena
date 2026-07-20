@@ -48,6 +48,7 @@ public class UploadSourceUseCase(
         if (classSource.Type == SourceType.Text)
         {
             classSource.TranscriptUrl = fileUrl;
+            classSource.Status = SourceStatus.Completed;
         }
 
         ClassSource createdClass = await classSourceRepository.CreateAsync(classSource);
