@@ -20,6 +20,13 @@ public class SqlQuestionRepository(QuizzingDbContext context) : IQuestionReposit
             .ToListAsync();
     }
 
+    public async Task<List<Question>> GetActiveByIdsAsync(IEnumerable<Guid> questionIds)
+    {
+        return await context.Questions
+            .Where(q => questionIds.Contains(q.Id) && !q.Deleted)
+            .ToListAsync();
+    }
+
     public async Task<List<Question>> GetByIdsWithOptionsAsync(List<Guid> questionIds)
     {
         return await context.Questions
@@ -44,9 +51,10 @@ public class SqlQuestionRepository(QuizzingDbContext context) : IQuestionReposit
     public async Task<List<Question>> GetByProcessingJobIdAsync(QuestionFilters filters)
     {
         IQueryable<Question> query = context.Questions
-            .Include(q => q.Options)
+            .Include(q => q.Options.Where(o => !o.Deleted))
             .AsNoTracking()
             .Where(q =>
+                !q.Deleted &&
                 q.ProcessingJobId.HasValue &&
                 filters.ProcessingJobIds.Contains(q.ProcessingJobId.Value) &&
                 q.Status == filters.Status);

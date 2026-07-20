@@ -22,7 +22,7 @@ public class CreateExamUseCase(
     {
         await createValidator.ValidateAndThrowAsync(dto);
 
-        List<Question> questions = await questionRepository.GetByIdsAsync(dto.QuestionIds.ToList());
+        List<Question> questions = await questionRepository.GetActiveByIdsAsync(dto.QuestionIds.ToList());
 
         if (questions.Count != dto.QuestionIds.Count())
         {
