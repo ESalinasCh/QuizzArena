@@ -5,6 +5,7 @@ name: "Backend CD"
 #   dotnet publish -> zip -> az webapp deploy
 #
 # Mirrors the OIDC login pattern used by the infra repo's terraform-cd.yml.
+# (live test: confirming this triggers automatically on push)
 
 on:
   push:
@@ -23,7 +24,7 @@ env:
 
   # Azure Web App (created via Azure CLI, own subscription)
   PROD_RESOURCE_GROUP: "quiz-backend-prod-rg"
-  PROD_WEBAPP_NAME: "quiz-backend-prod-glelan"
+  PROD_WEBAPP_NAME: "quizzarena-backend-prod"
 
 jobs:
   deploy:
