@@ -15,4 +15,5 @@ public interface IMatchAttemptRepository
     Task<List<MatchAttempt>> GetAttemptsByMatchId(Guid matchId, MatchAttemptFilters filters);
     Task<List<MatchAttempt>> GetAttemptsByUserIds(Guid matchId, List<Guid> userIds);
     Task<int> GetMatchAttemptCountByMatchIdAndStatusAsync(Guid matchId, QuizAttemptStatus status);
+    Task UpdateMatchAttempts(List<MatchAttempt> matchAttempts);
 }

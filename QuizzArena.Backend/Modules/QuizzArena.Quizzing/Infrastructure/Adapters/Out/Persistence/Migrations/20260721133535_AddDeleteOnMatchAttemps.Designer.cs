@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using QuizzArena.Quizzing.Domain.Enums;
@@ -12,9 +13,11 @@ using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence;
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
 {
     [DbContext(typeof(QuizzingDbContext))]
-    partial class QuizzingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260721133535_AddDeleteOnMatchAttemps")]
+    partial class AddDeleteOnMatchAttemps
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -17,19 +17,20 @@ internal sealed class SqlMatchAttemptRepository(QuizzingDbContext context) : IMa
 
     public async Task<int> GetMatchAttemptCountByMatchIdAndUserIdAsync(Guid matchId, Guid userId)
     {
-        return await context.MatchAttempts.CountAsync(ma => ma.MatchId == matchId && ma.UserId == userId);
+        return await context.MatchAttempts.CountAsync(ma => ma.MatchId == matchId && ma.UserId == userId && !ma.Deleted);
     }
 
     public async Task<int> GetMatchAttemptCountByMatchIdAndStatusAsync(Guid matchId, QuizAttemptStatus status)
     {
-        return await context.MatchAttempts.CountAsync(ma => ma.MatchId == matchId && ma.Status == status);
+        return await context.MatchAttempts.CountAsync(ma => ma.MatchId == matchId && ma.Status == status && !ma.Deleted);
     }
     public async Task<bool> HasActiveAttemptByMatchIdAsync(Guid matchId, Guid userId)
     {
         return await context.MatchAttempts.AnyAsync(
             ma => ma.MatchId == matchId &&
             ma.UserId == userId &&
-            ma.Status == QuizAttemptStatus.InProgress
+            ma.Status == QuizAttemptStatus.InProgress &&
+            !ma.Deleted
         );
     }
     public async Task<MatchAttempt?> GetByIdAsync(Guid matchAttemptId)
@@ -44,11 +45,17 @@ internal sealed class SqlMatchAttemptRepository(QuizzingDbContext context) : IMa
         return matchAttempt;
     }
 
+    public async Task UpdateMatchAttempts(List<MatchAttempt> matchAttempts)
+    {
+        context.MatchAttempts.UpdateRange(matchAttempts);
+        await context.SaveChangesAsync();
+    }
+
     public async Task<List<MatchAttempt>> GetAttemptsByStudentId(Guid studentId, MatchAttemptFilters filters)
     {
         var query = context.MatchAttempts
          .AsNoTracking()
-         .Where(x => x.UserId == studentId)
+         .Where(x => x.UserId == studentId && !x.Deleted)
          .Join(
             context.Matches.AsNoTracking(),
             matchAttempt => matchAttempt.MatchId,
@@ -103,7 +110,7 @@ internal sealed class SqlMatchAttemptRepository(QuizzingDbContext context) : IMa
     {
         IQueryable<MatchAttempt> query = context.MatchAttempts
             .AsNoTracking()
-            .Where(x => x.MatchId == matchId);
+            .Where(x => x.MatchId == matchId && !x.Deleted);
 
         if (filters.Status.HasValue)
         {
@@ -131,7 +138,8 @@ internal sealed class SqlMatchAttemptRepository(QuizzingDbContext context) : IMa
             .AsNoTracking()
             .Where(x =>
                 x.MatchId == matchId &&
-                userIds.Contains(x.UserId))
+                userIds.Contains(x.UserId) &&
+                !x.Deleted)
             .ToListAsync();
     }
 }

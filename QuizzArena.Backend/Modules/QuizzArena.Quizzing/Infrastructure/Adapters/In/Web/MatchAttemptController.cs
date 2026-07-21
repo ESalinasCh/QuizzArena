@@ -18,7 +18,8 @@ public class MatchAttemptController(
     IFinishMatchTrackedUseCase finishMatchTrackedUseCase,
     IGetMatchAttemptsByStudent getMatchAttemptsByStudent,
     IGetMatchAttemptDetail getMatchAttemptDetail,
-    IGetMatchAttemptGradesUseCase getMatchAttemptGradesUseCase
+    IGetMatchAttemptGradesUseCase getMatchAttemptGradesUseCase,
+    IResetMatchAttemptUseCase resetMatchAttemptUseCase
 ) : ControllerBase
 {
     [HttpPost("plays")]
@@ -85,5 +86,13 @@ public class MatchAttemptController(
     {
         var matchAttemptDetail = await getMatchAttemptDetail.Execute(attemptId);
         return Ok(matchAttemptDetail);
+    }
+
+    [HttpPost("match-attempts/{userId}/reset")]
+    [Authorize(Roles = "teacher")]
+    public async Task<ActionResult<GetMatchAttemptDetailDTO>> ResetMatchAttempt([FromRoute] Guid userId)
+    {
+        await resetMatchAttemptUseCase.Execute(userId);
+        return Ok();
     }
 }
