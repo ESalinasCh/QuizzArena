@@ -71,21 +71,15 @@ public class Program
 
         builder.Services.AddJwtAuthentication(builder.Configuration);
 
-        builder.Services.AddCors(options =>
-        {
-            options.AddPolicy("AllowAll", policy =>
-            {
-                policy.AllowAnyOrigin()
+        builder.Services.AddCors(options => options.AddPolicy("AllowAll", policy => policy.AllowAnyOrigin()
                       .AllowAnyHeader()
-                      .AllowAnyMethod();
-            });
-        });
+                      .AllowAnyMethod()));
 
         builder.Services.AddUsersModule(builder.Configuration);
         builder.Services.AddQuizzingModule(builder.Configuration);
         builder.Services.AddDocumentProcessingModule(builder.Configuration);
         builder.Services.AddEndpointsApiExplorer();
-        
+
         builder.Services.AddSwaggerGen(options =>
         {
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -97,7 +91,7 @@ public class Program
                 In = ParameterLocation.Header,
                 Description = "Enter JWT token"
             });
-        
+
             options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
             {
                 [new OpenApiSecuritySchemeReference("Bearer", document)] = []
