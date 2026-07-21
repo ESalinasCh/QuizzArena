@@ -19,6 +19,10 @@ public class MatchAttempt
     public ICollection<Answer> Answers { get; set; } = [];
     public ICollection<MatchAttemptQuestion> MatchAttemptQuestions { get; set; } = [];
 
+    public bool Deleted { get; set; }
+    public DateTimeOffset? DeletedAt { get; set; }
+    public DateTimeOffset? UpdatedAt { get; set; }
+
     [NotMapped]
     public List<MatchAttempt> OtherAttempts { get; set; } = [];
 }
