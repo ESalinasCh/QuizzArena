@@ -117,10 +117,12 @@ internal class OpenAICompatibleTextGeneration : ITextGenerationService
                 }
         };
 
+        var serializedPayload = JsonSerializer.Serialize(payload);
+
         var response = await _httpClient.PostAsync(
             "chat/completions",
             new StringContent(
-                JsonSerializer.Serialize(payload),
+                serializedPayload,
                 Encoding.UTF8,
                 "application/json"
             )
@@ -144,5 +146,4 @@ internal class OpenAICompatibleTextGeneration : ITextGenerationService
 
         return completionResponse;
     }
-
 }

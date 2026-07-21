@@ -31,6 +31,7 @@ public class UploadSourceUseCase(
 
         Guid userId = Guid.Parse(currentUser.UserId);
         ClassSource classSource = mapper.Map<ClassSource>(dto);
+        classSource.UserId = userId;
         classSource.Type = SourceTypeResolver.Resolve(dto.File.FileName);
 
         CourseDto? course = await courseContract.GetCourseById(dto.CourseId) ?? throw new InvalidOperationException("Course not found");
@@ -47,6 +48,7 @@ public class UploadSourceUseCase(
         if (classSource.Type == SourceType.Text)
         {
             classSource.TranscriptUrl = fileUrl;
+            classSource.Status = SourceStatus.Completed;
         }
 
         ClassSource createdClass = await classSourceRepository.CreateAsync(classSource);

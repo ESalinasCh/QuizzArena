@@ -35,7 +35,7 @@ public partial class TranscriptionRequestConsumer(
             if (classSource != null)
             {
                 classSource.TranscriptUrl = transcriptUrl;
-                classSource.Status = SourceStatus.Processing;
+                classSource.Status = SourceStatus.Completed;
                 await classSourceRepository.UpdateAsync(classSource);
             }
             else

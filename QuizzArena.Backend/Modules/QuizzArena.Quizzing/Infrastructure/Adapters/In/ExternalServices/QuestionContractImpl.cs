@@ -20,7 +20,7 @@ public class QuestionContract(
                 Id = questionId,
                 Content = q.Content,
                 Justification = q.Justification,
-                Status = QuestionStatus.Draft,
+                Status = QuestionStatus.Verified,
                 Origin = QuestionOrigin.AiGenerated,
                 Type = QuestionType.SingleChoice,
                 Deleted = false,

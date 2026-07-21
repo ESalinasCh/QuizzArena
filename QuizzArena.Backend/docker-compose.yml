@@ -18,8 +18,9 @@ services:
       RabbitMq__Host: rabbitmq
       RabbitMq__Username: guest
       RabbitMq__Password: guest
-      WhisperSettings__BaseUrl: "http://whisper:9000/"
-      OllamaSettings__BaseUrl: "http://ollama:11434/"
+      TranscriptionSettings__BaseUrl: "http://whisper:9000/"
+      TextGenerationSettings__BaseUrl: "http://ollama:11434/"
+      EmbeddingSettings__BaseUrl: "http://ollama:11434/"
     ports:
       - "8080:8080"
     depends_on:
