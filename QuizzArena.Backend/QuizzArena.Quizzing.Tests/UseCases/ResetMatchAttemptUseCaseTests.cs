@@ -40,14 +40,9 @@ public class ResetMatchAttemptUseCaseTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
-        MatchAttemptFilters filters = new MatchAttemptFilters
-        {
-            Page = 1,
-            PageSize = 10
-        };
 
         _mockMatchAttemptRepository
-            .Setup(r => r.GetAttemptsByStudentId(userId, filters))
+            .Setup(r => r.GetAttemptsByStudentId(userId, It.IsAny<MatchAttemptFilters>()))
             .ReturnsAsync([]);
 
         // Act & Assert
@@ -65,11 +60,6 @@ public class ResetMatchAttemptUseCaseTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
-        MatchAttemptFilters filters = new MatchAttemptFilters
-        {
-            Page = 1,
-            PageSize = 10
-        };
 
         List<MatchAttempt> attempts = new List<MatchAttempt>
         {
@@ -81,7 +71,7 @@ public class ResetMatchAttemptUseCaseTests
         };
 
         _mockMatchAttemptRepository
-            .Setup(r => r.GetAttemptsByStudentId(userId, filters))
+            .Setup(r => r.GetAttemptsByStudentId(userId, It.IsAny<MatchAttemptFilters>()))
             .ReturnsAsync(attempts);
 
         // Act
