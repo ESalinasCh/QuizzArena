@@ -11,11 +11,6 @@ public class ResetMatchAttemptUseCase(
 {
     public async Task Execute(Guid userId)
     {
-        if (userId == Guid.Empty)
-        {
-            throw new ArgumentException("User ID cannot be empty.", nameof(userId));
-        }
-
         MatchAttemptFilters filters = new MatchAttemptFilters
         {
             Page = 1,
