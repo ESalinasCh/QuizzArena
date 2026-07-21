@@ -1,0 +1,67 @@
+name: "Backend CD"
+
+# Builds and deploys the .NET backend to the production Azure Web App
+# on every push to main. Automates the manual zip-deploy process:
+#   dotnet publish -> zip -> az webapp deploy
+#
+# Mirrors the OIDC login pattern used by the infra repo's terraform-cd.yml.
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  DOTNET_VERSION: '10.0.x'
+  HUSKY: '0'           # prevent Husky hooks from running inside the runner
+  DOTNET_NOLOGO: '1'   # suppress the .NET CLI logo in log output
+
+  # Azure Web App (created via Azure CLI, own subscription)
+  PROD_RESOURCE_GROUP: "quiz-backend-prod-rg"
+  PROD_WEBAPP_NAME: "quizzarena-backend-prod"
+
+jobs:
+  deploy:
+    name: "Build & Deploy"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore QuizzArena.Backend/QuizzArena.Backend.slnx
+
+      - name: Publish
+        run: |
+          dotnet publish QuizzArena.Backend/Host/Host.csproj \
+            -c Release \
+            -o ./publish \
+            --no-restore
+
+      - name: Zip publish output
+        working-directory: ./publish
+        run: zip -r ../app.zip .
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy to Azure Web App
+        run: |
+          az webapp deploy \
+            --resource-group "${{ env.PROD_RESOURCE_GROUP }}" \
+            --name "${{ env.PROD_WEBAPP_NAME }}" \
+            --src-path ./app.zip \
+            --type zip
