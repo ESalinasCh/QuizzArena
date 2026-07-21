@@ -14,6 +14,7 @@ public class GlobalExceptionMiddleware(RequestDelegate next)
         [typeof(UnauthorizedAccessException)] = new UnauthorizedAccessExceptionHandler(),
         [typeof(KeyNotFoundException)] = new KeyNotFoundExceptionHandler(),
         [typeof(ValidationException)] = new ValidationExceptionHandler(),
+        [typeof(ArgumentException)] = new ArgumentExceptionHandler()
     };
 
     public async Task InvokeAsync(HttpContext context)
