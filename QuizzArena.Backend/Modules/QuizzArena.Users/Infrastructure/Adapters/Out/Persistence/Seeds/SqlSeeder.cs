@@ -6,10 +6,11 @@ internal sealed class SqlSeeder
 {
     public static async Task SeedAsync(UserDbContext context)
     {
-        if (await context.Users.AnyAsync())
+        if (await context.Users.CountAsync() >= 5)
         {
             return;
         }
+
         var scriptPath = Path.Combine(
             AppContext.BaseDirectory,
             "Infrastructure",

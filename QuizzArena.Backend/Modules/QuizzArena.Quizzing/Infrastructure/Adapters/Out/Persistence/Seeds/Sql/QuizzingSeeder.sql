@@ -121,12 +121,11 @@ VALUES
 ON CONFLICT ("Id") DO NOTHING;
 
 -- ============================================================
--- 5. QUESTIONS, OPTIONS Y QUIZ_QUESTIONS (VERSIÓN CORREGIDA)
+-- 5. QUESTIONS, OPTIONS Y QUIZ_QUESTIONS
 -- ============================================================
 
 DO $$
 DECLARE
-    -- IDs de los quizzes
     quiz_ids uuid[] := ARRAY[
         '30000000-0000-0000-0000-000000000001'::uuid,
         '30000000-0000-0000-0000-000000000002'::uuid,
@@ -138,151 +137,146 @@ DECLARE
         '30000000-0000-0000-0000-000000000008'::uuid,
         '30000000-0000-0000-0000-000000000009'::uuid
     ];
-    
-    -- Preguntas por quiz (8 preguntas cada uno)
-    -- Cada pregunta tiene: [enunciado, opción1, opción2, opción3, opción4, posición_correcta (1-4)]
+
+    -- 7 elementos por pregunta: [enunciado, opt1, opt2, opt3, opt4, tipo, mascara]
+    -- tipo: 'single_choice' | 'multiple_choice' | 'true_false'
+    -- mascara: 4 chars para single/multiple ('1000'=opt1, '0110'=opt2+opt3)
+    --          2 chars para true_false ('10'=Verdadero, '01'=Falso)
+    -- true_false: opt3 y opt4 son '' y no se insertan
+    -- Estructura por quiz: Q1-Q4 single_choice, Q5-Q6 multiple_choice, Q7-Q8 true_false
+
     q1 text[] := ARRAY[
-        '¿Qué es la Inteligencia Artificial?', 'Sistemas que imitan la inteligencia humana', 'Solo robots físicos', 'Programas de cálculo matemático', 'Bases de datos avanzadas', '1',
-        '¿Cuál es el objetivo principal de la IA?', 'Reemplazar a los humanos', 'Automatizar tareas y resolver problemas', 'Crear robots con emociones', 'Almacenar grandes cantidades de datos', '2',
-        '¿Qué es un algoritmo en IA?', 'Un tipo de hardware', 'Una secuencia de instrucciones para resolver problemas', 'Un lenguaje de programación', 'Un tipo de dato', '2',
-        '¿Cuándo comenzó el campo de la IA?', 'Década de 1950', 'Década de 1980', 'Década de 2000', 'Década de 2010', '1',
-        '¿Qué es el aprendizaje automático?', 'Un tipo de hardware', 'Un subcampo de la IA que permite a las máquinas aprender', 'Un lenguaje de programación', 'Un tipo de base de datos', '2',
-        '¿Qué es un modelo de IA?', 'Una representación matemática de un problema', 'Un tipo de hardware', 'Un lenguaje de programación', 'Una base de datos', '1',
-        '¿Qué es el procesamiento del lenguaje natural?', 'Analizar datos numéricos', 'Interpretar y generar lenguaje humano', 'Procesar imágenes', 'Almacenar datos', '2',
-        '¿Qué es la visión por computadora?', 'Analizar y entender imágenes y videos', 'Procesar texto', 'Analizar datos numéricos', 'Almacenar archivos', '1'
+        '¿Qué es la Inteligencia Artificial?','Sistemas que imitan la inteligencia humana','Solo robots físicos','Programas de cálculo matemático','Bases de datos avanzadas','single_choice','1000',
+        '¿Cuál es el objetivo principal de la IA?','Reemplazar a los humanos','Automatizar tareas y resolver problemas','Crear robots con emociones','Almacenar grandes cantidades de datos','single_choice','0100',
+        '¿En qué década surgió el campo de la IA?','1930','1980','1950','2000','single_choice','0010',
+        '¿Qué es el procesamiento del lenguaje natural?','Analizar datos numéricos','Interpretar y generar lenguaje humano','Procesar imágenes','Almacenar datos textuales','single_choice','0100',
+        '¿Cuáles de los siguientes son subcampos de la IA?','Machine Learning','Visión por computadora','Contabilidad financiera','Procesamiento del lenguaje natural','multiple_choice','1101',
+        '¿Qué aplicaciones actuales utilizan IA?','Reconocimiento de voz','Gestión manual de archivos','Traducción automática','Asistentes virtuales','multiple_choice','1011',
+        '¿La IA puede aprender patrones a partir de datos?','Verdadero','Falso','','','true_false','10',
+        '¿El campo de la IA surgió en la década de 2000?','Verdadero','Falso','','','true_false','01'
     ];
-    
+
     q2 text[] := ARRAY[
-        '¿Qué es el aprendizaje supervisado?', 'El modelo aprende sin etiquetas', 'El modelo aprende con datos etiquetados', 'El modelo aprende por refuerzo', 'El modelo no aprende nada', '2',
-        '¿Qué es el aprendizaje no supervisado?', 'El modelo aprende sin etiquetas', 'El modelo aprende con datos etiquetados', 'El modelo aprende por refuerzo', 'El modelo memoriza datos', '1',
-        '¿Qué es la regresión lineal?', 'Un modelo de clasificación', 'Un modelo para predecir valores continuos', 'Un modelo para agrupar datos', 'Un modelo de redes neuronales', '2',
-        '¿Qué es la clasificación?', 'Predecir valores continuos', 'Predecir categorías o clases', 'Agrupar datos similares', 'Reducir dimensionalidad', '2',
-        '¿Qué es el sobreajuste?', 'El modelo generaliza bien', 'El modelo memoriza los datos de entrenamiento', 'El modelo no aprende', 'El modelo es muy simple', '2',
-        '¿Qué es la validación cruzada?', 'Una técnica para evaluar modelos', 'Un tipo de algoritmo', 'Un método de visualización', 'Una base de datos', '1',
-        '¿Qué es la matriz de confusión?', 'Una tabla para evaluar clasificadores', 'Una base de datos', 'Un algoritmo de clustering', 'Un modelo de regresión', '1',
-        '¿Qué es la precisión en ML?', 'Medida de falsos positivos', 'Medida de verdaderos positivos', 'Medida de falsos negativos', 'Medida de error general', '2'
+        '¿Qué es el aprendizaje supervisado?','El modelo aprende con datos etiquetados','El modelo aprende sin etiquetas','El modelo aprende por refuerzo','El modelo memoriza datos','single_choice','1000',
+        '¿Qué es la regresión lineal?','Un modelo de clasificación','Un modelo para predecir valores continuos','Un modelo de agrupamiento','Un modelo de redes neuronales','single_choice','0100',
+        '¿Qué es el sobreajuste (overfitting)?','El modelo generaliza muy bien','El modelo memoriza los datos de entrenamiento','El modelo es demasiado simple','El modelo no converge','single_choice','0100',
+        '¿Qué evalúa la matriz de confusión?','La velocidad del modelo','El rendimiento de clasificadores','El tamaño del dataset','La topología de la red','single_choice','0100',
+        '¿Cuáles son técnicas de aprendizaje no supervisado?','Clustering K-Means','Árbol de decisión supervisado','Reducción de dimensionalidad PCA','Redes adversariales generativas','multiple_choice','1011',
+        '¿Qué métricas evalúan clasificadores?','Precisión (Precision)','Tamaño del dataset','Exhaustividad (Recall)','F1-Score','multiple_choice','1011',
+        '¿La validación cruzada ayuda a detectar sobreajuste?','Verdadero','Falso','','','true_false','10',
+        '¿El aprendizaje no supervisado requiere datos etiquetados?','Verdadero','Falso','','','true_false','01'
     ];
-    
+
     q3 text[] := ARRAY[
-        '¿Qué es la IA generativa?', 'Modelos que generan nuevo contenido', 'Modelos que solo clasifican', 'Modelos que almacenan datos', 'Modelos que calculan', '1',
-        '¿Qué es un modelo generativo?', 'Un modelo que predice etiquetas', 'Un modelo que aprende la distribución de los datos', 'Un modelo que solo memoriza', 'Un modelo que no aprende', '2',
-        '¿Qué es un GAN?', 'Generative Adversarial Network', 'General Artificial Network', 'Genetic Algorithm Network', 'Graph Analysis Network', '1',
-        '¿Qué es un LLM?', 'Large Language Model', 'Little Learning Module', 'Long Linear Matrix', 'Low Level Memory', '1',
-        '¿Qué es ChatGPT?', 'Un modelo de IA conversacional', 'Un sistema operativo', 'Una base de datos', 'Un lenguaje de programación', '1',
-        '¿Qué es la generación de texto?', 'Crear texto automáticamente con IA', 'Almacenar texto', 'Analizar texto', 'Traducir texto', '1',
-        '¿Qué es la generación de imágenes?', 'Crear imágenes automáticamente con IA', 'Procesar imágenes', 'Almacenar imágenes', 'Analizar imágenes', '1',
-        '¿Qué es el embedding en IA?', 'Una representación vectorial de datos', 'Un tipo de hardware', 'Un lenguaje de programación', 'Una base de datos', '1'
+        '¿Qué son los modelos generativos?','Modelos que solo clasifican datos','Modelos que aprenden la distribución de datos para generar nuevo contenido','Modelos que almacenan datos','Modelos de búsqueda','single_choice','0100',
+        '¿Qué significa GAN?','Generative Adversarial Network','General Artificial Network','Genetic Algorithm Node','Graph Analysis Network','single_choice','1000',
+        '¿Qué es un LLM?','Large Language Model','Little Learning Module','Long Linear Matrix','Low Level Memory','single_choice','1000',
+        '¿Qué controla la temperatura en un LLM?','La velocidad de respuesta','La creatividad y aleatoriedad de las respuestas','El tamaño del modelo','La memoria del contexto','single_choice','0100',
+        '¿Cuáles son ejemplos de IA generativa?','GPT para generación de texto','DALL-E para generación de imágenes','Un sistema de detección de spam','Stable Diffusion para imágenes','multiple_choice','1101',
+        '¿Qué técnicas usa la IA generativa?','Redes adversariales (GAN)','Modelos de difusión','Búsqueda binaria','Transformers','multiple_choice','1101',
+        '¿ChatGPT es un ejemplo de IA generativa?','Verdadero','Falso','','','true_false','10',
+        '¿Los modelos GAN usan solo una red neuronal?','Verdadero','Falso','','','true_false','01'
     ];
-    
+
     q4 text[] := ARRAY[
-        '¿Qué es el sesgo en IA?', 'Los modelos son siempre objetivos', 'La tendencia a producir resultados injustos', 'Los modelos nunca se equivocan', 'La IA es neutral', '2',
-        '¿Qué es la privacidad en IA?', 'Proteger los datos de los usuarios', 'Compartir todos los datos', 'No usar datos', 'Almacenar datos sin control', '1',
-        '¿Qué es la transparencia en IA?', 'Ocultar cómo funcionan los modelos', 'Explicar cómo funcionan los modelos', 'No explicar nada', 'Usar modelos complejos', '2',
-        '¿Qué es la responsabilidad en IA?', 'No hacerse responsable de los errores', 'Asumir responsabilidad por las decisiones de la IA', 'La IA no tiene responsabilidad', 'Solo los humanos son responsables', '2',
-        '¿Qué es el uso responsable de IA?', 'Usar IA sin control', 'Usar IA de manera ética y segura', 'No usar IA', 'Usar IA solo para negocios', '2',
-        '¿Qué es la equidad en IA?', 'Tratar a todos los grupos de manera justa', 'Tratar a todos igual sin importar contexto', 'No considerar la equidad', 'Solo considerar algunos grupos', '1',
-        '¿Qué son las normas éticas en IA?', 'Directrices para un desarrollo responsable', 'Requisitos técnicos', 'Leyes internacionales', 'Recomendaciones de marketing', '1',
-        '¿Qué es la gobernanza de IA?', 'Marcos para gestionar riesgos de IA', 'No gestionar la IA', 'Solo aspectos técnicos', 'Ignorar los riesgos', '1'
+        '¿Qué es el sesgo algorítmico?','La tendencia del modelo a producir resultados injustos','La velocidad del modelo','La cantidad de datos de entrenamiento','El número de capas del modelo','single_choice','1000',
+        '¿Qué principio busca la transparencia en IA?','Ocultar cómo funcionan los modelos','Explicar cómo los modelos toman decisiones','No usar datos sensibles','Maximizar la velocidad','single_choice','0100',
+        '¿Qué es la gobernanza de IA?','Un lenguaje de programación para IA','Marcos para gestionar riesgos y responsabilidades de la IA','Una técnica de entrenamiento','Un tipo de hardware','single_choice','0100',
+        '¿Qué es la privacidad diferencial?','Una técnica para proteger datos individuales en análisis estadísticos','Un tipo de red neuronal','Un método de cifrado convencional','Una técnica de visualización','single_choice','1000',
+        '¿Cuáles son principios del uso ético de la IA?','Transparencia','Equidad','Maximización del beneficio sin límites','Responsabilidad','multiple_choice','1101',
+        '¿Qué riesgos presenta la IA sin supervisión ética?','Discriminación algorítmica','Mayor velocidad de procesamiento','Vulneración de privacidad','Propagación de desinformación','multiple_choice','1011',
+        '¿El sesgo en IA puede provenir de datos de entrenamiento sesgados?','Verdadero','Falso','','','true_false','10',
+        '¿La IA siempre toma decisiones objetivas e imparciales?','Verdadero','Falso','','','true_false','01'
     ];
-    
+
     q5 text[] := ARRAY[
-        '¿Qué es la IA fuerte?', 'IA que iguala o supera la inteligencia humana', 'IA básica', 'IA para juegos', 'IA para matemáticas', '1',
-        '¿Qué es la IA débil?', 'IA diseñada para tareas específicas', 'IA que supera a los humanos', 'IA general', 'IA consciente', '1',
-        '¿Qué es el test de Turing?', 'Prueba para evaluar inteligencia de máquinas', 'Un algoritmo', 'Un lenguaje de programación', 'Una base de datos', '1',
-        '¿Qué es el razonamiento en IA?', 'Capacidad de inferir conclusiones', 'Almacenar datos', 'Procesar imágenes', 'Generar texto', '1',
-        '¿Qué es la representación del conocimiento?', 'Cómo almacenar información útil en IA', 'Almacenar datos sin estructura', 'No almacenar información', 'Solo usar datos numéricos', '1',
-        '¿Qué es la planificación en IA?', 'Secuenciar acciones para lograr objetivos', 'Reaccionar sin planificar', 'Solo memorizar', 'No tener objetivos', '1',
-        '¿Qué es la robótica en IA?', 'Aplicación de IA a robots físicos', 'Solo software', 'No relacionado con IA', 'Juegos de computadora', '1',
-        '¿Qué es el agente inteligente?', 'Entidad que percibe y actúa en un entorno', 'Un programa simple', 'Una base de datos', 'Un sistema operativo', '1'
+        '¿Qué distingue a la IA débil de la IA fuerte?','La IA débil está diseñada para tareas específicas','La IA fuerte solo funciona offline','La IA débil requiere más datos','La IA fuerte es más barata','single_choice','1000',
+        '¿En qué consiste el Test de Turing?','Medir la velocidad de una computadora','Evaluar si una máquina exhibe comportamiento inteligente indistinguible del humano','Probar la capacidad de almacenamiento','Verificar la seguridad del sistema','single_choice','0100',
+        '¿Qué es un agente inteligente?','Un programa simple sin percepción del entorno','Una entidad que percibe su entorno y actúa para lograr objetivos','Un tipo de base de datos','Un lenguaje de marcado','single_choice','0100',
+        '¿Qué es la representación del conocimiento en IA?','Almacenar datos sin estructura','Codificar información para que la IA pueda razonar sobre ella','Solo usar datos numéricos','No almacenar información','single_choice','0100',
+        '¿Qué características definen a la IA fuerte (AGI)?','Capacidad de razonar en dominios generales','Conciencia de sí misma','Especialización en una tarea única','Adaptación sin reentrenamiento explícito','multiple_choice','1101',
+        '¿Qué áreas aplica la IA en robótica?','Percepción del entorno','Planificación de movimientos','Gestión de bases de datos relacionales','Toma de decisiones autónoma','multiple_choice','1101',
+        '¿La IA débil puede superar a humanos en tareas específicas?','Verdadero','Falso','','','true_false','10',
+        '¿Actualmente existe una IA fuerte (AGI) real?','Verdadero','Falso','','','true_false','01'
     ];
-    
+
     q6 text[] := ARRAY[
-        '¿Qué es el deep learning?', 'Aprendizaje con redes neuronales profundas', 'Aprendizaje básico', 'Aprendizaje sin datos', 'Aprendizaje superficial', '1',
-        '¿Qué es una red neuronal?', 'Inspirada en el cerebro humano', 'Un algoritmo simple', 'Una base de datos', 'Un lenguaje de programación', '1',
-        '¿Qué es la capa oculta?', 'Capas internas de una red neuronal', 'Capa de entrada', 'Capa de salida', 'Sin capas', '1',
-        '¿Qué es la función de activación?', 'Introduce no linealidad a la red', 'Una función lineal', 'Un tipo de dato', 'Un algoritmo de búsqueda', '1',
-        '¿Qué es el backpropagation?', 'Algoritmo para entrenar redes neuronales', 'Un tipo de red', 'Un método de visualización', 'Una base de datos', '1',
-        '¿Qué es el optimizador en deep learning?', 'Ajusta los pesos de la red para minimizar error', 'Un tipo de dato', 'Un algoritmo de búsqueda', 'Un método de visualización', '1',
-        '¿Qué es el batch size?', 'Número de muestras procesadas a la vez', 'El tamaño total de la base de datos', 'El número de capas', 'El número de neuronas', '1',
-        '¿Qué es el learning rate?', 'Controla qué tan rápido aprende la red', 'El número de épocas', 'El tamaño del batch', 'El número de capas', '1'
+        '¿Qué es el deep learning?','Aprendizaje con redes neuronales de pocas capas','Aprendizaje con redes neuronales profundas (muchas capas)','Aprendizaje sin datos','Aprendizaje superficial','single_choice','0100',
+        '¿Qué hace la función de activación?','Suma todas las entradas linealmente','Introduce no-linealidad en la red neuronal','Almacena los pesos del modelo','Calcula el error de salida','single_choice','0100',
+        '¿Qué algoritmo ajusta los pesos entrenando redes neuronales?','Forward propagation','Backpropagation','Clustering K-Means','Regresión lineal','single_choice','0100',
+        '¿Qué controla el learning rate?','El número de capas de la red','Qué tan grandes son los ajustes de pesos en cada paso','El tamaño del batch','El número de neuronas','single_choice','0100',
+        '¿Cuáles son técnicas de regularización en deep learning?','Dropout','L2 Regularization','Aumentar el learning rate','Batch Normalization','multiple_choice','1101',
+        '¿Qué componentes forman una red neuronal?','Capas de entrada','Capas ocultas','Tablas de base de datos','Capas de salida','multiple_choice','1101',
+        '¿El dropout se usa para prevenir el sobreajuste?','Verdadero','Falso','','','true_false','10',
+        '¿Las redes neuronales requieren siempre GPU para entrenarse?','Verdadero','Falso','','','true_false','01'
     ];
-    
+
     q7 text[] := ARRAY[
-        '¿Qué es una CNN?', 'Red neuronal convolucional para imágenes', 'Un tipo de base de datos', 'Un lenguaje de programación', 'Un sistema operativo', '1',
-        '¿Qué es una RNN?', 'Red neuronal recurrente para secuencias', 'Una red simple', 'Un algoritmo básico', 'Un tipo de dato', '1',
-        '¿Qué es el padding en CNN?', 'Agregar bordes a la imagen de entrada', 'Eliminar píxeles', 'Redimensionar imagen', 'Cambiar colores', '1',
-        '¿Qué es el stride en CNN?', 'El paso de movimiento del filtro', 'El tamaño del filtro', 'El número de capas', 'El tipo de activación', '1',
-        '¿Qué es el pooling en CNN?', 'Reducir dimensionalidad de la imagen', 'Aumentar resolución', 'Eliminar capas', 'Agregar filtros', '1',
-        '¿Qué es el dropout?', 'Técnica de regularización para prevenir sobreajuste', 'Un tipo de red', 'Un algoritmo de optimización', 'Una función de activación', '1',
-        '¿Qué es la transferencia de aprendizaje?', 'Reutilizar modelos pre-entrenados', 'Entrenar desde cero', 'Sin aprendizaje previo', 'Aprender sin datos', '1',
-        '¿Qué es el fine-tuning?', 'Ajustar un modelo pre-entrenado para nuevas tareas', 'Entrenar desde cero', 'No ajustar nada', 'Usar el modelo sin cambios', '1'
+        '¿Para qué tipo de datos se usa principalmente una CNN?','Series temporales','Imágenes y video','Texto plano','Datos tabulares','single_choice','0100',
+        '¿Qué hace la capa de pooling en una CNN?','Aumenta la resolución de la imagen','Reduce la dimensionalidad de los mapas de características','Añade más filtros','Normaliza los pesos','single_choice','0100',
+        '¿Qué tipo de datos procesa mejor una RNN?','Imágenes estáticas','Datos tabulares','Secuencias y series temporales','Grafos','single_choice','0010',
+        '¿En qué consiste la transferencia de aprendizaje?','Entrenar una red desde cero en cada tarea','Reutilizar pesos de un modelo pre-entrenado para tareas relacionadas','No usar datos previos','Solo usar modelos simples','single_choice','0100',
+        '¿Cuáles son operaciones propias de una CNN?','Convolución','Pooling','Backpropagation en grafos','Detección de bordes con filtros','multiple_choice','1101',
+        '¿Qué variantes de RNN existen?','LSTM','GRU','CNN residual','Redes de Elman','multiple_choice','1101',
+        '¿Las CNN son especialmente efectivas para reconocimiento de imágenes?','Verdadero','Falso','','','true_false','10',
+        '¿Una RNN tiene memoria de las entradas anteriores en la secuencia?','Verdadero','Falso','','','true_false','10'
     ];
-    
+
     q8 text[] := ARRAY[
-        '¿Qué es un prompt?', 'Una instrucción o pregunta para un LLM', 'Un tipo de base de datos', 'Un algoritmo', 'Un lenguaje de programación', '1',
-        '¿Qué es el prompt engineering?', 'Diseñar prompts efectivos para LLMs', 'Programar en Python', 'Diseñar bases de datos', 'Optimizar algoritmos', '1',
-        '¿Qué es few-shot prompting?', 'Incluir ejemplos en el prompt', 'No incluir ejemplos', 'Prompt muy corto', 'Prompt sin instrucciones', '1',
-        '¿Qué es zero-shot prompting?', 'Prompt sin ejemplos previos', 'Con muchos ejemplos', 'Con pocos ejemplos', 'Sin instrucciones', '1',
-        '¿Qué es chain-of-thought?', 'Guía al modelo a razonar paso a paso', 'Dar respuestas directas', 'Sin razonamiento', 'Respuestas cortas', '1',
-        '¿Qué es el role prompting?', 'Asignar un rol o personalidad al modelo', 'Sin rol', 'Rol genérico', 'No especificar rol', '1',
-        '¿Qué es la temperatura en LLM?', 'Controla la creatividad de las respuestas', 'Controla la velocidad', 'Controla la memoria', 'Controla el tamaño', '1',
-        '¿Qué es el top-p sampling?', 'Selección de tokens con probabilidad acumulada', 'Selección aleatoria', 'Selección del primer token', 'Selección del último token', '1'
+        '¿Qué es un prompt en el contexto de los LLM?','Una instrucción o entrada que se le da al modelo','Un tipo de red neuronal','Un algoritmo de búsqueda','Un lenguaje de programación','single_choice','1000',
+        '¿Qué es el few-shot prompting?','Proporcionar ejemplos en el prompt para guiar la respuesta','Usar el modelo sin instrucciones','Hacer el prompt muy largo','No incluir ningún ejemplo','single_choice','1000',
+        '¿Qué logra el chain-of-thought prompting?','Acortar las respuestas del modelo','Reducir el uso de memoria','Guiar al modelo a razonar paso a paso antes de responder','Aumentar la velocidad de inferencia','single_choice','0010',
+        '¿Qué controla el parámetro top-p en un LLM?','El tamaño máximo del contexto','La selección de tokens por probabilidad acumulada','El número de capas del modelo','La temperatura del sistema','single_choice','0100',
+        '¿Cuáles son técnicas de prompting?','Zero-shot prompting','Few-shot prompting','Kernel trick','Chain-of-thought','multiple_choice','1101',
+        '¿Qué factores afectan la calidad de la respuesta de un LLM?','La claridad del prompt','La temperatura configurada','El color de la interfaz','El contexto incluido en el prompt','multiple_choice','1101',
+        '¿El zero-shot prompting incluye ejemplos en el prompt?','Verdadero','Falso','','','true_false','01',
+        '¿La temperatura 0 produce respuestas más deterministas en un LLM?','Verdadero','Falso','','','true_false','10'
     ];
-    
+
     q9 text[] := ARRAY[
-        '¿Qué es la IA en el futuro?', 'Integración en todos los aspectos de la vida', 'Solo en robots', 'Solo en computadoras', 'No tendrá impacto', '1',
-        '¿Cuál es un desafío de la IA?', 'Sesgo y equidad', 'No hay desafíos', 'Solo problemas técnicos', 'No tiene impacto social', '1',
-        '¿Qué es el impacto social de IA?', 'Cambios en la sociedad y economía', 'No hay impacto', 'Solo impacto positivo', 'Solo impacto negativo', '1',
-        '¿Qué es la regulación de IA?', 'Marcos legales para gobernar la IA', 'No regular IA', 'Solo autorregulación', 'Sin normas', '1',
-        '¿Qué es la colaboración humano-IA?', 'Trabajar junto con sistemas de IA', 'IA sin humanos', 'Humanos sin IA', 'Competencia entre humanos e IA', '1',
-        '¿Qué es la educación en IA?', 'Aprender sobre IA y su aplicación', 'No aprender sobre IA', 'Solo aprender a programar', 'No es importante', '1',
-        '¿Qué son los agentes autónomos?', 'Sistemas que toman decisiones sin intervención humana', 'Sistemas que necesitan humanos', 'Sistemas sin decisiones', 'Sistemas básicos', '1',
-        '¿Qué es la singularidad tecnológica?', 'Punto donde la IA supera a la inteligencia humana', 'Un tipo de algoritmo', 'Un hardware específico', 'Una base de datos', '1'
+        '¿Cuál es un desafío social de la IA?','Mayor velocidad de procesamiento','Sesgo algorítmico y discriminación','Menor consumo energético','Más almacenamiento de datos','single_choice','0100',
+        '¿Qué busca la regulación de la IA?','Eliminar toda IA','Establecer marcos legales para gobernar el desarrollo y uso de la IA','Prohibir el machine learning','Solo regular hardware','single_choice','0100',
+        '¿Qué es la singularidad tecnológica?','Un tipo de hardware cuántico','El punto hipotético donde la IA supera la inteligencia humana general','Un algoritmo de búsqueda','Una técnica de optimización','single_choice','0100',
+        '¿Qué describe la colaboración humano-IA?','Reemplazar humanos con IA','Trabajar junto con sistemas de IA para potenciar capacidades humanas','Competir contra la IA','No interactuar con IA','single_choice','0100',
+        '¿Qué impactos genera la IA en la sociedad?','Automatización de empleos rutinarios','Mejora en diagnósticos médicos','Eliminación total de sesgos','Personalización de servicios digitales','multiple_choice','1101',
+        '¿Cuáles son ejemplos de agentes autónomos de IA?','Vehículos autónomos','Robots quirúrgicos','Hojas de cálculo manuales','Drones inteligentes','multiple_choice','1101',
+        '¿La IA puede generar desinformación (deepfakes)?','Verdadero','Falso','','','true_false','10',
+        '¿La regulación de IA es igual en todos los países del mundo?','Verdadero','Falso','','','true_false','01'
     ];
-    
+
     questions text[][] := ARRAY[q1, q2, q3, q4, q5, q6, q7, q8, q9];
-    
-    -- Variables
-    i int;
-    j int;
-    k int;
+
+    i int; j int; k int;
     question_id uuid;
     option_id uuid;
-    correct_pos int;
-    quiz_id uuid;
+    q_type text;
+    q_mask text;
+    opt_count int;
     base_index int;
+    quiz_id uuid;
 
 BEGIN
-    -- Recorrer cada quiz
     FOR i IN 1..array_length(quiz_ids, 1) LOOP
         quiz_id := quiz_ids[i];
-        
-        -- Recorrer cada pregunta del quiz (8 preguntas)
+
         FOR j IN 1..8 LOOP
-            base_index := (j - 1) * 6 + 1;
-            
-            -- Generar UUID para la pregunta
+            base_index := (j - 1) * 7 + 1;
+
+            q_type := questions[i][base_index + 5];
+            q_mask := questions[i][base_index + 6];
+            opt_count := CASE WHEN q_type = 'true_false' THEN 2 ELSE 4 END;
+
             question_id := gen_random_uuid();
-            correct_pos := questions[i][base_index + 5]::int;
-            
-            -- Insertar pregunta
+
             INSERT INTO quizzing.question (
-                "Id",
-                "Content",
-                "Status",
-                "Type",
-                "Deleted",
-                "CreatedAt",
-                "UpdatedAt",
-                "DeletedAt",
-                "ProcessingJobId",
-                "Origin",
-                "Justification"
+                "Id", "Content", "Status", "Type", "Deleted",
+                "CreatedAt", "UpdatedAt", "DeletedAt",
+                "ProcessingJobId", "Origin", "Justification"
             ) VALUES (
                 question_id,
                 questions[i][base_index],
                 'verified',
-                'single_choice',
+                q_type::quizzing.question_type,
                 FALSE,
                 NOW() - INTERVAL '70 days' + (i * INTERVAL '5 days') + (j * INTERVAL '1 hour'),
                 NOW(),
@@ -291,24 +285,16 @@ BEGIN
                 'manually_created',
                 'Pregunta creada para demo'
             );
-            
-            -- Insertar opciones
-            FOR k IN 1..4 LOOP
+
+            FOR k IN 1..opt_count LOOP
                 option_id := gen_random_uuid();
                 INSERT INTO quizzing."option" (
-                    "Id",
-                    "Description",
-                    "IsCorrect",
-                    "Position",
-                    "Deleted",
-                    "CreatedAt",
-                    "UpdatedAt",
-                    "DeletedAt",
-                    "QuestionId"
+                    "Id", "Description", "IsCorrect", "Position",
+                    "Deleted", "CreatedAt", "UpdatedAt", "DeletedAt", "QuestionId"
                 ) VALUES (
                     option_id,
                     questions[i][base_index + k],
-                    (k = correct_pos),
+                    substring(q_mask, k, 1) = '1',
                     k,
                     FALSE,
                     NOW() - INTERVAL '70 days' + (i * INTERVAL '5 days') + (j * INTERVAL '1 hour'),
@@ -317,18 +303,10 @@ BEGIN
                     question_id
                 );
             END LOOP;
-            
-            -- Insertar quiz_question
+
             INSERT INTO quizzing.quiz_question (
-                "Id",
-                "Position",
-                "ValueScore",
-                "Deleted",
-                "CreatedAt",
-                "UpdatedAt",
-                "DeletedAt",
-                "QuizId",
-                "QuestionId"
+                "Id", "Position", "ValueScore", "Deleted",
+                "CreatedAt", "UpdatedAt", "DeletedAt", "QuizId", "QuestionId"
             ) VALUES (
                 gen_random_uuid(),
                 j,
@@ -558,7 +536,106 @@ VALUES
 );
 
 -- ============================================================
--- 7. MATCH_ATTEMPTS (3 completados para los exámenes expirados)
+-- 7. ADDITIONAL QUIZZES (draft and archived for variety)
+-- ============================================================
+
+INSERT INTO quizzing.quiz
+(
+    "Id", "Title", "Description", "Status", "Deleted",
+    "CreatedAt", "UpdatedAt", "DeletedAt", "Origin"
+)
+VALUES
+(
+    '30000000-0000-0000-0000-000000000010'::uuid,
+    'Introducción a Python (Borrador)',
+    'Quiz en preparación sobre fundamentos de Python.',
+    'draft',
+    FALSE,
+    NOW() - INTERVAL '5 days',
+    NOW(),
+    NULL,
+    'manually_created'
+),
+(
+    '30000000-0000-0000-0000-000000000011'::uuid,
+    'Historia de la Computación',
+    'Quiz archivado sobre historia de la computación.',
+    'archived',
+    FALSE,
+    NOW() - INTERVAL '180 days',
+    NOW() - INTERVAL '90 days',
+    NULL,
+    'manually_created'
+)
+ON CONFLICT ("Id") DO NOTHING;
+
+-- ============================================================
+-- 8. ADDITIONAL MATCHES (expired and pending for variety)
+-- ============================================================
+
+INSERT INTO quizzing."match"
+(
+    "Id", "Code", "Status", "StartedAt", "FinishedAt", "Mode",
+    "TimeMinutes", "Deleted", "CreatedAt", "UpdatedAt", "DeletedAt",
+    "CourseId", "QuizId", "AttemptsAmount", "QuestionsAmount",
+    "ShuffleOptions", "ShuffleQuestion", "Title"
+)
+VALUES
+(
+    '40000000-0000-0000-0000-000000000010'::uuid,
+    'EXAM-OLD-001',
+    'expired',
+    NOW() - INTERVAL '90 days',
+    NOW() - INTERVAL '89 days' + INTERVAL '60 minutes',
+    'exam',
+    60,
+    FALSE,
+    NOW() - INTERVAL '91 days',
+    NOW() - INTERVAL '89 days',
+    NULL,
+    '10000000-0000-0000-0000-000000000001'::uuid,
+    '30000000-0000-0000-0000-000000000005'::uuid,
+    10, 8, FALSE, FALSE,
+    'Examen Parcial I (Pasado)'
+),
+(
+    '40000000-0000-0000-0000-000000000011'::uuid,
+    'SINGLE-OLD-001',
+    'expired',
+    NOW() - INTERVAL '60 days',
+    NOW() - INTERVAL '59 days' + INTERVAL '15 minutes',
+    'single',
+    15,
+    FALSE,
+    NOW() - INTERVAL '61 days',
+    NOW() - INTERVAL '59 days',
+    NULL,
+    '10000000-0000-0000-0000-000000000001'::uuid,
+    '30000000-0000-0000-0000-000000000001'::uuid,
+    10, 8, FALSE, FALSE,
+    'Quiz: Intro IA (Pasado)'
+),
+(
+    '40000000-0000-0000-0000-000000000012'::uuid,
+    'EXAM-NEXT-001',
+    'pending',
+    NOW() + INTERVAL '5 days',
+    NULL,
+    'exam',
+    60,
+    FALSE,
+    NOW(),
+    NOW(),
+    NULL,
+    '10000000-0000-0000-0000-000000000001'::uuid,
+    '30000000-0000-0000-0000-000000000009'::uuid,
+    10, 8, FALSE, FALSE,
+    'Examen Final (Próximo)'
+)
+ON CONFLICT ("Id") DO NOTHING;
+
+-- ============================================================
+-- 9. MATCH_ATTEMPTS
 -- ============================================================
 
 INSERT INTO quizzing.match_attempt
@@ -574,14 +651,13 @@ INSERT INTO quizzing.match_attempt
     "MatchId"
 )
 VALUES
+-- max.maximus: completed (x5)
 (
     '50000000-0000-0000-0000-000000000001'::uuid,
     NOW() - INTERVAL '45 days' + INTERVAL '5 minutes',
     NOW() - INTERVAL '45 days' + INTERVAL '55 minutes',
     NOW() - INTERVAL '45 days' + INTERVAL '3 minutes',
-    'carlos.ruiz',
-    'completed',
-    100.00,
+    'max.maximus', 'completed', 100.00,
     '37976960-c868-45d4-b3c2-4967cb46f4b0'::uuid,
     '40000000-0000-0000-0000-000000000001'::uuid
 ),
@@ -590,9 +666,7 @@ VALUES
     NOW() - INTERVAL '35 days' + INTERVAL '7 minutes',
     NOW() - INTERVAL '35 days' + INTERVAL '57 minutes',
     NOW() - INTERVAL '35 days' + INTERVAL '4 minutes',
-    'carlos.ruiz',
-    'completed',
-    87.50,
+    'max.maximus', 'completed', 87.50,
     '37976960-c868-45d4-b3c2-4967cb46f4b0'::uuid,
     '40000000-0000-0000-0000-000000000002'::uuid
 ),
@@ -601,12 +675,154 @@ VALUES
     NOW() - INTERVAL '25 days' + INTERVAL '3 minutes',
     NOW() - INTERVAL '25 days' + INTERVAL '52 minutes',
     NOW() - INTERVAL '25 days' + INTERVAL '2 minutes',
-    'carlos.ruiz',
-    'completed',
-    75.00,
+    'max.maximus', 'completed', 75.00,
     '37976960-c868-45d4-b3c2-4967cb46f4b0'::uuid,
     '40000000-0000-0000-0000-000000000003'::uuid
-);
+),
+(
+    '50000000-0000-0000-0000-000000000004'::uuid,
+    NOW() - INTERVAL '7 days' + INTERVAL '10 minutes',
+    NOW() - INTERVAL '7 days' + INTERVAL '23 minutes',
+    NOW() - INTERVAL '7 days' + INTERVAL '8 minutes',
+    'max.maximus', 'completed', 75.00,
+    '37976960-c868-45d4-b3c2-4967cb46f4b0'::uuid,
+    '40000000-0000-0000-0000-000000000006'::uuid
+),
+(
+    '50000000-0000-0000-0000-000000000005'::uuid,
+    NOW() - INTERVAL '6 days' + INTERVAL '5 minutes',
+    NOW() - INTERVAL '6 days' + INTERVAL '19 minutes',
+    NOW() - INTERVAL '6 days' + INTERVAL '3 minutes',
+    'max.maximus', 'completed', 62.50,
+    '37976960-c868-45d4-b3c2-4967cb46f4b0'::uuid,
+    '40000000-0000-0000-0000-000000000007'::uuid
+),
+-- max.maximus: timeout (x2)
+(
+    '50000000-0000-0000-0000-000000000006'::uuid,
+    NOW() - INTERVAL '4 days' + INTERVAL '2 minutes',
+    NOW() - INTERVAL '4 days' + INTERVAL '17 minutes',
+    NOW() - INTERVAL '4 days' + INTERVAL '1 minute',
+    'max.maximus', 'timeout', 37.50,
+    '37976960-c868-45d4-b3c2-4967cb46f4b0'::uuid,
+    '40000000-0000-0000-0000-000000000008'::uuid
+),
+(
+    '50000000-0000-0000-0000-000000000013'::uuid,
+    NOW() - INTERVAL '4 days' + INTERVAL '1 minute',
+    NOW() - INTERVAL '4 days' + INTERVAL '61 minutes',
+    NOW() - INTERVAL '4 days',
+    'max.maximus', 'timeout', 25.00,
+    '37976960-c868-45d4-b3c2-4967cb46f4b0'::uuid,
+    '40000000-0000-0000-0000-000000000004'::uuid
+),
+-- max.maximus: in_progress (x2)
+(
+    '50000000-0000-0000-0000-000000000007'::uuid,
+    NOW() - INTERVAL '3 days' + INTERVAL '1 minute',
+    NULL,
+    NOW() - INTERVAL '3 days',
+    'max.maximus', 'in_progress', 0.00,
+    '37976960-c868-45d4-b3c2-4967cb46f4b0'::uuid,
+    '40000000-0000-0000-0000-000000000009'::uuid
+),
+(
+    '50000000-0000-0000-0000-000000000014'::uuid,
+    NOW() - INTERVAL '1 day' + INTERVAL '1 minute',
+    NULL,
+    NOW() - INTERVAL '1 day',
+    'max.maximus', 'in_progress', 0.00,
+    '37976960-c868-45d4-b3c2-4967cb46f4b0'::uuid,
+    '40000000-0000-0000-0000-000000000005'::uuid
+),
+-- student01: completed (x2)
+(
+    '50000000-0000-0000-0000-000000000011'::uuid,
+    NOW() - INTERVAL '90 days' + INTERVAL '5 minutes',
+    NOW() - INTERVAL '90 days' + INTERVAL '58 minutes',
+    NOW() - INTERVAL '90 days' + INTERVAL '3 minutes',
+    'student01', 'completed', 75.00,
+    '33333333-3333-3333-3333-333333333333'::uuid,
+    '40000000-0000-0000-0000-000000000010'::uuid
+),
+(
+    '50000000-0000-0000-0000-000000000015'::uuid,
+    NOW() - INTERVAL '89 days' + INTERVAL '10 minutes',
+    NOW() - INTERVAL '89 days' + INTERVAL '55 minutes',
+    NOW() - INTERVAL '89 days' + INTERVAL '8 minutes',
+    'student01', 'completed', 50.00,
+    '33333333-3333-3333-3333-333333333333'::uuid,
+    '40000000-0000-0000-0000-000000000011'::uuid
+),
+-- student01: timeout (x2)
+(
+    '50000000-0000-0000-0000-000000000012'::uuid,
+    NOW() - INTERVAL '60 days' + INTERVAL '2 minutes',
+    NOW() - INTERVAL '60 days' + INTERVAL '16 minutes',
+    NOW() - INTERVAL '60 days' + INTERVAL '1 minute',
+    'student01', 'timeout', 25.00,
+    '33333333-3333-3333-3333-333333333333'::uuid,
+    '40000000-0000-0000-0000-000000000011'::uuid
+),
+(
+    '50000000-0000-0000-0000-000000000016'::uuid,
+    NOW() - INTERVAL '6 days' + INTERVAL '3 minutes',
+    NOW() - INTERVAL '6 days' + INTERVAL '18 minutes',
+    NOW() - INTERVAL '6 days' + INTERVAL '1 minute',
+    'student01', 'timeout', 12.50,
+    '33333333-3333-3333-3333-333333333333'::uuid,
+    '40000000-0000-0000-0000-000000000007'::uuid
+),
+-- student01: in_progress (x2)
+(
+    '50000000-0000-0000-0000-000000000008'::uuid,
+    NOW() - INTERVAL '5 days' + INTERVAL '2 minutes',
+    NULL,
+    NOW() - INTERVAL '5 days',
+    'student01', 'in_progress', 0.00,
+    '33333333-3333-3333-3333-333333333333'::uuid,
+    '40000000-0000-0000-0000-000000000004'::uuid
+),
+(
+    '50000000-0000-0000-0000-000000000017'::uuid,
+    NOW() - INTERVAL '2 days' + INTERVAL '2 minutes',
+    NULL,
+    NOW() - INTERVAL '2 days',
+    'student01', 'in_progress', 0.00,
+    '33333333-3333-3333-3333-333333333333'::uuid,
+    '40000000-0000-0000-0000-000000000003'::uuid
+),
+-- carlos.ruiz (max.maximus): completed
+(
+    '50000000-0000-0000-0000-000000000018'::uuid,
+    NOW() - INTERVAL '45 days' + INTERVAL '10 minutes',
+    NOW() - INTERVAL '45 days' + INTERVAL '50 minutes',
+    NOW() - INTERVAL '45 days' + INTERVAL '8 minutes',
+    'carlos.ruiz', 'completed', 80.00,
+    '37976960-c868-45d4-b3c2-4967cb46f4b0'::uuid,
+    '40000000-0000-0000-0000-000000000001'::uuid
+),
+-- pedro.villca: completed
+(
+    '50000000-0000-0000-0000-000000000019'::uuid,
+    NOW() - INTERVAL '45 days' + INTERVAL '12 minutes',
+    NOW() - INTERVAL '45 days' + INTERVAL '52 minutes',
+    NOW() - INTERVAL '45 days' + INTERVAL '10 minutes',
+    'pedro.villca', 'completed', 80.00,
+    'd7f65af9-57a1-4b5b-9685-815770faea7d'::uuid,
+    '40000000-0000-0000-0000-000000000001'::uuid
+),
+-- pedro.villca: segundo intento completed
+(
+    '50000000-0000-0000-0000-000000000020'::uuid,
+    NOW() - INTERVAL '44 days' + INTERVAL '5 minutes',
+    NOW() - INTERVAL '44 days' + INTERVAL '45 minutes',
+    NOW() - INTERVAL '44 days' + INTERVAL '3 minutes',
+    'pedro.villca', 'completed', 40.00,
+    'd7f65af9-57a1-4b5b-9685-815770faea7d'::uuid,
+    '40000000-0000-0000-0000-000000000001'::uuid
+)
+ON CONFLICT ("Id") DO NOTHING;
 
 -- ============================================================
 -- 8. MATCH_ATTEMPT_QUESTIONS
@@ -843,8 +1059,6 @@ BEGIN
     END LOOP;
 END $$;
 
--- ============================================================
--- 10. VERIFICACIÓN FINAL (opcional - descomentar para validar)
 -- ============================================================
 
 -- Verificar usuarios
