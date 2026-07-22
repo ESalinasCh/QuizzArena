@@ -30,6 +30,10 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\..\Shared\Shared.csproj" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <InternalsVisibleTo Include="QuizzArena.Users.Tests" />
+	</ItemGroup>
   
   <ItemGroup>
     <None Update="Infrastructure\Adapters\Out\Persistence\Seeds\Sql\**\*.sql">

@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using QuizzArena.Users.Application.Ports.In;
 using QuizzArena.Users.Application.Ports.Out;
+using QuizzArena.Users.Application.UseCases.Course;
 using QuizzArena.Users.Application.UseCases.User;
 using QuizzArena.Users.Application.Validators;
 using QuizzArena.Users.Domain.Enums;
@@ -32,6 +33,7 @@ public static class DependencyInjection
 
         services.AddScoped<UserUseCase>();
         services.AddScoped<IUserUseCase>(sp => sp.GetRequiredService<UserUseCase>());
+        services.AddScoped<IGetTeacherCoursesUseCase, GetTeacherCoursesUseCase>();
         services.AddHttpContextAccessor();
 
         services.AddScoped<ICurrentUser, CurrentUserUseCase>();
