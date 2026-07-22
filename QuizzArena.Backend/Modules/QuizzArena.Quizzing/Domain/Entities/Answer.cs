@@ -2,6 +2,11 @@
 
 public class Answer
 {
+    /*
+     Note:
+        The followings properties have to be deleted after the refactor of multiple-choice questions :
+    - IsCorrect, OptionId, 
+     */
     public Guid Id { get; set; }
     public bool IsCorrect { get; set; }
     public DateTimeOffset AnsweredAt { get; set; }
@@ -10,4 +15,6 @@ public class Answer
     public Guid OptionId { get; set; }
     public Guid QuestionId { get; set; }
     public Guid MatchAttemptId { get; set; }
+
+    public ICollection<SelectedOption> SelectedOptions { get; set; } = [];
 }
