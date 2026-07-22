@@ -17,6 +17,7 @@ public class QuizzingDbContext : DbContext
     public DbSet<Match> Matches => Set<Match>();
     public DbSet<MatchAttempt> MatchAttempts => Set<MatchAttempt>();
     public DbSet<Answer> Answers => Set<Answer>();
+    public DbSet<SelectedOption> SelectedOptions => Set<SelectedOption>();
     public DbSet<MatchAttemptQuestion> MatchAttemptQuestions => Set<MatchAttemptQuestion>();
 
 
