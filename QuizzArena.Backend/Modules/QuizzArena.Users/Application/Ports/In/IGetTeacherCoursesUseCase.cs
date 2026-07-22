@@ -1,4 +1,4 @@
-using QuizzArena.Users.Application.DTOs.Course;
+﻿using QuizzArena.Users.Application.DTOs.Course;
 
 namespace QuizzArena.Users.Application.Ports.In;
 

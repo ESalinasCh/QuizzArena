@@ -10,6 +10,7 @@
   <Folder Name="/Tests/">
     <Project Path="QuizzArena.DocumentProcessing.Tests/QuizzArena.DocumentProcessing.Tests.csproj" Id="d7ebb274-8728-41af-833e-45959e8c14ca" />
     <Project Path="QuizzArena.Quizzing.Tests/QuizzArena.Quizzing.Tests.csproj" Id="69d0b10d-0363-492a-a545-36e52371c42e" />
+    <Project Path="QuizzArena.Users.Tests/QuizzArena.Users.Tests.csproj" />
   </Folder>
   <Project Path="Shared/Shared.csproj" />
 </Solution>

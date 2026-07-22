@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using QuizzArena.Users.Application.DTOs.Course;
 using QuizzArena.Users.Domain.Entities;
 

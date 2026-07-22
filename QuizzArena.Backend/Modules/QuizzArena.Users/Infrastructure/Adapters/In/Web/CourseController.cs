@@ -10,8 +10,6 @@ namespace QuizzArena.Users.Infrastructure.Adapters.In.Web;
 [Route("api/v{version:apiVersion}")]
 public class CourseController(IGetTeacherCoursesUseCase getTeacherCoursesUseCase) : ControllerBase
 {
-    // Alternative:
-    //[HttpGet("courses")] - is implicit that the user will get the courses he is related to
     [HttpGet("users/me/courses")]
     [Authorize(Roles = "teacher")]
     public async Task<ActionResult<List<CourseDto>>> GetTeacherCourses()
