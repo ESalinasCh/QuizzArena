@@ -71,7 +71,7 @@ public class CreateExamUseCaseTests
         CreateQuizResponseDto expectedResponse = new() { Id = quizId, Title = dto.Title };
 
         _mockQuestionRepository
-            .Setup(r => r.GetByIdsAsync(It.IsAny<List<Guid>>()))
+            .Setup(r => r.GetActiveByIdsAsync(It.IsAny<List<Guid>>()))
             .ReturnsAsync(foundQuestions);
 
         _mockMapper.Setup(m => m.Map<Quiz>(dto)).Returns(mappedQuiz);
@@ -105,7 +105,7 @@ public class CreateExamUseCaseTests
         ];
 
         _mockQuestionRepository
-            .Setup(r => r.GetByIdsAsync(It.IsAny<List<Guid>>()))
+            .Setup(r => r.GetActiveByIdsAsync(It.IsAny<List<Guid>>()))
             .ReturnsAsync(foundQuestions);
 
         _mockMapper.Setup(m => m.Map<Quiz>(dto)).Returns(new Quiz { Id = Guid.NewGuid() });
@@ -122,7 +122,7 @@ public class CreateExamUseCaseTests
 
         // Assert
         _mockQuestionRepository.Verify(
-            r => r.GetByIdsAsync(It.Is<List<Guid>>(ids =>
+            r => r.GetActiveByIdsAsync(It.Is<List<Guid>>(ids =>
                 ids.Contains(q1) && ids.Contains(q2))),
             Times.Once);
     }
@@ -135,7 +135,7 @@ public class CreateExamUseCaseTests
         CreateExamDto dto = BuildValidDto(q1);
 
         _mockQuestionRepository
-            .Setup(r => r.GetByIdsAsync(It.IsAny<List<Guid>>()))
+            .Setup(r => r.GetActiveByIdsAsync(It.IsAny<List<Guid>>()))
             .ReturnsAsync([new Question { Id = q1 }]);
 
         _mockMapper.Setup(m => m.Map<Quiz>(dto)).Returns(new Quiz { Id = Guid.NewGuid() });
@@ -191,7 +191,7 @@ public class CreateExamUseCaseTests
 
         await Assert.ThrowsAsync<ValidationException>(() => _useCase.Execute(dto));
 
-        _mockQuestionRepository.Verify(r => r.GetByIdsAsync(It.IsAny<List<Guid>>()), Times.Never);
+        _mockQuestionRepository.Verify(r => r.GetActiveByIdsAsync(It.IsAny<List<Guid>>()), Times.Never);
         _mockQuizRepository.Verify(r => r.CreateAsync(It.IsAny<Quiz>()), Times.Never);
     }
 
@@ -208,7 +208,7 @@ public class CreateExamUseCaseTests
         CreateExamDto dto = BuildValidDto(q1, q2, q3);
 
         _mockQuestionRepository
-            .Setup(r => r.GetByIdsAsync(It.IsAny<List<Guid>>()))
+            .Setup(r => r.GetActiveByIdsAsync(It.IsAny<List<Guid>>()))
             .ReturnsAsync([new Question { Id = q1 }, new Question { Id = q2 }]);
 
         // Act & Assert
@@ -227,11 +227,52 @@ public class CreateExamUseCaseTests
         CreateExamDto dto = BuildValidDto(q1, q2);
 
         _mockQuestionRepository
-            .Setup(r => r.GetByIdsAsync(It.IsAny<List<Guid>>()))
+            .Setup(r => r.GetActiveByIdsAsync(It.IsAny<List<Guid>>()))
             .ReturnsAsync([new Question { Id = q1 }]); // only 1 of 2 found
 
         await Assert.ThrowsAsync<ValidationException>(() => _useCase.Execute(dto));
 
         _mockQuizRepository.Verify(r => r.CreateAsync(It.IsAny<Quiz>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Execute_SoftDeletedQuestionId_ThrowsValidationException()
+    {
+        Guid q1 = Guid.NewGuid();
+        Guid q2 = Guid.NewGuid();
+
+        CreateExamDto dto = BuildValidDto(q1, q2);
+
+        _mockQuestionRepository
+            .Setup(r => r.GetActiveByIdsAsync(It.IsAny<List<Guid>>()))
+            .ReturnsAsync([new Question { Id = q1 }]);
+
+        // Act & Assert
+        ValidationException ex = await Assert.ThrowsAsync<ValidationException>(
+            () => _useCase.Execute(dto));
+
+        Assert.Contains("One or more question IDs do not exist", ex.Message);
+        _mockQuizRepository.Verify(r => r.CreateAsync(It.IsAny<Quiz>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Execute_UsesActiveOnlyQuery_NotTheUnfilteredOne()
+    {
+        Guid q1 = Guid.NewGuid();
+        CreateExamDto dto = BuildValidDto(q1);
+
+        _mockQuestionRepository
+            .Setup(r => r.GetActiveByIdsAsync(It.IsAny<List<Guid>>()))
+            .ReturnsAsync([new Question { Id = q1 }]);
+
+        _mockMapper.Setup(m => m.Map<Quiz>(dto)).Returns(new Quiz { Id = Guid.NewGuid() });
+        _mockQuizRepository.Setup(r => r.CreateAsync(It.IsAny<Quiz>())).ReturnsAsync(new Quiz());
+        _mockMapper.Setup(m => m.Map<CreateQuizResponseDto>(It.IsAny<Quiz>()))
+            .Returns(new CreateQuizResponseDto());
+
+        await _useCase.Execute(dto);
+
+        _mockQuestionRepository.Verify(r => r.GetActiveByIdsAsync(It.IsAny<List<Guid>>()), Times.Once);
+        _mockQuestionRepository.Verify(r => r.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>()), Times.Never);
     }
 }

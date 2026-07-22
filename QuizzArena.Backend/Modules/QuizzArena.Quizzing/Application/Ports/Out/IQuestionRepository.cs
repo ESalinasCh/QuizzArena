@@ -7,6 +7,7 @@ public interface IQuestionRepository
 {
     public Task CreateMultipleAsync(IEnumerable<Question> questions);
     Task<List<Question>> GetByIdsAsync(IEnumerable<Guid> questionIds);
+    Task<List<Question>> GetActiveByIdsAsync(IEnumerable<Guid> questionIds);
     Task<List<Question>> GetByIdsWithOptionsAsync(List<Guid> questionIds);
     Task<List<Question>> GetByProcessingJobIdAsync(QuestionFilters filters);
     Task<Question?> GetByIdWithOptionsAsync(Guid questionId);
