@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -72,6 +72,7 @@ public static class DependencyInjection
         services.AddScoped<IGetMatchAttemptGradesUseCase, GetMatchAttemptGradesUseCase>();
         services.AddScoped<IPublishMatchUseCase, PublishMatchUseCase>();
         services.AddScoped<IUnpublishMatchUseCase, UnpublishMatchUseCase>();
+        services.AddScoped<IGetQuizzesUseCase, GetQuizzesUseCase>();
         services.AddScoped<IResetMatchAttemptUseCase, ResetMatchAttemptUseCase>();
         #endregion
 
