@@ -62,20 +62,17 @@ public class SubmitAnswersUseCase(
         List<Question> questions = await questionRepository.GetByIdsWithOptionsAsync(questionsIds);
         Dictionary<Guid, Question> questionsById = questions.ToDictionary(question => question.Id);
 
-        // A student may send one entry per selected option, so a question's answer
-        // is the whole group of rows sharing its QuestionId, not a single row.
-        List<IGrouping<Guid, Answer>> answersByQuestion = answers.GroupBy(a => a.QuestionId).ToList();
-
         int correctCount = 0;
         int incorrectCount = 0;
-        int totalQuestions = answersByQuestion.Count;
+        int totalQuestions = answers.Count;
 
         List<QuestionResultDto> questionResultDtos = [];
 
-        foreach (IGrouping<Guid, Answer> answerGroup in answersByQuestion)
+        // One Answer per question; the options the student picked live in its SelectedOptions
+        foreach (Answer answer in answers)
         {
-            Question question = questionsById.GetValueOrDefault(answerGroup.Key)
-                ?? throw new InvalidOperationException($"Question {answerGroup.Key} not found.");
+            Question question = questionsById.GetValueOrDefault(answer.QuestionId)
+                ?? throw new InvalidOperationException($"Question {answer.QuestionId} not found.");
 
             HashSet<Guid> correctOptionIds = question.Options
                 .Where(option => option.IsCorrect)
@@ -87,7 +84,16 @@ public class SubmitAnswersUseCase(
                 throw new InvalidOperationException($"Question {question.Id} has no correct option.");
             }
 
-            HashSet<Guid> selectedOptionIds = answerGroup.Select(a => a.OptionId).ToHashSet();
+            HashSet<Guid> questionOptionIds = question.Options.Select(option => option.Id).ToHashSet();
+            HashSet<Guid> selectedOptionIds = answer.SelectedOptions.Select(selected => selected.OptionId).ToHashSet();
+
+            foreach (Guid selectedOptionId in selectedOptionIds)
+            {
+                if (!questionOptionIds.Contains(selectedOptionId))
+                {
+                    throw new InvalidSelectedOptionException(selectedOptionId, question.Id);
+                }
+            }
 
             // MultipleChoice is all-or-nothing: SetEquals rejects both partial
             // selections and over-selection. Single-answer types allow exactly one pick.
@@ -104,12 +110,17 @@ public class SubmitAnswersUseCase(
                 incorrectCount++;
             }
 
-            // The verdict belongs to the question, so every row of the group carries it
-            foreach (Answer answer in answerGroup)
+            foreach (SelectedOption selected in answer.SelectedOptions)
             {
-                answer.MatchAttemptId = matchAttemptId;
-                answer.IsCorrect = isCorrect;
+                selected.IsCorrect = correctOptionIds.Contains(selected.OptionId);
             }
+
+            answer.MatchAttemptId = matchAttemptId;
+
+            // Placeholder only: answer.OptionId is still a NOT NULL FK to option, so it must
+            // hold a real option id. It carries no meaning — SelectedOptions is the answer.
+            // Delete this line when the column is dropped (see the note in Answer.cs).
+            answer.OptionId = selectedOptionIds.First();
 
             questionResultDtos.Add(new QuestionResultDto(
                 question.Id,
