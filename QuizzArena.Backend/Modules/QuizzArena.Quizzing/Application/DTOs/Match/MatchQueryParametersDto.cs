@@ -1,8 +1,9 @@
-﻿using QuizzArena.Quizzing.Domain.Enums;
+using QuizzArena.Quizzing.Domain.Enums;
+using Shared.Contracts.DTOs;
 
 namespace QuizzArena.Quizzing.Application.DTOs.Match;
 
-public record MatchQueryParametersDto
+public record MatchQueryParametersDto : PagedRequest
 {
     public string? Code { get; set; }
     public MatchStatus? Status { get; set; }

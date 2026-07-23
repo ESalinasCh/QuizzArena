@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using QuizzArena.Quizzing.Application.DTOs.Match;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Domain.Entities;
 using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence;
+using Shared.Extensions;
 
 namespace QuizzArena.Users.Infrastructure.Adapters.Out.Persistence.Repositories;
 
@@ -52,6 +53,14 @@ internal sealed class SqlMatchRepository(QuizzingDbContext context) : IMatchRepo
         {
             q = q.Where(m => m.QuizId == query.QuizId);
         }
+
+        if (!string.IsNullOrWhiteSpace(query.Search))
+        {
+            var searchLower = query.Search.ToLower().Trim();
+            q = q.Where(m => m.Title != null && m.Title.ToLower().Contains(searchLower));
+        }
+
+        q = q.Paginate(query.Page, query.PageSize);
 
         return await q.ToListAsync();
     }
