@@ -1,5 +1,3 @@
-using System.Linq;
-
 namespace Shared.Extensions;
 
 public static class QueryableExtensions

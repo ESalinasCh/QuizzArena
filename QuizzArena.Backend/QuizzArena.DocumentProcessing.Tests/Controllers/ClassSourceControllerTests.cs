@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -7,6 +7,7 @@ using QuizzArena.DocumentProcessing.Application.DTOs.ClassSource;
 using QuizzArena.DocumentProcessing.Application.Ports.In;
 using QuizzArena.DocumentProcessing.Domain.Enums;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Web;
+using Shared.Contracts.DTOs;
 
 namespace QuizzArena.DocumentProcessing.Tests.Controllers;
 
@@ -40,20 +41,20 @@ public class ClassSourceControllerTests
     [Fact]
     public async Task GetMyClassSources_WithValidSubClaim_ReturnsOkWithList()
     {
-        // Arrange
         var userId = Guid.NewGuid();
+        var query = new PagedRequest();
         var expected = new List<GetClassSourceResponseDto>
         {
             new() { Id = Guid.NewGuid(), Name = "Clase 1", Status = SourceStatus.Completed, CourseId = Guid.NewGuid(), ProcessingJobsIds = [] }
         };
 
         SetUserClaim(userId.ToString());
-        _mockGetClassSourcesUseCase.Setup(uc => uc.Execute(userId)).ReturnsAsync(expected);
+        _mockGetClassSourcesUseCase
+            .Setup(uc => uc.Execute(userId, It.IsAny<PagedRequest>()))
+            .ReturnsAsync(expected);
 
-        // Act
-        var result = await _controller.GetMyClassSources();
+        var result = await _controller.GetMyClassSources(query);
 
-        // Assert
         var ok = result.Result.Should().BeOfType<OkObjectResult>().Subject;
         ok.Value.Should().BeEquivalentTo(expected);
     }
@@ -61,28 +62,22 @@ public class ClassSourceControllerTests
     [Fact]
     public async Task GetMyClassSources_WithMissingSubClaim_ReturnsUnauthorized()
     {
-        // Arrange
         SetUserClaim(null);
 
-        // Act
-        var result = await _controller.GetMyClassSources();
+        var result = await _controller.GetMyClassSources(new PagedRequest());
 
-        // Assert
         result.Result.Should().BeOfType<UnauthorizedResult>();
-        _mockGetClassSourcesUseCase.Verify(uc => uc.Execute(It.IsAny<Guid>()), Times.Never);
+        _mockGetClassSourcesUseCase.Verify(uc => uc.Execute(It.IsAny<Guid>(), It.IsAny<PagedRequest>()), Times.Never);
     }
 
     [Fact]
     public async Task GetMyClassSources_WithInvalidSubClaim_ReturnsUnauthorized()
     {
-        // Arrange
         SetUserClaim("not-a-guid");
 
-        // Act
-        var result = await _controller.GetMyClassSources();
+        var result = await _controller.GetMyClassSources(new PagedRequest());
 
-        // Assert
         result.Result.Should().BeOfType<UnauthorizedResult>();
-        _mockGetClassSourcesUseCase.Verify(uc => uc.Execute(It.IsAny<Guid>()), Times.Never);
+        _mockGetClassSourcesUseCase.Verify(uc => uc.Execute(It.IsAny<Guid>(), It.IsAny<PagedRequest>()), Times.Never);
     }
 }

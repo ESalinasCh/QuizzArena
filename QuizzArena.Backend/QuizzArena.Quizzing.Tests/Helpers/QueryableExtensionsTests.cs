@@ -8,14 +8,11 @@ public class QueryableExtensionsTests
     private static IQueryable<int> MakeRange(int count) =>
         Enumerable.Range(1, count).AsQueryable();
 
-    // --- Paginate: page number clamping ---
-
     [Fact]
     public void Paginate_PageLessThanOne_TreatsAsPageOne()
     {
         var result = MakeRange(10).Paginate(0, 3).ToList();
 
-        // page 1, size 3 → items 1,2,3
         Assert.Equal([1, 2, 3], result);
     }
 
@@ -26,8 +23,6 @@ public class QueryableExtensionsTests
 
         Assert.Equal([1, 2, 3], result);
     }
-
-    // --- Paginate: page size clamping ---
 
     [Fact]
     public void Paginate_PageSizeZero_UsesDefaultSixItems()
@@ -45,8 +40,6 @@ public class QueryableExtensionsTests
 
         Assert.Equal(6, result.Count);
     }
-
-    // --- Paginate: normal usage ---
 
     [Fact]
     public void Paginate_FirstPage_ReturnsFirstNItems()
@@ -69,7 +62,6 @@ public class QueryableExtensionsTests
     {
         var result = MakeRange(10).Paginate(3, 4).ToList();
 
-        // items 9 and 10
         Assert.Equal([9, 10], result);
     }
 

@@ -24,9 +24,12 @@ public class GetQuizzesUseCaseTests : IDisposable
         _useCase = new GetQuizzesUseCase(_context);
     }
 
-    public void Dispose() => _context.Dispose();
+    public void Dispose()
+    {
+        _context.Dispose();
+        GC.SuppressFinalize(this);
+    }
 
-    // --- Empty state ---
 
     [Fact]
     public async Task Execute_NoQuizzes_ReturnsEmptyList()
@@ -37,7 +40,6 @@ public class GetQuizzesUseCaseTests : IDisposable
         Assert.Empty(result);
     }
 
-    // --- Search filtering ---
 
     [Fact]
     public async Task Execute_SearchMatchesTitle_ReturnsMachingQuizzes()
@@ -90,7 +92,6 @@ public class GetQuizzesUseCaseTests : IDisposable
         Assert.Equal(2, result.Count);
     }
 
-    // --- Pagination ---
 
     [Fact]
     public async Task Execute_Pagination_ReturnsCorrectPage()
@@ -119,7 +120,6 @@ public class GetQuizzesUseCaseTests : IDisposable
         Assert.Single(result);
     }
 
-    // --- Mapping correctness ---
 
     [Fact]
     public async Task Execute_QuizMappedCorrectly_ReturnsCorrectDto()
