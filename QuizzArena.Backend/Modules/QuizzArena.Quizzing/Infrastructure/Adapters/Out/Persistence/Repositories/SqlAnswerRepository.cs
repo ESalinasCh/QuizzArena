@@ -15,7 +15,8 @@ internal sealed class SqlAnswerRepository(QuizzingDbContext context) : IAnswerRe
     }
     public async Task<Answer?> GetByAttemptAndQuestionAsync(Guid attemptId, Guid questionId)
     {
-        return await context.Answers.FirstOrDefaultAsync(x => x.QuestionId == questionId && x.MatchAttemptId == attemptId);
+        return await context.Answers.Include(a => a.SelectedOptions).
+            FirstOrDefaultAsync(x => x.QuestionId == questionId && x.MatchAttemptId == attemptId);
     }
 
     public async Task<Answer> UpdateAnswerAsync(Answer answer)
@@ -24,4 +25,12 @@ internal sealed class SqlAnswerRepository(QuizzingDbContext context) : IAnswerRe
         await context.SaveChangesAsync();
         return answer;
     }
+    public async Task<Answer> UpdateAnswerAndReplaceOptionsAsync(Answer answer, ICollection<SelectedOption> selectedOptions)
+    {
+        context.SelectedOptions.RemoveRange(answer.SelectedOptions);
+        answer.SelectedOptions = selectedOptions;
+        await context.SaveChangesAsync();
+        return answer;
+    }
+
 }

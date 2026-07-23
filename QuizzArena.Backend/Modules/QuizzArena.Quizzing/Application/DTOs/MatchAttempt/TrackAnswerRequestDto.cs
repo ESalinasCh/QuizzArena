@@ -2,5 +2,5 @@
 
 public record TrackAnswerRequestDto
 {
-    public Guid SelectedOptionId { get; set; }
+    public List<Guid> SelectedOptionIds { get; set; } = [];
 }

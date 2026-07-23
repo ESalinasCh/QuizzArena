@@ -26,8 +26,15 @@ public class TrackAnswerUseCase(IAnswerRepository answerRepository, IOptionRepos
             throw new InvalidOperationException();
         }
 
-        Option? option = await optionRepository.GetByIdAsync(trackAnswerRequestDto.SelectedOptionId);
-        if (option == null || option.QuestionId != questionId)
+        List<Option> options = await optionRepository.GetByIdsAsync(trackAnswerRequestDto.SelectedOptionIds);
+
+        if(options.Count <= 0)
+        {
+            throw new InvalidOperationException();
+        }
+
+        Option? optionFromAnotherQuestion = options.FirstOrDefault(x => x.QuestionId != questionId);
+        if (optionFromAnotherQuestion != null)
         {
             throw new InvalidOperationException();
         }
@@ -44,8 +51,8 @@ public class TrackAnswerUseCase(IAnswerRepository answerRepository, IOptionRepos
             };
         }
         answer!.AnsweredAt = DateTimeOffset.UtcNow;
-        answer.OptionId = trackAnswerRequestDto.SelectedOptionId;
-        answer.IsCorrect = option.IsCorrect;
+        List<SelectedOption> selectedOptions = options.Select(option => new SelectedOption() { OptionId = option.Id, IsCorrect = option.IsCorrect}).ToList();
+        answer.SelectedOptions = selectedOptions;
 
         if (isNew)
         {
