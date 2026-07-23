@@ -1,8 +1,9 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QuizzArena.DocumentProcessing.Application.DTOs.ClassSource;
 using QuizzArena.DocumentProcessing.Application.Ports.In;
+using Shared.Contracts.DTOs;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Web;
 
@@ -25,7 +26,9 @@ public class ClassSourceController(
 
     [HttpGet("users/me/class-sources")]
     [Authorize(Roles = "teacher")]
-    public async Task<ActionResult<List<GetClassSourceResponseDto>>> GetMyClassSources()
+    public async Task<ActionResult<List<GetClassSourceResponseDto>>> GetMyClassSources(
+        [FromQuery] PagedRequest query
+    )
     {
         string? userIdClaim = User.FindFirstValue("sub");
         if (!Guid.TryParse(userIdClaim, out Guid userId))
@@ -33,7 +36,7 @@ public class ClassSourceController(
             return Unauthorized();
         }
 
-        List<GetClassSourceResponseDto> result = await getClassSourcesUseCase.Execute(userId);
+        List<GetClassSourceResponseDto> result = await getClassSourcesUseCase.Execute(userId, query);
         return Ok(result);
     }
 }
