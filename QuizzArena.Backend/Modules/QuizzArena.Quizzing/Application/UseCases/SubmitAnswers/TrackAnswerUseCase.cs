@@ -52,15 +52,16 @@ public class TrackAnswerUseCase(IAnswerRepository answerRepository, IOptionRepos
         }
         answer!.AnsweredAt = DateTimeOffset.UtcNow;
         List<SelectedOption> selectedOptions = options.Select(option => new SelectedOption() { OptionId = option.Id, IsCorrect = option.IsCorrect}).ToList();
-        answer.SelectedOptions = selectedOptions;
+        
 
         if (isNew)
         {
+            answer.SelectedOptions = selectedOptions;
             await answerRepository.CreateAnswerAsync(answer);
         }
         else
         {
-            await answerRepository.UpdateAnswerAsync(answer);
+            await answerRepository.UpdateAnswerAndReplaceOptionsAsync(answer, selectedOptions);
         }
 
         return new MatchAttemptSmallProgressDto() { AnsweredQuestions = attempt.Answers.Count, TotalQuestions = attempt.MatchAttemptQuestions.Count };
