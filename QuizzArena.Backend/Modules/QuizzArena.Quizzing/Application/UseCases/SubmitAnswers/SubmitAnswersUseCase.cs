@@ -13,7 +13,6 @@ namespace QuizzArena.Quizzing.Application.UseCases.SubmitAnswers;
 
 public class SubmitAnswersUseCase(
     SubmitAnswersRequestValidator submitAnswersValidator,
-    IOptionRepository optionRepository,
     IMatchRepository matchRepository,
     IMatchAttemptRepository matchAttemptRepository,
     IMapper mapper,
@@ -58,22 +57,52 @@ public class SubmitAnswersUseCase(
         // Map every answer to Answer
         List<Answer> answers = mapper.Map<List<Answer>>(dto.Answers);
 
-        // Get options to know correct answers
-        List<Guid> optionsIds = dto.Answers.Select(answer => answer.SelectedOptionId).ToList();
-        List<Option> options = await optionRepository.GetByIdsAsync(optionsIds);
-        Dictionary<Guid, Option> optionsById = options.ToDictionary(option => option.Id);
+        // Get questions with their options (options tell us which ones are correct)
+        List<Guid> questionsIds = answers.Select(a => a.QuestionId).Distinct().ToList();
+        List<Question> questions = await questionRepository.GetByIdsWithOptionsAsync(questionsIds);
+        Dictionary<Guid, Question> questionsById = questions.ToDictionary(question => question.Id);
 
-        // Calculate score, correctCount, incorrectCount, totalQuestions
         int correctCount = 0;
         int incorrectCount = 0;
         int totalQuestions = answers.Count;
 
+        List<QuestionResultDto> questionResultDtos = [];
+
+        // One Answer per question; the options the student picked live in its SelectedOptions
         foreach (Answer answer in answers)
         {
-            answer.MatchAttemptId = matchAttemptId;
-            answer.IsCorrect = optionsById.TryGetValue(answer.OptionId, out Option? option)
-                && option.IsCorrect;
-            if (answer.IsCorrect)
+            Question question = questionsById.GetValueOrDefault(answer.QuestionId)
+                ?? throw new InvalidOperationException($"Question {answer.QuestionId} not found.");
+
+            HashSet<Guid> correctOptionIds = question.Options
+                .Where(option => option.IsCorrect)
+                .Select(option => option.Id)
+                .ToHashSet();
+
+            if (correctOptionIds.Count == 0)
+            {
+                throw new InvalidOperationException($"Question {question.Id} has no correct option.");
+            }
+
+            HashSet<Guid> questionOptionIds = question.Options.Select(option => option.Id).ToHashSet();
+            HashSet<Guid> selectedOptionIds = answer.SelectedOptions.Select(selected => selected.OptionId).ToHashSet();
+
+            foreach (Guid selectedOptionId in selectedOptionIds)
+            {
+                if (!questionOptionIds.Contains(selectedOptionId))
+                {
+                    throw new InvalidSelectedOptionException(selectedOptionId, question.Id);
+                }
+            }
+
+            // MultipleChoice is all-or-nothing: SetEquals rejects both partial
+            // selections and over-selection. Single-answer types allow exactly one pick.
+            bool isCorrect = question.Type == Domain.Enums.QuestionType.MultipleChoice
+                ? selectedOptionIds.SetEquals(correctOptionIds)
+                : selectedOptionIds.Count == 1 && correctOptionIds.Contains(selectedOptionIds.First());
+
+            answer.IsCorrect = isCorrect;
+            if (isCorrect)
             {
                 correctCount++;
             }
@@ -81,6 +110,26 @@ public class SubmitAnswersUseCase(
             {
                 incorrectCount++;
             }
+
+            foreach (SelectedOption selected in answer.SelectedOptions)
+            {
+                selected.IsCorrect = correctOptionIds.Contains(selected.OptionId);
+            }
+
+            answer.MatchAttemptId = matchAttemptId;
+
+            // Placeholder only: answer.OptionId is still a NOT NULL FK to option, so it must
+            // hold a real option id. It carries no meaning — SelectedOptions is the answer.
+            // Delete this line when the column is dropped (see the note in Answer.cs).
+            answer.OptionId = selectedOptionIds.First();
+
+            questionResultDtos.Add(new QuestionResultDto(
+                question.Id,
+                question.Content,
+                [.. selectedOptionIds],
+                [.. correctOptionIds],
+                isCorrect
+            ));
         }
 
         // Multiply before dividing to avoid integer-division truncating to 0
@@ -92,29 +141,6 @@ public class SubmitAnswersUseCase(
         matchAttempt.Status = Domain.Enums.QuizAttemptStatus.Completed;
 
         await matchAttemptRepository.UpdateAsync(matchAttempt);
-
-        // Get questions with their options (need options to know the correct one)
-        List<Guid> questionsIds = answers.Select(a => a.QuestionId).Distinct().ToList();
-        List<Question> questions = await questionRepository.GetByIdsWithOptionsAsync(questionsIds);
-        Dictionary<Guid, Question> questionsById = questions.ToDictionary(question => question.Id);
-
-        // One result per answer: question text + selected vs correct option
-        List<QuestionResultDto> questionResultDtos = answers.Select(answer =>
-        {
-            Question question = questionsById.GetValueOrDefault(answer.QuestionId)
-                ?? throw new InvalidOperationException($"Question {answer.QuestionId} not found.");
-
-            Option correctOption = question.Options.FirstOrDefault(option => option.IsCorrect)
-                ?? throw new InvalidOperationException($"Question {question.Id} has no correct option.");
-
-            return new QuestionResultDto(
-                question.Id,
-                question.Content,
-                answer.OptionId,
-                correctOption.Id,
-                answer.IsCorrect
-            );
-        }).ToList();
 
         // Build response object
         SubmitAnswersResponseDto response = new SubmitAnswersResponseDto

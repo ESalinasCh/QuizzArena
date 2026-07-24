@@ -14,7 +14,7 @@ public record QuestionResultDto
 (
     Guid Id,
     string Text,
-    Guid SelectedOptionId,
-    Guid CorrectOptionId,
+    IReadOnlyList<Guid> SelectedOptionIds,
+    IReadOnlyList<Guid> CorrectOptionIds,
     bool IsCorrect
 );
