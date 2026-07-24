@@ -66,7 +66,7 @@ public class GetMatchAttemptDetailCaseTests
                 new Answer
                 {
                     QuestionId = questionId,
-                    OptionId = optionId,
+                    SelectedOptions = [new SelectedOption { OptionId = optionId, IsCorrect = true }],
                     IsCorrect = true
                 }
             ]
@@ -123,7 +123,7 @@ public class GetMatchAttemptDetailCaseTests
 
         Assert.Equal(questionId, question.QuestionId);
         Assert.Equal("Question content", question.Content);
-        Assert.Equal(optionId, question.SelectedOptionId);
+        Assert.Equal(optionId, Assert.Single(question.SelectedOptionIds));
         Assert.True(question.IsCorrect);
 
         Assert.Single(question.Options);
@@ -192,7 +192,7 @@ public class GetMatchAttemptDetailCaseTests
 
         var question = result.Questions.Single();
 
-        Assert.Null(question.SelectedOptionId);
+        Assert.Empty(question.SelectedOptionIds);
         Assert.False(question.IsCorrect);
     }
 
@@ -254,7 +254,7 @@ public class GetMatchAttemptDetailCaseTests
                 new Answer
                 {
                     QuestionId = questionId,
-                    OptionId = optionId,
+                    SelectedOptions = [new SelectedOption { OptionId = optionId, IsCorrect = true }],
                     IsCorrect = true
                 }
             ]
@@ -300,6 +300,158 @@ public class GetMatchAttemptDetailCaseTests
         Assert.Null(question.Justification);
         Assert.Null(question.IsCorrect);
         Assert.Null(option.IsCorrect);
-        Assert.Equal(optionId, question.SelectedOptionId);
+
+        // The student's own picks are not a result, so hiding results must not hide them.
+        Assert.Equal(optionId, Assert.Single(question.SelectedOptionIds));
+    }
+
+    [Fact]
+    public async Task Execute_MultipleSelectedOptions_ReturnsEveryPick()
+    {
+        Guid matchId = Guid.NewGuid();
+        Guid matchAttemptId = Guid.NewGuid();
+        Guid questionId = Guid.NewGuid();
+        Guid firstOptionId = Guid.NewGuid();
+        Guid secondOptionId = Guid.NewGuid();
+        Guid unpickedOptionId = Guid.NewGuid();
+
+        var match = new Domain.Entities.Match
+        {
+            Id = matchId,
+            Status = MatchStatus.Active,
+            Mode = MatchMode.Solo
+        };
+
+        var matchAttempt = new MatchAttempt
+        {
+            Id = matchAttemptId,
+            Score = 100,
+            Status = QuizAttemptStatus.Completed,
+            MatchId = matchId,
+            MatchAttemptQuestions = [new MatchAttemptQuestion { QuestionId = questionId }],
+            Answers =
+            [
+                new Answer
+                {
+                    QuestionId = questionId,
+                    SelectedOptions =
+                    [
+                        new SelectedOption { OptionId = firstOptionId, IsCorrect = true },
+                        new SelectedOption { OptionId = secondOptionId, IsCorrect = true }
+                    ],
+                    IsCorrect = true
+                }
+            ]
+        };
+
+        var questions = new List<Question>
+        {
+            new()
+            {
+                Id = questionId,
+                Content = "Question content",
+                Type = QuestionType.MultipleChoice,
+                Options =
+                [
+                    new Option { Id = firstOptionId, Description = "Option A", IsCorrect = true },
+                    new Option { Id = secondOptionId, Description = "Option B", IsCorrect = true },
+                    new Option { Id = unpickedOptionId, Description = "Option C", IsCorrect = false }
+                ]
+            }
+        };
+
+        _mockMatchRepository
+            .Setup(x => x.GetMatchAttemptsDetailById(matchAttemptId))
+            .ReturnsAsync(matchAttempt);
+
+        _mockMatchRepository
+            .Setup(x => x.GetMatchByIdAsync(matchId))
+            .ReturnsAsync(match);
+
+        _mockQuestionRepository
+            .Setup(x => x.GetByIdsWithOptionsAsync(It.IsAny<List<Guid>>()))
+            .ReturnsAsync(questions);
+
+        GetMatchAttemptDetailDTO result = await _getMatchAttemptDetail.Execute(matchAttemptId);
+
+        var question = result.Questions.Single();
+
+        // Both picks survive: the old single OptionId could only ever carry one of them.
+        Assert.Equal(2, question.SelectedOptionIds.Count);
+        Assert.True(question.SelectedOptionIds.ToHashSet().SetEquals([firstOptionId, secondOptionId]));
+        Assert.DoesNotContain(unpickedOptionId, question.SelectedOptionIds);
+        Assert.True(question.IsCorrect);
+    }
+
+    [Fact]
+    public async Task Execute_PartiallyCorrectMultipleChoice_ReportsPicksAndFailedVerdict()
+    {
+        Guid matchId = Guid.NewGuid();
+        Guid matchAttemptId = Guid.NewGuid();
+        Guid questionId = Guid.NewGuid();
+        Guid correctOptionId = Guid.NewGuid();
+        Guid missedOptionId = Guid.NewGuid();
+
+        var match = new Domain.Entities.Match
+        {
+            Id = matchId,
+            Status = MatchStatus.Active,
+            Mode = MatchMode.Solo
+        };
+
+        // One of the two correct options picked: every pick is right, the answer is not.
+        var matchAttempt = new MatchAttempt
+        {
+            Id = matchAttemptId,
+            Score = 0,
+            Status = QuizAttemptStatus.Completed,
+            MatchId = matchId,
+            MatchAttemptQuestions = [new MatchAttemptQuestion { QuestionId = questionId }],
+            Answers =
+            [
+                new Answer
+                {
+                    QuestionId = questionId,
+                    SelectedOptions = [new SelectedOption { OptionId = correctOptionId, IsCorrect = true }],
+                    IsCorrect = false
+                }
+            ]
+        };
+
+        var questions = new List<Question>
+        {
+            new()
+            {
+                Id = questionId,
+                Content = "Question content",
+                Type = QuestionType.MultipleChoice,
+                Options =
+                [
+                    new Option { Id = correctOptionId, Description = "Option A", IsCorrect = true },
+                    new Option { Id = missedOptionId, Description = "Option B", IsCorrect = true }
+                ]
+            }
+        };
+
+        _mockMatchRepository
+            .Setup(x => x.GetMatchAttemptsDetailById(matchAttemptId))
+            .ReturnsAsync(matchAttempt);
+
+        _mockMatchRepository
+            .Setup(x => x.GetMatchByIdAsync(matchId))
+            .ReturnsAsync(match);
+
+        _mockQuestionRepository
+            .Setup(x => x.GetByIdsWithOptionsAsync(It.IsAny<List<Guid>>()))
+            .ReturnsAsync(questions);
+
+        GetMatchAttemptDetailDTO result = await _getMatchAttemptDetail.Execute(matchAttemptId);
+
+        var question = result.Questions.Single();
+
+        Assert.Equal(correctOptionId, Assert.Single(question.SelectedOptionIds));
+
+        // Reported straight from the stored verdict, not recomputed from the picks.
+        Assert.False(question.IsCorrect);
     }
 }
