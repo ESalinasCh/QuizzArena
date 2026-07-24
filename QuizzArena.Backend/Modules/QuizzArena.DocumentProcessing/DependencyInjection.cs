@@ -3,7 +3,9 @@ using Azure.Storage.Blobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Http.Resilience;
 using Npgsql;
+using Polly;
 using QuizzArena.DocumentProcessing.Application.Ports.In;
 using QuizzArena.DocumentProcessing.Application.Ports.Out;
 using QuizzArena.DocumentProcessing.Application.UseCases;
@@ -95,6 +97,21 @@ public static class DependencyInjection
                     new AuthenticationHeaderValue("Bearer", apiKey);
 
                 client.Timeout = TimeSpan.FromMinutes(60);
+            })
+            .AddResilienceHandler("groq-retry", pipeline =>
+            {
+                pipeline.AddRetry(new HttpRetryStrategyOptions
+                {
+                    // TODO Review if its correct
+                    MaxRetryAttempts = 5,
+                    ShouldRetryAfterHeader = true,
+                    Delay = TimeSpan.FromSeconds(60),
+                    BackoffType = DelayBackoffType.Exponential,
+                    UseJitter = true,
+                    ShouldHandle = args => ValueTask.FromResult(
+                        args.Outcome.Result?.StatusCode == System.Net.HttpStatusCode.TooManyRequests
+                    )
+                });
             });
         }
         else
@@ -123,6 +140,21 @@ public static class DependencyInjection
                 client.BaseAddress = new Uri(embeddingBaseUrl);
                 client.Timeout = TimeSpan.FromMinutes(60);
                 client.DefaultRequestHeaders.Add("x-goog-api-key", apiKey);
+            })
+            .AddResilienceHandler("gemini-retry", pipeline =>
+            {
+                pipeline.AddRetry(new HttpRetryStrategyOptions
+                {
+                    // TODO Review if its correct
+                    MaxRetryAttempts = 5,
+                    ShouldRetryAfterHeader = true,
+                    Delay = TimeSpan.FromSeconds(60),
+                    BackoffType = DelayBackoffType.Exponential,
+                    UseJitter = true,
+                    ShouldHandle = args => ValueTask.FromResult(
+                        args.Outcome.Result?.StatusCode == System.Net.HttpStatusCode.TooManyRequests
+                    )
+                });
             });
         }
         else

@@ -19,6 +19,7 @@ public class DocumentProcessingMassTransit
         x.AddSagaStateMachine<IndexingSaga, IndexingSagaState>()
             .InMemoryRepository();
 
-        x.AddConsumer<IndexTranscriptConsumer>();
+        x.AddConsumer<IndexTranscriptConsumer>()
+            .Endpoint(e => e.PrefetchCount = 1); // only process next message if the current completed
     }
 }
