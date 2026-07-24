@@ -109,6 +109,12 @@ public class SubmitAnswersUseCaseTests
     }
 
     /// <summary>
+    /// One question of <paramref name="Type"/> offering <paramref name="Options"/>,
+    /// of which the student picked <paramref name="SelectedOptionIds"/>.
+    /// </summary>
+    private sealed record QuestionSpec(QuestionType Type, List<Option> Options, List<Guid> SelectedOptionIds);
+
+    /// <summary>
     /// Wires up the happy-path repositories and returns the attempt id for a
     /// single question of <paramref name="type"/> whose options are <paramref name="options"/>.
     /// The attempt is handed back so tests can inspect what was persisted.
@@ -116,12 +122,19 @@ public class SubmitAnswersUseCaseTests
     private (Guid MatchAttemptId, SubmitAnswersRequestDto Dto, MatchAttempt MatchAttempt) ArrangeSingleQuestion(
         QuestionType type,
         List<Option> options,
-        List<Guid> selectedOptionIds)
+        List<Guid> selectedOptionIds) =>
+        ArrangeQuestions(new QuestionSpec(type, options, selectedOptionIds));
+
+    /// <summary>
+    /// Wires up the happy-path repositories for one question per entry in <paramref name="specs"/>.
+    /// The attempt is handed back so tests can inspect what was persisted.
+    /// </summary>
+    private (Guid MatchAttemptId, SubmitAnswersRequestDto Dto, MatchAttempt MatchAttempt) ArrangeQuestions(
+        params QuestionSpec[] specs)
     {
         string userId = Guid.NewGuid().ToString();
         var matchAttemptId = Guid.NewGuid();
         var matchId = Guid.NewGuid();
-        var questionId = Guid.NewGuid();
 
         _mockCurrentUser.Setup(user => user.UserId).Returns(userId);
 
@@ -139,27 +152,43 @@ public class SubmitAnswersUseCaseTests
             .Setup(repo => repo.UpdateAsync(It.IsAny<MatchAttempt>()))
             .ReturnsAsync(matchAttempt);
 
+        List<Question> questions =
+        [
+            .. specs.Select(spec => new Question
+            {
+                Id = Guid.NewGuid(),
+                Content = "Sample question",
+                Type = spec.Type,
+                Options = spec.Options
+            })
+        ];
+
         // One request entry per question, carrying every option the student picked.
         var dto = new SubmitAnswersRequestDto
         {
-            Answers = [new SubmitAnswerBody(questionId, selectedOptionIds, DateTimeOffset.UtcNow.AddMinutes(-1))]
+            Answers =
+            [
+                .. questions.Select((question, index) => new SubmitAnswerBody(
+                    question.Id,
+                    specs[index].SelectedOptionIds,
+                    DateTimeOffset.UtcNow.AddMinutes(-1)))
+            ]
         };
 
         // Stands in for what SubmitAnswersMappingProfile produces (the mapper is mocked).
         List<Answer> answers =
         [
-            new Answer
+            .. questions.Select((question, index) => new Answer
             {
-                QuestionId = questionId,
-                SelectedOptions = [.. selectedOptionIds.Select(id => new SelectedOption { OptionId = id })]
-            }
+                QuestionId = question.Id,
+                SelectedOptions = [.. specs[index].SelectedOptionIds.Select(id => new SelectedOption { OptionId = id })]
+            })
         ];
         _mockMapper.Setup(m => m.Map<List<Answer>>(dto.Answers)).Returns(answers);
 
-        var question = new Question { Id = questionId, Content = "Sample question", Type = type, Options = options };
         _mockQuestionRepository
             .Setup(repo => repo.GetByIdsWithOptionsAsync(It.IsAny<List<Guid>>()))
-            .ReturnsAsync([question]);
+            .ReturnsAsync(questions);
 
         return (matchAttemptId, dto, matchAttempt);
     }
@@ -403,6 +432,81 @@ public class SubmitAnswersUseCaseTests
         Answer answer = Assert.Single(matchAttempt.Answers);
         Assert.True(answer.SelectedOptions.Single(selected => selected.OptionId == correct.Id).IsCorrect);
         Assert.False(answer.SelectedOptions.Single(selected => selected.OptionId == wrong.Id).IsCorrect);
+    }
+
+    // Answer.IsCorrect is what GetMatchAttemptDetail reports back to the student, so the
+    // verdict has to reach the persisted entity and not just the response DTO.
+    [Fact]
+    public async Task SubmitAnswer_CorrectAnswer_PersistsVerdictOnAnswer()
+    {
+        List<Option> options = BuildOptions(correctCount: 1, wrongCount: 3);
+        Guid correctOptionId = options.Single(option => option.IsCorrect).Id;
+
+        (Guid matchAttemptId, SubmitAnswersRequestDto dto, MatchAttempt matchAttempt) = ArrangeSingleQuestion(
+            QuestionType.SingleChoice, options, [correctOptionId]);
+
+        await _submitAnswersUseCase.Execute(matchAttemptId, dto);
+
+        Assert.True(Assert.Single(matchAttempt.Answers).IsCorrect);
+    }
+
+    [Fact]
+    public async Task SubmitAnswer_WrongAnswer_PersistsVerdictOnAnswer()
+    {
+        List<Option> options = BuildOptions(correctCount: 1, wrongCount: 3);
+        Guid wrongOptionId = options.First(option => !option.IsCorrect).Id;
+
+        (Guid matchAttemptId, SubmitAnswersRequestDto dto, MatchAttempt matchAttempt) = ArrangeSingleQuestion(
+            QuestionType.SingleChoice, options, [wrongOptionId]);
+
+        await _submitAnswersUseCase.Execute(matchAttemptId, dto);
+
+        Assert.False(Assert.Single(matchAttempt.Answers).IsCorrect);
+    }
+
+    [Fact]
+    public async Task SubmitAnswer_MultipleChoicePartialSelection_PersistsIncorrectVerdictThoughEveryPickIsCorrect()
+    {
+        Option a = new() { Id = Guid.NewGuid(), IsCorrect = true };
+        Option b = new() { Id = Guid.NewGuid(), IsCorrect = true };
+        Option c = new() { Id = Guid.NewGuid(), IsCorrect = false };
+
+        // One of the two correct options and nothing wrong.
+        (Guid matchAttemptId, SubmitAnswersRequestDto dto, MatchAttempt matchAttempt) = ArrangeSingleQuestion(
+            QuestionType.MultipleChoice, [a, b, c], [a.Id]);
+
+        await _submitAnswersUseCase.Execute(matchAttemptId, dto);
+
+        Answer answer = Assert.Single(matchAttempt.Answers);
+
+        // Every pick is individually correct, so the question verdict cannot be folded into
+        // SelectedOptions — Answer.IsCorrect has to carry the all-or-nothing result on its own.
+        Assert.All(answer.SelectedOptions, selected => Assert.True(selected.IsCorrect));
+        Assert.False(answer.IsCorrect);
+    }
+
+    [Fact]
+    public async Task SubmitAnswer_MixedResults_PersistedVerdictsAgreeWithReportedScore()
+    {
+        List<Option> passed = BuildOptions(correctCount: 1, wrongCount: 1);
+        List<Option> failed = BuildOptions(correctCount: 1, wrongCount: 1);
+
+        (Guid matchAttemptId, SubmitAnswersRequestDto dto, MatchAttempt matchAttempt) = ArrangeQuestions(
+            new QuestionSpec(QuestionType.SingleChoice, passed, [passed.Single(option => option.IsCorrect).Id]),
+            new QuestionSpec(QuestionType.SingleChoice, failed, [failed.First(option => !option.IsCorrect).Id]));
+
+        SubmitAnswersResponseDto result = await _submitAnswersUseCase.Execute(matchAttemptId, dto);
+
+        Assert.Equal(50, result.ScorePercentage);
+        Assert.Equal(1, result.CorrectCount);
+        Assert.Equal(1, result.IncorrectCount);
+
+        // The stored verdicts and the stored score are read back together, so they must not disagree.
+        Assert.Equal(result.CorrectCount, matchAttempt.Answers.Count(answer => answer.IsCorrect));
+        Assert.Equal(result.IncorrectCount, matchAttempt.Answers.Count(answer => !answer.IsCorrect));
+        Assert.True(
+            matchAttempt.Answers.Where(answer => answer.IsCorrect).Select(answer => answer.QuestionId).ToHashSet()
+                .SetEquals(result.Questions.Where(question => question.IsCorrect).Select(question => question.Id)));
     }
 
     [Fact]

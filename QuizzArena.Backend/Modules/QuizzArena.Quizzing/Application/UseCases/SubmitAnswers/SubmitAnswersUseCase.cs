@@ -101,6 +101,7 @@ public class SubmitAnswersUseCase(
                 ? selectedOptionIds.SetEquals(correctOptionIds)
                 : selectedOptionIds.Count == 1 && correctOptionIds.Contains(selectedOptionIds.First());
 
+            answer.IsCorrect = isCorrect;
             if (isCorrect)
             {
                 correctCount++;
