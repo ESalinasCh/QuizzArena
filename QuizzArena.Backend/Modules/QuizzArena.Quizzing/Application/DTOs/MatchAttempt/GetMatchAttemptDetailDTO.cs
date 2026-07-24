@@ -16,7 +16,7 @@ public class GetMatchAttemptQuestionDTO
     public Guid QuestionId { get; set; }
     public string Content { get; set; } = "";
     public string? Justification { get; set; } = "";
-    public Guid? SelectedOptionId { get; set; }
+    public IReadOnlyList<Guid> SelectedOptionIds { get; set; } = [];
     public bool? IsCorrect { get; set; }
     public IEnumerable<GetMatchAttemptOptionDTO> Options { get; set; } = [];
 }
