@@ -3,6 +3,6 @@
 public record SubmitAnswerBody
 (
     Guid QuestionId,
-    Guid SelectedOptionId,
+    IReadOnlyList<Guid> SelectedOptionIds,
     DateTimeOffset AnsweredAt
 );
