@@ -31,7 +31,7 @@ public class GetMatchAttemptDetail(IMatchRepository matchRepository, IQuestionRe
                     QuestionId = x.Id,
                     Content = x.Content,
                     Justification = showResults ? x.Justification : null,
-                    SelectedOptionId = answer?.OptionId,
+                    SelectedOptionIds = [.. answer?.SelectedOptions.Select(selected => selected.OptionId) ?? []],
                     IsCorrect = showResults ? (answer?.IsCorrect ?? false) : null,
                     Options = x.Options.Select(y => new GetMatchAttemptOptionDTO() { Id = y.Id, IsCorrect = showResults ? y.IsCorrect : null, Description = y.Description })
                 };
