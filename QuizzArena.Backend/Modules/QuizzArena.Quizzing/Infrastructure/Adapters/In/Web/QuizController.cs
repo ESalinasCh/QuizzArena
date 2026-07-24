@@ -17,4 +17,11 @@ public class QuizController(
         CreateQuizResponseDto response = await createExamUseCase.Execute(dto);
         return Ok(response);
     }
+
+    [HttpGet("users/me/quizzes")]
+    [Authorize(Roles = "teacher")]
+    public Task GetTeacherQuizzes()
+    {
+        return null;
+    }
 }
