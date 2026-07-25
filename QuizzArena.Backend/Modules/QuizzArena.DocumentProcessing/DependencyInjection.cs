@@ -68,7 +68,18 @@ public static class DependencyInjection
                 client.BaseAddress = new Uri(transcriptionBaseUrl);
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
                 client.Timeout = TimeSpan.FromMinutes(30);
-            });
+            })
+            .AddResilienceHandler("transcription-retry", pipeline => pipeline.AddRetry(new HttpRetryStrategyOptions
+            {
+                MaxRetryAttempts = 5,
+                ShouldRetryAfterHeader = true,
+                Delay = TimeSpan.FromSeconds(60),
+                BackoffType = DelayBackoffType.Exponential,
+                UseJitter = true,
+                ShouldHandle = args => ValueTask.FromResult(
+                    args.Outcome.Result?.StatusCode == System.Net.HttpStatusCode.TooManyRequests
+                )
+            }));
         }
         else
         {
@@ -98,21 +109,22 @@ public static class DependencyInjection
 
                 client.Timeout = TimeSpan.FromMinutes(60);
             })
-            .AddResilienceHandler("groq-retry", pipeline =>
+            .AddResilienceHandler("llm-retry", pipeline => pipeline.AddRetry(new HttpRetryStrategyOptions
             {
-                pipeline.AddRetry(new HttpRetryStrategyOptions
+                MaxRetryAttempts = 5,
+                ShouldRetryAfterHeader = true,
+                DelayGenerator = args =>
                 {
-                    // TODO Review if its correct
-                    MaxRetryAttempts = 5,
-                    ShouldRetryAfterHeader = true,
-                    Delay = TimeSpan.FromSeconds(60),
-                    BackoffType = DelayBackoffType.Exponential,
-                    UseJitter = true,
-                    ShouldHandle = args => ValueTask.FromResult(
-                        args.Outcome.Result?.StatusCode == System.Net.HttpStatusCode.TooManyRequests
-                    )
-                });
-            });
+                    var baseSeconds = 70;
+                    var stepSeconds = 60;
+                    var totalSeconds = baseSeconds + (args.AttemptNumber * stepSeconds);
+                    return ValueTask.FromResult<TimeSpan?>(TimeSpan.FromSeconds(totalSeconds));
+                },
+                UseJitter = true,
+                ShouldHandle = args => ValueTask.FromResult(
+                    args.Outcome.Result?.StatusCode == System.Net.HttpStatusCode.TooManyRequests
+                )
+            }));
         }
         else
         {
@@ -141,21 +153,23 @@ public static class DependencyInjection
                 client.Timeout = TimeSpan.FromMinutes(60);
                 client.DefaultRequestHeaders.Add("x-goog-api-key", apiKey);
             })
-            .AddResilienceHandler("gemini-retry", pipeline =>
+            .AddResilienceHandler("embedding-retry", pipeline => pipeline.AddRetry(new HttpRetryStrategyOptions
             {
-                pipeline.AddRetry(new HttpRetryStrategyOptions
+                MaxRetryAttempts = 5,
+                ShouldRetryAfterHeader = true,
+                DelayGenerator = args =>
                 {
-                    // TODO Review if its correct
-                    MaxRetryAttempts = 5,
-                    ShouldRetryAfterHeader = true,
-                    Delay = TimeSpan.FromSeconds(60),
-                    BackoffType = DelayBackoffType.Exponential,
-                    UseJitter = true,
-                    ShouldHandle = args => ValueTask.FromResult(
-                        args.Outcome.Result?.StatusCode == System.Net.HttpStatusCode.TooManyRequests
-                    )
-                });
-            });
+                    var baseSeconds = 70;
+                    var stepSeconds = 60;
+                    var totalSeconds = baseSeconds + (args.AttemptNumber * stepSeconds);
+                    return ValueTask.FromResult<TimeSpan?>(TimeSpan.FromSeconds(totalSeconds));
+                },
+                BackoffType = DelayBackoffType.Exponential,
+                UseJitter = true,
+                ShouldHandle = args => ValueTask.FromResult(
+                    args.Outcome.Result?.StatusCode == System.Net.HttpStatusCode.TooManyRequests
+                )
+            }));
         }
         else
         {
