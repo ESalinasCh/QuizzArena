@@ -3,7 +3,6 @@ using QuizzArena.DocumentProcessing.Application.Messaging.Commands.Indexing;
 using QuizzArena.DocumentProcessing.Application.Messaging.Events.Generation;
 using QuizzArena.DocumentProcessing.Application.Messaging.Events.Indexing;
 using QuizzArena.DocumentProcessing.Domain.Enums;
-using Shared.Messaging.Events;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Sagas.Indexing;
 
@@ -13,51 +12,52 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Sag
 /// </summary>
 public class IndexingSaga : MassTransitStateMachine<IndexingSagaState>
 {
-    public State Processing { get; private set; } = null!;
-    public State Indexed { get; private set; } = null!;
-    public State Faulted { get; private set; } = null!;
+    public State IndexingInProgress { get; private set; } = null!;
+    public State IndexingSuccess { get; private set; } = null!;
+    public State IndexingFailed { get; private set; } = null!;
 
-    public Event<TranscriptionCompletedEvent> TranscriptionCompleted { get; private set; } = null!;
-    public Event<IndexingCompletedEvent> IndexingCompleted { get; private set; } = null!;
-    public Event<IndexingFailedEvent> IndexingFailed { get; private set; } = null!;
+    public Event<IndexingRequestEvent> RequestEvent { get; private set; } = null!;
+    public Event<IndexingSuccessEvent> SuccessEvent { get; private set; } = null!;
+    public Event<IndexingFailedEvent> FailedEvent { get; private set; } = null!;
 
     public IndexingSaga()
     {
         InstanceState(x => x.CurrentState);
 
-        Event(() => TranscriptionCompleted, e =>
+        Event(() => RequestEvent, e =>
         {
             e.CorrelateBy(state => state.IndexingIdKey, ctx => ctx.Message.ClassSourceId.ToString());
             e.SelectId(_ => NewId.NextGuid());
         });
 
-        Event(() => IndexingCompleted, e =>
+        Event(() => SuccessEvent, e =>
             e.CorrelateBy(state => state.IndexingIdKey, ctx => ctx.Message.ClassSourceId.ToString()));
 
-        Event(() => IndexingFailed, e =>
+        Event(() => FailedEvent, e =>
             e.CorrelateBy(state => state.IndexingIdKey, ctx => ctx.Message.ClassSourceId.ToString()));
 
         Initially(
-            When(TranscriptionCompleted)
+            When(RequestEvent)
                 .Then(ctx =>
                 {
                     ctx.Saga.ClassSourceId = ctx.Message.ClassSourceId.ToString();
                     ctx.Saga.IndexingIdKey = ctx.Message.ClassSourceId.ToString();
+                    Console.WriteLine($"[SAGA] Indexing request received for ClassSourceId: {ctx.Message.ClassSourceId}. Starting indexing process...");
                 })
-                .Publish(ctx => new IndexTranscriptCommand
+                .Publish(ctx => new IndexingRequestCommand
                 {
                     ClassSourceId = ctx.Message.ClassSourceId,
                     TranscriptUrl = ctx.Message.TranscriptUrl,
                 })
-                .TransitionTo(Processing)
+                .TransitionTo(IndexingInProgress)
         );
 
-        During(Processing,
-            When(IndexingCompleted)
+        During(IndexingInProgress,
+            When(SuccessEvent)
                 .Then(ctx =>
-                    Console.WriteLine(
-                        $"[Saga] Indexing #{ctx.Saga.ClassSourceId} completed → stored {ctx.Message.StoredChunkCount} chunks."))
-                .TransitionTo(Indexed)
+                    Console.WriteLine($"[SAGA] Indexing Success received for ClassSource: {ctx.Saga.ClassSourceId}. Stored {ctx.Message.StoredChunkCount} chunks. Requesting generation...")
+                )
+                .TransitionTo(IndexingSuccess)
                 .Publish(ctx => new GenerationProcessingJobRequestEvent
                 {
                     ClassSourceId = ctx.Message.ClassSourceId,
@@ -71,11 +71,11 @@ public class IndexingSaga : MassTransitStateMachine<IndexingSagaState>
                 })
                 .Finalize(),
 
-            When(IndexingFailed)
+            When(FailedEvent)
                 .Then(ctx =>
-                    Console.WriteLine(
-                        $"[Saga] Indexing #{ctx.Saga.ClassSourceId} failed: {ctx.Message.Reason}"))
-                .TransitionTo(Faulted)
+                    Console.WriteLine($"[SAGA] Indexing Failed received for ClassSource: {ctx.Saga.ClassSourceId}. Error: {ctx.Message.ErrorMessage}")
+                )
+                .TransitionTo(IndexingFailed)
                 .Finalize()
         );
 

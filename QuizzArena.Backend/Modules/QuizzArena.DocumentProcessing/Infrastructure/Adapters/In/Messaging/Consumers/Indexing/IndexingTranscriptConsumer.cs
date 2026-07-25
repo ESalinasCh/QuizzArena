@@ -15,20 +15,20 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Con
 /// <summary>
 /// Indexing transcript to get most valuable chunks.
 /// </summary>
-public partial class IndexTranscriptConsumer(
+public partial class IndexingTranscriptConsumer(
     IStorageServiceRepository storageServiceRepository,
     IEmbeddingService embeddingService,
     IChunkClassifier chunkClassifier,
     IDocumentChunkRepository documentChunkRepository,
-    ILogger<IndexTranscriptConsumer> logger,
+    ILogger<IndexingTranscriptConsumer> logger,
     IOptions<IndexingOptions> indexingConfig
-) : IConsumer<IndexTranscriptCommand>
+) : IConsumer<IndexingRequestCommand>
 {
     private readonly IndexingOptions _indexingConfig = indexingConfig.Value;
 
-    public async Task Consume(ConsumeContext<IndexTranscriptCommand> context)
+    public async Task Consume(ConsumeContext<IndexingRequestCommand> context)
     {
-        IndexTranscriptCommand command = context.Message;
+        IndexingRequestCommand command = context.Message;
 
         try
         {
@@ -85,38 +85,38 @@ public partial class IndexTranscriptConsumer(
         }
         catch (Exception ex)
         {
-            LogFailed(logger, ex, command.ClassSourceId);
+            LogFailed(logger, ex, command.ClassSourceId, ex.Message);
 
             await context.Publish(new IndexingFailedEvent
             {
                 ClassSourceId = command.ClassSourceId,
-                Reason = ex.Message,
+                ErrorMessage = ex.Message,
             });
         }
     }
 
     private static Task PublishCompleted(ConsumeContext context, Guid classSourceId, int storedChunkCount) =>
-        context.Publish(new IndexingCompletedEvent
+        context.Publish(new IndexingSuccessEvent
         {
             ClassSourceId = classSourceId,
             StoredChunkCount = storedChunkCount,
         });
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Indexing started for ClassSource {ClassSourceId} (transcript {TranscriptUrl}).")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "[CONSUMER] Indexing started for ClassSource: {ClassSourceId} (transcript {TranscriptUrl}).")]
     private static partial void LogStarted(ILogger logger, Guid classSourceId, string transcriptUrl);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Split into {SentenceCount} sentences for ClassSource {ClassSourceId}.")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "[CONSUMER] Indexing for ClassSource: {ClassSourceId} split into {SentenceCount} sentences.")]
     private static partial void LogSentences(ILogger logger, int sentenceCount, Guid classSourceId);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Generated {ChunkCount} semantic chunks for ClassSource {ClassSourceId}.")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "[CONSUMER] Indexing for ClassSource: {ClassSourceId} generated {ChunkCount} semantic chunks.")]
     private static partial void LogChunks(ILogger logger, int chunkCount, Guid classSourceId);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Kept {KeptCount} of {ChunkCount} chunks after classification for ClassSource {ClassSourceId}.")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "[CONSUMER] Indexing for ClassSource: {ClassSourceId} kept {KeptCount} of {ChunkCount} chunks after classification.")]
     private static partial void LogFiltered(ILogger logger, int keptCount, int chunkCount, Guid classSourceId);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Stored {StoredCount} chunks for ClassSource {ClassSourceId}.")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "[CONSUMER] Indexing for ClassSource: {ClassSourceId} stored {StoredCount} chunks.")]
     private static partial void LogStored(ILogger logger, int storedCount, Guid classSourceId);
 
-    [LoggerMessage(Level = LogLevel.Error, Message = "Indexing failed for ClassSource {ClassSourceId}.")]
-    private static partial void LogFailed(ILogger logger, Exception exception, Guid classSourceId);
+    [LoggerMessage(Level = LogLevel.Error, Message = "[CONSUMER] Indexing for ClassSource: {ClassSourceId} failed with error: {ErrorMessage}")]
+    private static partial void LogFailed(ILogger logger, Exception exception, Guid classSourceId, string errorMessage);
 }

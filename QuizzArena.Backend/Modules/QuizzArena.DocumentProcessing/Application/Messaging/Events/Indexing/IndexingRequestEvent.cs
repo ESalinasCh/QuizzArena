@@ -1,7 +1,7 @@
 ﻿namespace QuizzArena.DocumentProcessing.Application.Messaging.Events.Indexing;
 
-public class IndexingFailedEvent
+public class IndexingRequestEvent
 {
     public Guid ClassSourceId { get; set; }
-    public string ErrorMessage { get; set; } = string.Empty;
+    public string TranscriptUrl { get; set; } = string.Empty;
 }

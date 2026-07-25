@@ -1,7 +1,7 @@
 ﻿using MassTransit;
 using QuizzArena.DocumentProcessing.Application.Messaging.Commands.Ingestion;
+using QuizzArena.DocumentProcessing.Application.Messaging.Events.Indexing;
 using QuizzArena.DocumentProcessing.Application.Messaging.Events.Ingestion;
-using Shared.Messaging.Events;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Sagas.Ingestion;
 
@@ -14,8 +14,8 @@ public class IngestionSaga : MassTransitStateMachine<IngestionSagaState>
 
 
     public Event<TranscriptionRequestEvent> RequestEvent { get; private set; } = null!;
-    public Event<TranscriptionCompletedEvent> CompletedEvent { get; private set; } = null!;
-    public Event<TranscriptionFailedEvent> ErrorEvent { get; private set; } = null!;
+    public Event<TranscriptionSuccessEvent> SuccessEvent { get; private set; } = null!;
+    public Event<TranscriptionFailedEvent> FailedEvent { get; private set; } = null!;
 
 
     public IngestionSaga()
@@ -28,10 +28,10 @@ public class IngestionSaga : MassTransitStateMachine<IngestionSagaState>
             e.SelectId(_ => NewId.NextGuid());
         });
 
-        Event(() => CompletedEvent, e =>
+        Event(() => SuccessEvent, e =>
             e.CorrelateBy(state => state.IngestionIdKey, ctx => ctx.Message.ClassSourceId.ToString()));
 
-        Event(() => ErrorEvent, e =>
+        Event(() => FailedEvent, e =>
             e.CorrelateBy(state => state.IngestionIdKey, ctx => ctx.Message.ClassSourceId.ToString()));
 
 
@@ -52,19 +52,21 @@ public class IngestionSaga : MassTransitStateMachine<IngestionSagaState>
         );
 
         During(TranscriptionInProgress,
-            When(CompletedEvent)
+            When(SuccessEvent)
                 .Then(ctx =>
-                    Console.WriteLine($"[SAGA] Transcription completed received for ClassSourceId: {ctx.Saga.ClassSourceId}. Requesting indexation...")
+                    Console.WriteLine($"[SAGA] Transcription success received for ClassSourceId: {ctx.Saga.ClassSourceId}. Requesting indexation...")
                 )
-                //.Publish(ctx => new 
-                //{
-                //})
+                .Publish(ctx => new IndexingRequestEvent
+                {
+                    ClassSourceId = Guid.Parse(ctx.Saga.ClassSourceId),
+                    TranscriptUrl = ctx.Message.TranscriptUrl
+                })
                 .TransitionTo(TranscriptionSuccess)
                 .Finalize(),
 
-            When(ErrorEvent)
+            When(FailedEvent)
                 .Then(ctx =>
-                    Console.WriteLine($"[SAGA] Transcription error received for ClassSourceId: {ctx.Saga.ClassSourceId}. Updating status...")
+                    Console.WriteLine($"[SAGA] Transcription failed received for ClassSourceId: {ctx.Saga.ClassSourceId}. Updating status...")
                 )
                 .Publish(ctx => new TranscriptionFailedCommand
                 {

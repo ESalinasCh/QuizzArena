@@ -5,7 +5,6 @@ using QuizzArena.DocumentProcessing.Application.Messaging.Events.Ingestion;
 using QuizzArena.DocumentProcessing.Application.Ports.Out;
 using QuizzArena.DocumentProcessing.Domain.Entities;
 using QuizzArena.DocumentProcessing.Domain.Enums;
-using Shared.Messaging.Events;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Consumers;
 
@@ -42,7 +41,7 @@ public partial class TranscriptionRequestConsumer(
             classSource.Status = SourceStatus.Completed;
             await classSourceRepository.UpdateAsync(classSource);
 
-            await context.Publish(new TranscriptionCompletedEvent
+            await context.Publish(new TranscriptionSuccessEvent
             {
                 ClassSourceId = command.ClassSourceId,
                 TranscriptUrl = transcriptUrl
