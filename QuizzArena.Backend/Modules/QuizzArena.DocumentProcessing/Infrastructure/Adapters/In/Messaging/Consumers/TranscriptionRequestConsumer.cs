@@ -24,6 +24,13 @@ public partial class TranscriptionRequestConsumer(
         {
             LogStarted(logger, command.ClassSourceId, command.FileUrl);
 
+            ClassSource? classSource = await classSourceRepository.GetByIdAsync(command.ClassSourceId);
+            if (classSource == null)
+            {
+                LogClassSourceNotFound(logger, command.ClassSourceId);
+                throw new InvalidOperationException($"Class source with ID {command.ClassSourceId} not found");
+            }
+
             string transcribedText = await transcriptionService.TranscribeAudioAsync(command.FileUrl);
             LogTranscribed(logger, transcribedText.Length, command.ClassSourceId);
 
@@ -31,19 +38,11 @@ public partial class TranscriptionRequestConsumer(
             string transcriptUrl = await storageServiceRepository.UploadTextAsync(transcribedText, blobPath, "quiz-sources");
             LogStored(logger, transcriptUrl, command.ClassSourceId);
 
-            ClassSource? classSource = await classSourceRepository.GetByIdAsync(command.ClassSourceId);
-            if (classSource != null)
-            {
-                classSource.TranscriptUrl = transcriptUrl;
-                classSource.Status = SourceStatus.Completed;
-                await classSourceRepository.UpdateAsync(classSource);
-            }
-            else
-            {
-                LogClassSourceNotFound(logger, command.ClassSourceId);
-            }
+            classSource.TranscriptUrl = transcriptUrl;
+            classSource.Status = SourceStatus.Completed;
+            await classSourceRepository.UpdateAsync(classSource);
 
-            await context.Publish<TranscriptionCompletedEvent>(new TranscriptionCompletedEvent
+            await context.Publish(new TranscriptionCompletedEvent
             {
                 ClassSourceId = command.ClassSourceId,
                 TranscriptUrl = transcriptUrl
@@ -52,31 +51,31 @@ public partial class TranscriptionRequestConsumer(
         }
         catch (HttpRequestException ex)
         {
-            LogFailed(logger, ex, command.ClassSourceId);
+            LogFailed(logger, ex, command.ClassSourceId, ex.Message);
 
-            await context.Publish<TranscriptionFailedEvent>(new TranscriptionFailedEvent
+            await context.Publish(new TranscriptionFailedEvent
             {
                 ClassSourceId = command.ClassSourceId,
-                Reason = ex.Message
+                ErrorMessage = ex.Message
             });
         }
     }
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Transcription started for ClassSource {ClassSourceId} (file {FileUrl}).")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "[CONSUMER] Transcription started for ClassSource: {ClassSourceId} (file {FileUrl}).")]
     private static partial void LogStarted(ILogger logger, Guid classSourceId, string fileUrl);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Transcription produced {CharCount} characters for ClassSource {ClassSourceId}.")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "[CONSUMER] Transcription for ClassSource: {ClassSourceId} produced {CharCount} characters.")]
     private static partial void LogTranscribed(ILogger logger, int charCount, Guid classSourceId);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Transcript stored at {TranscriptUrl} for ClassSource {ClassSourceId}.")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "[CONSUMER] Transcription for ClassSource: {ClassSourceId} stored at {TranscriptUrl}.")]
     private static partial void LogStored(ILogger logger, string transcriptUrl, Guid classSourceId);
 
-    [LoggerMessage(Level = LogLevel.Warning, Message = "ClassSource {ClassSourceId} not found while saving transcript URL.")]
+    [LoggerMessage(Level = LogLevel.Warning, Message = "[CONSUMER] Transcription for ClassSource: {ClassSourceId} not found while saving transcript URL.")]
     private static partial void LogClassSourceNotFound(ILogger logger, Guid classSourceId);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "TranscriptionCompletedEvent published for ClassSource {ClassSourceId}.")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "[CONSUMER] Transcription for ClassSource: {ClassSourceId} completed and TranscriptionCompletedEvent published.")]
     private static partial void LogCompletedPublished(ILogger logger, Guid classSourceId);
 
-    [LoggerMessage(Level = LogLevel.Error, Message = "Transcription failed for ClassSource {ClassSourceId}.")]
-    private static partial void LogFailed(ILogger logger, Exception exception, Guid classSourceId);
+    [LoggerMessage(Level = LogLevel.Error, Message = "[CONSUMER] Transcription for ClassSource: {ClassSourceId} failed. Publishing TranscriptionFailedEvent with error: {ErrorMessage}.")]
+    private static partial void LogFailed(ILogger logger, Exception exception, Guid classSourceId, string errorMessage);
 }

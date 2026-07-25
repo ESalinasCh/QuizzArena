@@ -3,5 +3,5 @@
 public class TranscriptionFailedEvent
 {
     public Guid ClassSourceId { get; set; }
-    public string Reason { get; set; } = string.Empty;
+    public string ErrorMessage { get; set; } = string.Empty;
 }
