@@ -1,0 +1,57 @@
+using MassTransit;
+using QuizzArena.Workers.Contracts;
+
+namespace FFmpeg.Worker.Consumers;
+
+/// <summary>
+/// Lógica común a CUALQUIER tipo de job: ejecuta, publica IJobCompleted o
+/// IJobFaulted. Los consumers concretos (CompressAudioJobConsumer, y los que
+/// vengan después) solo implementan ExecuteAsync.
+/// </summary>
+public abstract class JobConsumerBase<TJob> : IConsumer<TJob> where TJob : class, IWorkerJob
+{
+    private readonly ILogger _logger;
+
+    protected JobConsumerBase(ILogger logger) => _logger = logger;
+
+    public async Task Consume(ConsumeContext<TJob> context)
+    {
+        var job = context.Message;
+        var jobType = typeof(TJob).Name;
+
+        try
+        {
+            var outputBlobUrl = await ExecuteAsync(job, context.CancellationToken);
+
+            await context.Publish<IJobCompleted>(new
+            {
+                job.JobId,
+                job.CorrelationId,
+                JobType = jobType,
+                OutputBlobUrl = outputBlobUrl,
+                CompletedAtUtc = DateTime.UtcNow
+            });
+
+            _logger.LogInformation("Job {JobId} ({JobType}) completado -> {BlobUrl}", job.JobId, jobType, outputBlobUrl);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Job {JobId} ({JobType}) falló", job.JobId, jobType);
+
+            await context.Publish<IJobFaulted>(new
+            {
+                job.JobId,
+                job.CorrelationId,
+                JobType = jobType,
+                Reason = ex.Message,
+                FailedAtUtc = DateTime.UtcNow
+            });
+        }
+    }
+
+    /// <summary>
+    /// Cada tipo de job implementa su propio pipeline (descargar, procesar, subir)
+    /// y retorna la URL del blob resultante.
+    /// </summary>
+    protected abstract Task<string> ExecuteAsync(TJob job, CancellationToken ct);
+}
