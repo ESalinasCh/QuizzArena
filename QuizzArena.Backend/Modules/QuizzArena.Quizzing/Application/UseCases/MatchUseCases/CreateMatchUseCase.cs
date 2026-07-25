@@ -27,7 +27,7 @@ public class CreateMatchUseCase(
         match.CreatedAt = DateTimeOffset.UtcNow;
         match.UpdatedAt = DateTimeOffset.UtcNow;
         match.Title = quiz.Title + " " + match.CreatedAt;
-        match.QuestionsAmount = null;
+        match.QuestionsAmount = dto.QuestionsAmount;
         match.Code = Random.Shared.Next(100000, 999999).ToString(CultureInfo.InvariantCulture);
 
         Match createdMatch = await matchRepository.CreateMatchAsync(match);
