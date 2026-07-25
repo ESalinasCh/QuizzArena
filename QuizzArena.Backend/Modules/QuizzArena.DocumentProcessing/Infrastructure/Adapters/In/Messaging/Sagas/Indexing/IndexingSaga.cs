@@ -58,7 +58,7 @@ public class IndexingSaga : MassTransitStateMachine<IndexingSagaState>
                     Console.WriteLine($"[SAGA] Indexing Success received for ClassSource: {ctx.Saga.ClassSourceId}. Stored {ctx.Message.StoredChunkCount} chunks. Requesting generation...")
                 )
                 .TransitionTo(IndexingSuccess)
-                .Publish(ctx => new GenerationProcessingJobRequestEvent
+                .Publish(ctx => new GenerationRequestEvent
                 {
                     ClassSourceId = ctx.Message.ClassSourceId,
                     ProcessingJobId = Guid.NewGuid(),

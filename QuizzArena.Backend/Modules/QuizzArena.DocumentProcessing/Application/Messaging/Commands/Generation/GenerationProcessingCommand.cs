@@ -1,12 +1,12 @@
 ﻿using QuizzArena.DocumentProcessing.Domain.Enums;
 
-namespace QuizzArena.DocumentProcessing.Application.Messaging.Events.Generation;
+namespace QuizzArena.DocumentProcessing.Application.Messaging.Commands.Generation;
 
-public class GenerationProcessingJobRequestEvent
+public class GenerationProcessingCommand
 {
     public Guid ClassSourceId { get; set; }
-    public Guid ProcessingJobId { get; set; } = Guid.NewGuid();
-    public Guid DocumentProcessingJobId { get; set; } = Guid.NewGuid();
+    public Guid ProcessingJobId { get; set; }
+    public Guid DocumentProcessingJobId { get; set; }
     public int NumberOfQuestions { get; set; } = 5;
     public int MinNumberOfOptions { get; set; } = 2;
     public int MaxNumberOfOptions { get; set; } = 4;

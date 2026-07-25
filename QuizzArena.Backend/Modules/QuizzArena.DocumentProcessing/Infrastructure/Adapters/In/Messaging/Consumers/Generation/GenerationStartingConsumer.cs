@@ -7,11 +7,11 @@ using QuizzArena.DocumentProcessing.Domain.Enums;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Consumers.Generation;
 
-public class GenerationProcessingJobRequestConsumer(
+public class GenerationStartingConsumer(
     IProcessingJobRepository processingJobRepository
-) : IConsumer<GenerationProcessingJobRequestCommand>
+) : IConsumer<GenerationStartingCommand>
 {
-    public async Task Consume(ConsumeContext<GenerationProcessingJobRequestCommand> context)
+    public async Task Consume(ConsumeContext<GenerationStartingCommand> context)
     {
         await processingJobRepository.CreateAsync(new ProcessingJob()
         {
@@ -29,7 +29,7 @@ public class GenerationProcessingJobRequestConsumer(
             }
         });
 
-        await context.Publish<GenerationRequestEvent>(new GenerationRequestEvent
+        await context.Publish(new GenerationProcessEvent
         {
             ClassSourceId = context.Message.ClassSourceId,
             ProcessingJobId = context.Message.ProcessingJobId,

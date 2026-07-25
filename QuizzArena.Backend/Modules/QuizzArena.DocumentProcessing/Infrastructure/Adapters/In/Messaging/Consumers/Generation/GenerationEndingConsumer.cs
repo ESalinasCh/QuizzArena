@@ -8,13 +8,13 @@ using Shared.Contracts.DTOs;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Consumers.Generation;
 
-public class GenerationTerminatingProcessingRequestConsumer(
+public class GenerationEndingConsumer(
     IProcessingJobRepository processingJobRepository,
     IClassSourceRepository classSourceRepository,
     IMatchContract matchContract
-) : IConsumer<GenerationTerminatingProcessingRequestCommand>
+) : IConsumer<GenerationEndingCommand>
 {
-    public async Task Consume(ConsumeContext<GenerationTerminatingProcessingRequestCommand> context)
+    public async Task Consume(ConsumeContext<GenerationEndingCommand> context)
     {
         if (context.Message.CreateMatch)
         {

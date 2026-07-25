@@ -1,6 +1,6 @@
 ﻿namespace QuizzArena.DocumentProcessing.Application.Messaging.Events.Generation;
 
-public class GenerationFinalizeProcessingRequestEvent
+public class GenerationEndingEvent
 {
     public Guid ClassSourceId { get; set; }
     public Guid ProcessingJobId { get; set; } = Guid.NewGuid();

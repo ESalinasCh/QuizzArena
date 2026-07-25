@@ -2,7 +2,7 @@
 
 namespace QuizzArena.DocumentProcessing.Application.Messaging.Commands.Generation;
 
-public class GenerationRequestCommand
+public class GenerationStartingCommand
 {
     public Guid ClassSourceId { get; set; }
     public Guid ProcessingJobId { get; set; }

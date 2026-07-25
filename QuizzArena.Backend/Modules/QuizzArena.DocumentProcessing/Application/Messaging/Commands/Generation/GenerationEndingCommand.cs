@@ -1,6 +1,6 @@
 ﻿namespace QuizzArena.DocumentProcessing.Application.Messaging.Commands.Generation;
 
-public class GenerationTerminatingProcessingRequestCommand
+public class GenerationEndingCommand
 {
     public Guid ClassSourceId { get; set; }
     public Guid ProcessingJobId { get; set; }

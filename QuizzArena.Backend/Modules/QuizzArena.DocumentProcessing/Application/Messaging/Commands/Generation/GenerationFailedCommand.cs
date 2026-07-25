@@ -1,6 +1,6 @@
-﻿namespace QuizzArena.DocumentProcessing.Application.Messaging.Events.Generation;
+﻿namespace QuizzArena.DocumentProcessing.Application.Messaging.Commands.Generation;
 
-public class GenerationFailedEvent
+public class GenerationFailedCommand
 {
     public Guid ClassSourceId { get; set; }
     public Guid ProcessingJobId { get; set; }

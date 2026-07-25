@@ -26,7 +26,7 @@ public partial class IndexingTranscriptConsumer(
 {
     private readonly IndexingOptions _indexingConfig = indexingConfig.Value;
 
-    public record Paragraphs(List<string> paragraphs);
+    public record Paragraphs(List<string> Results);
 
     public static string GenerateIndexingPrompt(string transcriptFragment)
     {
@@ -76,7 +76,7 @@ public partial class IndexingTranscriptConsumer(
                 throw new InvalidOperationException($"Transcript for ClassSource {command.ClassSourceId} has no valid sentences");
             }
 
-            List<string> fragments = TextChunker.ChunkSentences(sentences, _indexingConfig.MaxChunkSize);
+            List<string> fragments = TextChunker.ChunkList(sentences, _indexingConfig.MaxChunkSize);
             LogFragments(logger, _indexingConfig.MaxChunkSize, fragments.Count, command.ClassSourceId);
             if (fragments.Count == 0)
             {
@@ -91,7 +91,7 @@ public partial class IndexingTranscriptConsumer(
                     _indexingConfig.IndexingModel,
                     GenerateIndexingPrompt(fragment)
                 );
-                rawChunks.AddRange(docChunks.paragraphs);
+                rawChunks.AddRange(docChunks.Results);
             }
 
             LogDocumentChunks(logger, rawChunks.Count, command.ClassSourceId);
