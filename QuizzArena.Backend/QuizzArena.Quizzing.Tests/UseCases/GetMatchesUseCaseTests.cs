@@ -1,8 +1,10 @@
 ﻿using FluentValidation;
 using Moq;
 using QuizzArena.Quizzing.Application.DTOs.Match;
+using QuizzArena.Quizzing.Application.DTOs.MatchAttempt;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Application.UseCases.MatchUseCases;
+using QuizzArena.Quizzing.Domain.Enums;
 using Shared.Contracts;
 using Shared.Contracts.DTOs;
 
@@ -14,6 +16,7 @@ public class GetMatchesUseCaseTests
     private readonly Mock<ICourseContract> _mockCourseImpl;
     private readonly Mock<IMatchRepository> _mockMatchRepository;
     private readonly Mock<IQuizQuestionQueriesRepository> _mockQuizQuestionQueriesRepository;
+    private readonly Mock<IMatchAttemptRepository> _mockMatchAttemptRepository;
     private readonly Mock<ICurrentUser> _mockCurrentUser;
 
     private readonly GetMatchesUseCase _getMatchesUseCase;
@@ -24,6 +27,7 @@ public class GetMatchesUseCaseTests
         _mockCourseImpl = new Mock<ICourseContract>();
         _mockMatchRepository = new Mock<IMatchRepository>();
         _mockQuizQuestionQueriesRepository = new Mock<IQuizQuestionQueriesRepository>();
+        _mockMatchAttemptRepository = new Mock<IMatchAttemptRepository>();
         _mockCurrentUser = new Mock<ICurrentUser>();
 
         _getMatchesUseCase = new GetMatchesUseCase(
@@ -31,6 +35,7 @@ public class GetMatchesUseCaseTests
             _mockCourseImpl.Object,
             _mockMatchRepository.Object,
             _mockQuizQuestionQueriesRepository.Object,
+            _mockMatchAttemptRepository.Object,
             _mockCurrentUser.Object
         );
     }
@@ -257,6 +262,89 @@ public class GetMatchesUseCaseTests
         Assert.Equal(2, result.Count);
         Assert.Equal("Electricity", result[0].CourseName);
         Assert.Equal("Physics", result[1].CourseName);
+    }
+
+    [Fact]
+    public async Task GetMatches_Student_ReturnsAttemptSummaryFields()
+    {
+        // Arrange
+        string userId = Guid.NewGuid().ToString();
+        _mockCurrentUser.Setup(c => c.UserId).Returns(userId);
+        _mockCurrentUser.Setup(c => c.Role).Returns("Student");
+        var courses = new List<CourseSummaryDTO>
+        {
+            new CourseSummaryDTO { Id = Guid.NewGuid(), CourseName = "Electricity", ProfessorName = "Nikola Tesla" }
+        };
+        _mockCourseImpl.Setup(c => c.GetCoursesByStudent(Guid.Parse(userId))).ReturnsAsync(courses);
+        var matchId = Guid.NewGuid();
+        var matches = new List<Domain.Entities.Match>
+        {
+            new Domain.Entities.Match
+            {
+                Id = matchId,
+                Title = "My Match",
+                CourseId = courses[0].Id,
+                Status = MatchStatus.Active,
+                Mode = MatchMode.Exam,
+                AttemptsAmount = 3
+            }
+        };
+        _mockMatchRepository.Setup(m => m.GetMatchesAsync(
+            It.IsAny<List<Guid>>(),
+            It.IsAny<MatchQueryParametersDto>())
+        ).ReturnsAsync(matches);
+        _mockMatchAttemptRepository.Setup(r => r.GetAttemptSummariesByMatchIdsAndUserIdAsync(
+            It.Is<List<Guid>>(ids => ids.Single() == matchId),
+            Guid.Parse(userId))
+        ).ReturnsAsync(new Dictionary<Guid, MatchAttemptSummaryDto>
+        {
+            [matchId] = new MatchAttemptSummaryDto { Count = 2, HasActiveAttempt = true }
+        });
+        var query = new MatchQueryParametersDto();
+
+        // Act
+        List<MatchResponseDto> result = await _getMatchesUseCase.Execute(query);
+
+        // Assert
+        Assert.Single(result);
+        Assert.Equal(courses[0].Id, result[0].CourseId);
+        Assert.Equal(MatchStatus.Active, result[0].Status);
+        Assert.Equal(MatchMode.Exam, result[0].Mode);
+        Assert.Equal(3, result[0].AttemptsAmount);
+        Assert.Equal(2, result[0].AttemptsUsed);
+        Assert.True(result[0].HasActiveAttempt);
+    }
+
+    [Fact]
+    public async Task GetMatches_Teacher_DoesNotReturnAttemptSummaryFields()
+    {
+        // Arrange
+        string userId = Guid.NewGuid().ToString();
+        _mockCurrentUser.Setup(c => c.UserId).Returns(userId);
+        _mockCurrentUser.Setup(c => c.Role).Returns("Teacher");
+        var courses = new List<CourseSummaryDTO>
+        {
+            new CourseSummaryDTO { Id = Guid.NewGuid(), CourseName = "Electricity", ProfessorName = "Nikola Tesla" }
+        };
+        _mockCourseImpl.Setup(c => c.GetCoursesByTeacherId(Guid.Parse(userId))).ReturnsAsync(courses);
+        var matches = new List<Domain.Entities.Match>
+        {
+            new Domain.Entities.Match { Id = Guid.NewGuid(), Title = "My Match", CourseId = courses[0].Id }
+        };
+        _mockMatchRepository.Setup(m => m.GetMatchesAsync(
+            It.IsAny<List<Guid>>(),
+            It.IsAny<MatchQueryParametersDto>())
+        ).ReturnsAsync(matches);
+        var query = new MatchQueryParametersDto();
+
+        // Act
+        List<MatchResponseDto> result = await _getMatchesUseCase.Execute(query);
+
+        // Assert
+        Assert.Single(result);
+        Assert.Null(result[0].AttemptsUsed);
+        Assert.Null(result[0].HasActiveAttempt);
+        _mockMatchAttemptRepository.Verify(r => r.GetAttemptSummariesByMatchIdsAndUserIdAsync(It.IsAny<List<Guid>>(), It.IsAny<Guid>()), Times.Never);
     }
 
 }
