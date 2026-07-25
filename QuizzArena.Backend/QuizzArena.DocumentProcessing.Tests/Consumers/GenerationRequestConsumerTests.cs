@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using QuizzArena.DocumentProcessing.Application.Messaging.Commands.Generation;
@@ -12,7 +13,7 @@ using Shared.Contracts.DTOs;
 
 namespace QuizzArena.DocumentProcessing.Tests.Consumers;
 
-public class GenerationRequestConsumerTests
+public class GenerationProcessingConsumerTests
 {
     private static readonly float[][] _singleQuestionEmbedding = [[1f, 0f]];
     private static readonly float[][] _distinctQuestionEmbeddings = [[1f, 0f], [0f, 1f]];
@@ -23,21 +24,21 @@ public class GenerationRequestConsumerTests
     private readonly Mock<ITextGenerationService> _mockTextGenerationService;
     private readonly Mock<IQuizContract> _mockQuizContract;
     private readonly Mock<IQuestionContract> _mockQuestionContract;
-    private readonly Mock<ConsumeContext<GenerationRequestCommand>> _mockContext;
+    private readonly Mock<ConsumeContext<GenerationProcessingCommand>> _mockContext;
     private readonly Mock<IOptions<QuizGenerationOptions>> _mockOptions;
 
-    private readonly GenerationRequestCommand _command;
-    private readonly GenerationRequestConsumer _consumer;
+    private readonly GenerationProcessingCommand _command;
+    private readonly GenerationProcessingConsumer _consumer;
     private readonly QuizGenerationOptions _optionsValues;
 
-    public GenerationRequestConsumerTests()
+    public GenerationProcessingConsumerTests()
     {
         _mockDocumentChunkRepository = new Mock<IDocumentChunkRepository>();
         _mockEmbeddingService = new Mock<IEmbeddingService>();
         _mockTextGenerationService = new Mock<ITextGenerationService>();
         _mockQuizContract = new Mock<IQuizContract>();
         _mockQuestionContract = new Mock<IQuestionContract>();
-        _mockContext = new Mock<ConsumeContext<GenerationRequestCommand>>();
+        _mockContext = new Mock<ConsumeContext<GenerationProcessingCommand>>();
         _mockOptions = new Mock<IOptions<QuizGenerationOptions>>();
 
         _optionsValues = new QuizGenerationOptions
@@ -50,7 +51,7 @@ public class GenerationRequestConsumerTests
         };
         _mockOptions.Setup(o => o.Value).Returns(_optionsValues);
 
-        _command = new GenerationRequestCommand
+        _command = new GenerationProcessingCommand
         {
             ClassSourceId = Guid.NewGuid(),
             ProcessingJobId = Guid.NewGuid(),
@@ -63,59 +64,66 @@ public class GenerationRequestConsumerTests
 
         _mockContext.Setup(c => c.Message).Returns(_command);
 
-        _consumer = new GenerationRequestConsumer(
+        _consumer = new GenerationProcessingConsumer(
             _mockDocumentChunkRepository.Object,
             _mockEmbeddingService.Object,
             _mockTextGenerationService.Object,
             _mockQuizContract.Object,
             _mockQuestionContract.Object,
+            NullLogger<GenerationProcessingConsumer>.Instance,
             _mockOptions.Object
         );
     }
 
     [Fact]
-    public async Task Consume_NoDocumentChunks_ThrowsException()
+    public async Task Consume_NoDocumentChunks_PublishesGenerationFailedEvent()
     {
         // Arrange
         _mockDocumentChunkRepository
             .Setup(r => r.GetChunksByClassSourceIdAsync(_command.ClassSourceId))
             .ReturnsAsync(new List<DocumentChunk>());
 
-        // Act & Assert
-        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _consumer.Consume(_mockContext.Object));
-        Assert.Equal("No document chunks found for the specified class source.", ex.Message);
+        // Act
+        await _consumer.Consume(_mockContext.Object);
+
+        // Assert
+        _mockContext.Verify(c => c.Publish(It.IsAny<GenerationFailedEvent>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
-    public async Task Consume_AllGeneratedQuestionsHaveInvalidCorrectAnswer_ThrowsException()
+    public async Task Consume_AllGeneratedQuestionsHaveInvalidCorrectAnswer_PublishesGenerationFailedEvent()
     {
         // Arrange
         SetupDocumentChunks();
-        SetupGeneratedQuiz(new GenerationRequestConsumer.QuizGenerationFormat(
+        SetupGeneratedQuiz(new GenerationProcessingConsumer.QuizGenerationFormat(
             "Invalid quiz",
             "Invalid answers",
-            new List<GenerationRequestConsumer.QuestionGenerationFormat>
+            new List<GenerationProcessingConsumer.QuestionGenerationFormat>
             {
-                CreateGeneratedQuestion(correctAnswer: -1),
-                CreateGeneratedQuestion(question: "Invalid second question?", correctAnswer: 2, options: new List<string> { "A", "B" }),
+            CreateGeneratedQuestion(correctAnswer: -1),
+            CreateGeneratedQuestion(question: "Invalid second question?", correctAnswer: 2, options: new List<string> { "A", "B" }),
             }
         ));
 
-        // Act & Assert
-        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _consumer.Consume(_mockContext.Object));
-        Assert.Equal("No valid questions found after filtering out questions with invalid CorrectAnswer indices.", ex.Message);
+        // Act
+        await _consumer.Consume(_mockContext.Object);
+
+        // Assert
+        _mockContext.Verify(c => c.Publish(It.IsAny<GenerationFailedEvent>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
-    public async Task Consume_JudgementEvaluationCountDoesNotMatchQuestions_ThrowsException()
+    public async Task Consume_NoSurvivingQuestions_PublishesGenerationFailedEvent()
     {
         // Arrange
         SetupDocumentChunks();
-        SetupSequenceGeneration(CreateValidQuiz(), new GenerationRequestConsumer.QuizJudgementFormat(new List<GenerationRequestConsumer.QuestionJudgement>()));
+        SetupSequenceGeneration(CreateValidQuiz(), new GenerationProcessingConsumer.QuizJudgementFormat(new List<GenerationProcessingConsumer.QuestionJudgement>()));
 
-        // Act & Assert
-        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _consumer.Consume(_mockContext.Object));
-        Assert.Equal("The AI judge returned an invalid or mismatched array of scores.", ex.Message);
+        // Act
+        await _consumer.Consume(_mockContext.Object);
+
+        // Assert
+        _mockContext.Verify(c => c.Publish(It.IsAny<GenerationFailedEvent>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -124,7 +132,7 @@ public class GenerationRequestConsumerTests
         // Arrange
         var quizId = Guid.NewGuid();
         var questionIds = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() };
-        GenerationFinalizeProcessingRequestEvent? publishedEvent = null;
+        GenerationEndingEvent? publishedEvent = null;
         QuizCreationRequestDTO? createdQuiz = null;
         List<QuestionCreationRequestDTO>? createdQuestions = null;
 
@@ -141,8 +149,8 @@ public class GenerationRequestConsumerTests
             .ReturnsAsync(quizId);
 
         _mockContext
-            .Setup(c => c.Publish(It.IsAny<GenerationFinalizeProcessingRequestEvent>(), It.IsAny<CancellationToken>()))
-            .Callback<GenerationFinalizeProcessingRequestEvent, CancellationToken>((message, _) => publishedEvent = message)
+            .Setup(c => c.Publish(It.IsAny<GenerationEndingEvent>(), It.IsAny<CancellationToken>()))
+            .Callback<GenerationEndingEvent, CancellationToken>((message, _) => publishedEvent = message)
             .Returns(Task.CompletedTask);
 
         // Act
@@ -186,7 +194,7 @@ public class GenerationRequestConsumerTests
         SetupDocumentChunks();
         SetupSequenceGeneration(
             CreateValidQuiz(),
-            new GenerationRequestConsumer.QuizJudgementFormat(new List<GenerationRequestConsumer.QuestionJudgement>
+            new GenerationProcessingConsumer.QuizJudgementFormat(new List<GenerationProcessingConsumer.QuestionJudgement>
             {
                 new(0.9f, 0.9f, 0.9f),
                 new(0.6f, 0.6f, 0.6f),
@@ -204,7 +212,7 @@ public class GenerationRequestConsumerTests
             .ReturnsAsync(quizId);
 
         _mockContext
-            .Setup(c => c.Publish(It.IsAny<GenerationFinalizeProcessingRequestEvent>(), It.IsAny<CancellationToken>()))
+            .Setup(c => c.Publish(It.IsAny<GenerationEndingEvent>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
         // Act
@@ -227,7 +235,7 @@ public class GenerationRequestConsumerTests
         SetupDocumentChunks();
         SetupSequenceGeneration(
             CreateValidQuiz(),
-            new GenerationRequestConsumer.QuizJudgementFormat(new List<GenerationRequestConsumer.QuestionJudgement>
+            new GenerationProcessingConsumer.QuizJudgementFormat(new List<GenerationProcessingConsumer.QuestionJudgement>
             {
                 new(0.9f, 0.9f, 0.9f),
                 new(0.9f, 0.9f, 0.9f),
@@ -245,7 +253,7 @@ public class GenerationRequestConsumerTests
             .ReturnsAsync(quizId);
 
         _mockContext
-            .Setup(c => c.Publish(It.IsAny<GenerationFinalizeProcessingRequestEvent>(), It.IsAny<CancellationToken>()))
+            .Setup(c => c.Publish(It.IsAny<GenerationEndingEvent>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
         // Act
@@ -262,7 +270,7 @@ public class GenerationRequestConsumerTests
         SetupDocumentChunks();
         SetupSequenceGeneration(
             CreateValidQuiz(),
-            new GenerationRequestConsumer.QuizJudgementFormat(new List<GenerationRequestConsumer.QuestionJudgement>
+            new GenerationProcessingConsumer.QuizJudgementFormat(new List<GenerationProcessingConsumer.QuestionJudgement>
             {
                 new(0.9f, 0.9f, 0.9f),
                 new(0.8f, 0.8f, 0.8f),
@@ -290,24 +298,24 @@ public class GenerationRequestConsumerTests
             });
     }
 
-    private void SetupGeneratedQuiz(GenerationRequestConsumer.QuizGenerationFormat quiz)
+    private void SetupGeneratedQuiz(GenerationProcessingConsumer.QuizGenerationFormat quiz)
     {
         _mockTextGenerationService
-            .Setup(s => s.GenerateAsync<GenerationRequestConsumer.QuizGenerationFormat>(It.IsAny<string>(), It.IsAny<string>()))
+            .Setup(s => s.GenerateAsync<GenerationProcessingConsumer.QuizGenerationFormat>(It.IsAny<string>(), It.IsAny<string>()))
             .ReturnsAsync(quiz);
     }
 
-    private void SetupSequenceGeneration(GenerationRequestConsumer.QuizGenerationFormat quiz, GenerationRequestConsumer.QuizJudgementFormat judgement)
+    private void SetupSequenceGeneration(GenerationProcessingConsumer.QuizGenerationFormat quiz, GenerationProcessingConsumer.QuizJudgementFormat judgement)
     {
         var sequence = new MockSequence();
         _mockTextGenerationService
             .InSequence(sequence)
-            .Setup(s => s.GenerateAsync<GenerationRequestConsumer.QuizGenerationFormat>(_optionsValues.QuizGenerationModel, It.IsAny<string>()))
+            .Setup(s => s.GenerateAsync<GenerationProcessingConsumer.QuizGenerationFormat>(_optionsValues.QuizGenerationModel, It.IsAny<string>()))
             .ReturnsAsync(quiz);
 
         _mockTextGenerationService
             .InSequence(sequence)
-            .Setup(s => s.GenerateAsync<GenerationRequestConsumer.QuizJudgementFormat>(_optionsValues.QuizJudgementModel, It.IsAny<string>()))
+            .Setup(s => s.GenerateAsync<GenerationProcessingConsumer.QuizJudgementFormat>(_optionsValues.QuizJudgementModel, It.IsAny<string>()))
             .ReturnsAsync(judgement);
     }
 
@@ -318,12 +326,12 @@ public class GenerationRequestConsumerTests
             .ReturnsAsync(embeddings);
     }
 
-    private static GenerationRequestConsumer.QuizGenerationFormat CreateValidQuiz()
+    private static GenerationProcessingConsumer.QuizGenerationFormat CreateValidQuiz()
     {
-        return new GenerationRequestConsumer.QuizGenerationFormat(
+        return new GenerationProcessingConsumer.QuizGenerationFormat(
             "Generated quiz",
             "Short quiz",
-            new List<GenerationRequestConsumer.QuestionGenerationFormat>
+            new List<GenerationProcessingConsumer.QuestionGenerationFormat>
             {
                 CreateGeneratedQuestion(
                     question: "What is dependency injection?",
@@ -341,14 +349,14 @@ public class GenerationRequestConsumerTests
         );
     }
 
-    private static GenerationRequestConsumer.QuestionGenerationFormat CreateGeneratedQuestion(
+    private static GenerationProcessingConsumer.QuestionGenerationFormat CreateGeneratedQuestion(
         string question = "Question?",
         List<string>? options = null,
         int correctAnswer = 0,
         int valueScore = 1
     )
     {
-        return new GenerationRequestConsumer.QuestionGenerationFormat(
+        return new GenerationProcessingConsumer.QuestionGenerationFormat(
             question,
             options ?? new List<string> { "A", "B" },
             correctAnswer,
