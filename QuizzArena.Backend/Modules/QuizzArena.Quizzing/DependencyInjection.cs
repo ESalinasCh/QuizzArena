@@ -74,6 +74,7 @@ public static class DependencyInjection
         services.AddScoped<IPublishMatchUseCase, PublishMatchUseCase>();
         services.AddScoped<IUnpublishMatchUseCase, UnpublishMatchUseCase>();
         services.AddScoped<IResetMatchAttemptUseCase, ResetMatchAttemptUseCase>();
+        services.AddScoped<IGetTeacherQuizzesUseCase, GetTeacherQuizzesUseCase>();
         #endregion
 
         #region Validators

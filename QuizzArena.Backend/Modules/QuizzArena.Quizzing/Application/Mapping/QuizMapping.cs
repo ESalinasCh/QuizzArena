@@ -18,5 +18,11 @@ internal sealed class QuizMapping : Profile
         CreateMap<Quiz, CreateQuizResponseDto>()
             .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.QuizQuestions));
         CreateMap<QuizQuestion, QuizQuestionResponseDto>();
+
+        CreateMap<Quiz, TeacherQuizResponseDto>()
+            .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.QuizQuestions));
+        CreateMap<QuizQuestion, TeacherQuizQuestionResponseDto>()
+            .ForMember(dest => dest.Content, opt => opt.MapFrom(src => src.Question.Content))
+            .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Question.Type));
     }
 }

@@ -2,13 +2,14 @@
 using Microsoft.AspNetCore.Mvc;
 using QuizzArena.Quizzing.Application.DTOs.Quiz;
 using QuizzArena.Quizzing.Application.Ports.In;
-//using QuizzArena.Quizzing.Domain.Enums;
+using QuizzArena.Quizzing.Domain.Enums;
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.In.Web;
 
 [ApiController]
 [Route("api/v{version:apiVersion}")]
 public class QuizController(
-    ICreateExamUseCase createExamUseCase
+    ICreateExamUseCase createExamUseCase,
+    IGetTeacherQuizzesUseCase getTeacherQuizzesUseCase
     ) : ControllerBase
 {
     [HttpPost("quizzes")]
@@ -19,10 +20,11 @@ public class QuizController(
         return Ok(response);
     }
 
-    //[HttpGet("users/me/quizzes")]
-    //[Authorize(Roles = "teacher")]
-    //public Task GetTeacherQuizzes([FromQuery] QuizOrigin? origin)
-    //{
-    //    return null;
-    //}
+    [HttpGet("users/me/quizzes")]
+    [Authorize(Roles = "teacher")]
+    public async Task<ActionResult<List<TeacherQuizResponseDto>>> GetTeacherQuizzes([FromQuery] QuizOrigin? origin)
+    {
+        List<TeacherQuizResponseDto> response = await getTeacherQuizzesUseCase.Execute(origin);
+        return Ok(response);
+    }
 }
