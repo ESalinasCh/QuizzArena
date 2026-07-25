@@ -1,4 +1,4 @@
-namespace QuizzArena.Quizzing.Application.DTOs.MatchAttempt;
+﻿namespace QuizzArena.Quizzing.Application.DTOs.MatchAttempt;
 
 public record MatchAttemptSummaryDto
 {
