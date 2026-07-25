@@ -4,5 +4,5 @@ namespace QuizzArena.Quizzing.Application.Ports.In;
 
 public interface IGetTeacherQuizzesUseCase
 {
-    Task<QuizDto> Execute();
+    Task<List<QuizDto>> Execute();
 }

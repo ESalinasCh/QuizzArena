@@ -58,7 +58,7 @@ internal sealed class QuizQuestionConfiguration : IEntityTypeConfiguration<QuizQ
             x.QuestionId
         }).IsUnique();
 
-        builder.HasOne<Question>()
+        builder.HasOne(qq => qq.Question)
             .WithMany()
             .HasForeignKey(x => x.QuestionId)
             .OnDelete(DeleteBehavior.Restrict);

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using QuizzArena.Quizzing.Application.DTOs.Quiz;
 using QuizzArena.Quizzing.Application.Ports.In;
+//using QuizzArena.Quizzing.Domain.Enums;
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.In.Web;
 
 [ApiController]
@@ -18,10 +19,10 @@ public class QuizController(
         return Ok(response);
     }
 
-    [HttpGet("users/me/quizzes")]
-    [Authorize(Roles = "teacher")]
-    public Task GetTeacherQuizzes()
-    {
-        return null;
-    }
+    //[HttpGet("users/me/quizzes")]
+    //[Authorize(Roles = "teacher")]
+    //public Task GetTeacherQuizzes([FromQuery] QuizOrigin? origin)
+    //{
+    //    return null;
+    //}
 }

@@ -49,6 +49,7 @@ public static class DependencyInjection
         services.AddScoped<IQuizQuestionQueriesRepository, SqlQuizQuestionQueriesRepository>();
         services.AddScoped<IMatchRepository, SqlMatchRepository>();
         services.AddScoped<IQuizRepository, SqlQuizRepository>();
+        services.AddScoped<IQuizQueriesRepository, SqlQuizQueriesRepository>();
         services.AddScoped<IQuestionRepository, SqlQuestionRepository>();
         services.AddScoped<IOptionRepository, SqlOptionRepository>();
         services.AddScoped<IAnswerRepository, SqlAnswerRepository>();
