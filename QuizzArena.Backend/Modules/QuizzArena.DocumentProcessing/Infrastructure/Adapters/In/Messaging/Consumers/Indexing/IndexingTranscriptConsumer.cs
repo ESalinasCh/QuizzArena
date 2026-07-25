@@ -86,7 +86,6 @@ public partial class IndexingTranscriptConsumer(
             List<string> rawChunks = new List<string>();
             foreach (string fragment in fragments)
             {
-                Console.WriteLine(fragment);
                 Paragraphs docChunks = await textGenerationService.GenerateAsync<Paragraphs>(
                     _indexingConfig.IndexingModel,
                     GenerateIndexingPrompt(fragment)
