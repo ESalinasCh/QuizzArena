@@ -117,6 +117,7 @@ internal partial class OpenAICompatibleTextGeneration(
             },
             temperature = 0.2,
             stream = false,
+            max_completion_tokens = 4096,
             response_format = schema == null
                 ? null
                 : new
