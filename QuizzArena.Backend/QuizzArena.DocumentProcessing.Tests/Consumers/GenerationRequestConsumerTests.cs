@@ -1,11 +1,11 @@
 ﻿using MassTransit;
 using Microsoft.Extensions.Options;
 using Moq;
-using QuizzArena.DocumentProcessing.Application.Messaging.Commands;
-using QuizzArena.DocumentProcessing.Application.Messaging.Events;
+using QuizzArena.DocumentProcessing.Application.Messaging.Commands.Generation;
+using QuizzArena.DocumentProcessing.Application.Messaging.Events.Generation;
 using QuizzArena.DocumentProcessing.Application.Ports.Out;
 using QuizzArena.DocumentProcessing.Domain.Entities;
-using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Consumers;
+using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Consumers.Generation;
 using QuizzArena.DocumentProcessing.Infrastructure.Configuration;
 using Shared.Contracts;
 using Shared.Contracts.DTOs;

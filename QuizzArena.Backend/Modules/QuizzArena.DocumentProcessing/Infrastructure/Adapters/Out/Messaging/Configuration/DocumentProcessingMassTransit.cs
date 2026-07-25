@@ -1,6 +1,9 @@
 ﻿using MassTransit;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Consumers;
-using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Sagas;
+using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Consumers.Generation;
+using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Sagas.Generation;
+using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Sagas.Indexing;
+using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Sagas.Ingestion;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Messaging.Configuration;
 

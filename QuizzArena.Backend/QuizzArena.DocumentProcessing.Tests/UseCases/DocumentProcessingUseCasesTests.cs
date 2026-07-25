@@ -4,7 +4,7 @@ using MassTransit;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using QuizzArena.DocumentProcessing.Application.DTOs.ClassSource;
-using QuizzArena.DocumentProcessing.Application.Messaging.Events;
+using QuizzArena.DocumentProcessing.Application.Messaging.Events.Ingestion;
 using QuizzArena.DocumentProcessing.Application.Ports.Out;
 using QuizzArena.DocumentProcessing.Application.UseCases;
 using QuizzArena.DocumentProcessing.Application.Validators;

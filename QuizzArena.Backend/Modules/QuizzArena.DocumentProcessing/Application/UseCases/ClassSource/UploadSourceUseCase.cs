@@ -3,7 +3,7 @@ using FluentValidation;
 using MassTransit;
 using QuizzArena.DocumentProcessing.Application.DTOs.ClassSource;
 using QuizzArena.DocumentProcessing.Application.Helpers;
-using QuizzArena.DocumentProcessing.Application.Messaging.Events;
+using QuizzArena.DocumentProcessing.Application.Messaging.Events.Ingestion;
 using QuizzArena.DocumentProcessing.Application.Ports.In;
 using QuizzArena.DocumentProcessing.Application.Ports.Out;
 using QuizzArena.DocumentProcessing.Application.Validators;
