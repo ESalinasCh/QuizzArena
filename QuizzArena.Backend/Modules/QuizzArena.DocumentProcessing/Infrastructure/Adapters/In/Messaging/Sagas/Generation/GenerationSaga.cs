@@ -109,7 +109,7 @@ public class GenerationSaga : MassTransitStateMachine<GenerationSagaState>
 
             When(FailedEvent)
                 .Then(ctx => Console.WriteLine($"[SAGA] Generation request received for ClassSourceId: {ctx.Saga.ClassSourceId}. Generation failed."))
-                .Publish( ctx => new GenerationFailedCommand
+                .Publish(ctx => new GenerationFailedCommand
                 {
                     ClassSourceId = ctx.Message.ClassSourceId,
                     ProcessingJobId = ctx.Message.ProcessingJobId,

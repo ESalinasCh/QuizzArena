@@ -259,7 +259,7 @@ public partial class GenerationProcessingConsumer(
         {
             LogFailed(logger, ex, command.ClassSourceId, ex.Message);
 
-            await context.Publish( new GenerationFailedEvent
+            await context.Publish(new GenerationFailedEvent
             {
 
             });
