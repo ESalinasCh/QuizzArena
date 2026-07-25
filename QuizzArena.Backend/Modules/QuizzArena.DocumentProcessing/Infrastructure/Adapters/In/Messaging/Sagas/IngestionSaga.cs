@@ -9,35 +9,34 @@ public class IngestionSaga : MassTransitStateMachine<IngestionSagaState>
 {
 
     public State Transcribing { get; private set; } = null!;
-    // public State GeneratingQuiz { get; private set; } = null!;
     public State TranscriptionSuccess { get; private set; } = null!;
     public State TranscriptionFailed { get; private set; } = null!;
 
 
-    public Event<TranscriptionRequestEvent> TranscriptionRequest { get; private set; } = null!;
-    public Event<TranscriptionCompletedEvent> TranscriptionCompleted { get; private set; } = null!;
-    public Event<TranscriptionFailedEvent> TranscriptionError { get; private set; } = null!;
+    public Event<TranscriptionRequestEvent> RequestEvent { get; private set; } = null!;
+    public Event<TranscriptionCompletedEvent> CompletedEvent { get; private set; } = null!;
+    public Event<TranscriptionFailedEvent> ErrorEvent { get; private set; } = null!;
 
 
     public IngestionSaga()
     {
         InstanceState(x => x.CurrentState);
 
-        Event(() => TranscriptionRequest, e =>
+        Event(() => RequestEvent, e =>
         {
             e.CorrelateBy(state => state.IngestionIdKey, ctx => ctx.Message.ClassSourceId.ToString());
             e.SelectId(_ => NewId.NextGuid());
         });
 
-        Event(() => TranscriptionCompleted, e =>
+        Event(() => CompletedEvent, e =>
             e.CorrelateBy(state => state.IngestionIdKey, ctx => ctx.Message.ClassSourceId.ToString()));
 
-        Event(() => TranscriptionError, e =>
+        Event(() => ErrorEvent, e =>
             e.CorrelateBy(state => state.IngestionIdKey, ctx => ctx.Message.ClassSourceId.ToString()));
 
 
         Initially(
-            When(TranscriptionRequest)
+            When(RequestEvent)
                 .Then(ctx =>
                 {
                     ctx.Saga.ClassSourceId = ctx.Message.ClassSourceId.ToString();
@@ -52,14 +51,14 @@ public class IngestionSaga : MassTransitStateMachine<IngestionSagaState>
         );
 
         During(Transcribing,
-            When(TranscriptionCompleted)
+            When(CompletedEvent)
                 .Then(ctx =>
                         Console.WriteLine(
                             $"[Saga] Transcription #{ctx.Saga.ClassSourceId} completed → IndexingSaga takes over."))
                 .TransitionTo(TranscriptionSuccess)
                 .Finalize(),
 
-            When(TranscriptionError)
+            When(ErrorEvent)
                 .Then(ctx =>
                         Console.WriteLine(
                             $"[Saga] Transcription #{ctx.Saga.ClassSourceId} failed."))
