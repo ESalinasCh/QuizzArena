@@ -69,7 +69,7 @@ public partial class TranscriptionRequestConsumer(
     [LoggerMessage(Level = LogLevel.Information, Message = "[CONSUMER] Transcription for ClassSource: {ClassSourceId} stored at {TranscriptUrl}.")]
     private static partial void LogStored(ILogger logger, string transcriptUrl, Guid classSourceId);
 
-    [LoggerMessage(Level = LogLevel.Warning, Message = "[CONSUMER] Transcription for ClassSource: {ClassSourceId} not found while saving transcript URL.")]
+    [LoggerMessage(Level = LogLevel.Error, Message = "[CONSUMER] Transcription for ClassSource: {ClassSourceId} not found while saving transcript URL.")]
     private static partial void LogClassSourceNotFound(ILogger logger, Guid classSourceId);
 
     [LoggerMessage(Level = LogLevel.Information, Message = "[CONSUMER] Transcription for ClassSource: {ClassSourceId} completed and TranscriptionCompletedEvent published.")]

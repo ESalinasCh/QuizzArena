@@ -16,7 +16,7 @@ public class DocumentProcessingMassTransit
         x.AddConsumer<TranscriptionFailedConsumer>();
 
         x.AddSagaStateMachine<IndexingSaga, IndexingSagaState>().InMemoryRepository();
-        x.AddConsumer<IndexTranscriptConsumer>().Endpoint(e => e.PrefetchCount = 1);
+        x.AddConsumer<IndexingTranscriptConsumer>().Endpoint(e => e.PrefetchCount = 1);
 
         x.AddSagaStateMachine<GenerationSaga, GenerationSagaState>().InMemoryRepository();
         x.AddConsumer<GenerationRequestConsumer>().Endpoint(e => e.PrefetchCount = 1);

@@ -3,6 +3,7 @@ using FluentValidation;
 using MassTransit;
 using QuizzArena.DocumentProcessing.Application.DTOs.ClassSource;
 using QuizzArena.DocumentProcessing.Application.Helpers;
+using QuizzArena.DocumentProcessing.Application.Messaging.Events.Indexing;
 using QuizzArena.DocumentProcessing.Application.Messaging.Events.Ingestion;
 using QuizzArena.DocumentProcessing.Application.Ports.In;
 using QuizzArena.DocumentProcessing.Application.Ports.Out;
@@ -11,7 +12,6 @@ using QuizzArena.DocumentProcessing.Domain.Entities;
 using QuizzArena.DocumentProcessing.Domain.Enums;
 using Shared.Contracts;
 using Shared.Contracts.DTOs;
-using Shared.Messaging.Events;
 
 namespace QuizzArena.DocumentProcessing.Application.UseCases;
 
@@ -55,7 +55,7 @@ public class UploadSourceUseCase(
 
         if (createdClass.Type == SourceType.Text)
         {
-            await publishEnpoint.Publish(new TranscriptionCompletedEvent
+            await publishEnpoint.Publish(new IndexingRequestEvent
             {
                 ClassSourceId = createdClass.Id,
                 TranscriptUrl = createdClass.TranscriptUrl!
