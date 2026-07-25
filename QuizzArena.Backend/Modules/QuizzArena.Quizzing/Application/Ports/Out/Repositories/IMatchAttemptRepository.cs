@@ -1,4 +1,5 @@
-﻿using QuizzArena.Quizzing.Application.Filters;
+﻿using QuizzArena.Quizzing.Application.DTOs.MatchAttempt;
+using QuizzArena.Quizzing.Application.Filters;
 using QuizzArena.Quizzing.Domain.Entities;
 using QuizzArena.Quizzing.Domain.Enums;
 
@@ -16,4 +17,5 @@ public interface IMatchAttemptRepository
     Task<List<MatchAttempt>> GetAttemptsByUserIds(Guid matchId, List<Guid> userIds);
     Task<int> GetMatchAttemptCountByMatchIdAndStatusAsync(Guid matchId, QuizAttemptStatus status);
     Task UpdateMatchAttempts(List<MatchAttempt> matchAttempts);
+    Task<Dictionary<Guid, MatchAttemptSummaryDto>> GetAttemptSummariesByMatchIdsAndUserIdAsync(List<Guid> matchIds, Guid userId);
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using QuizzArena.Quizzing.Application.DTOs.MatchAttempt;
 using QuizzArena.Quizzing.Application.Filters;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Domain.Entities;
@@ -141,5 +142,23 @@ internal sealed class SqlMatchAttemptRepository(QuizzingDbContext context) : IMa
                 userIds.Contains(x.UserId) &&
                 !x.Deleted)
             .ToListAsync();
+    }
+
+    public async Task<Dictionary<Guid, MatchAttemptSummaryDto>> GetAttemptSummariesByMatchIdsAndUserIdAsync(List<Guid> matchIds, Guid userId)
+    {
+        return await context.MatchAttempts
+            .AsNoTracking()
+            .Where(x => matchIds.Contains(x.MatchId) && x.UserId == userId && !x.Deleted)
+            .GroupBy(x => x.MatchId)
+            .Select(g => new
+            {
+                MatchId = g.Key,
+                Summary = new MatchAttemptSummaryDto
+                {
+                    Count = g.Count(),
+                    HasActiveAttempt = g.Any(x => x.Status == QuizAttemptStatus.InProgress)
+                }
+            })
+            .ToDictionaryAsync(x => x.MatchId, x => x.Summary);
     }
 }
