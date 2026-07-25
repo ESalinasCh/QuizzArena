@@ -10,16 +10,14 @@ public class DocumentProcessingMassTransit
     {
         x.AddSagaStateMachine<IngestionSaga, IngestionSagaState>().InMemoryRepository();
         x.AddConsumer<TranscriptionRequestConsumer>().Endpoint(e => e.PrefetchCount = 1);
+        x.AddConsumer<TranscriptionFailedConsumer>();
+
+        x.AddSagaStateMachine<IndexingSaga, IndexingSagaState>().InMemoryRepository();
+        x.AddConsumer<IndexTranscriptConsumer>().Endpoint(e => e.PrefetchCount = 1);
 
         x.AddSagaStateMachine<GenerationSaga, GenerationSagaState>().InMemoryRepository();
         x.AddConsumer<GenerationRequestConsumer>().Endpoint(e => e.PrefetchCount = 1);
         x.AddConsumer<GenerationProcessingJobRequestConsumer>();
         x.AddConsumer<GenerationTerminatingProcessingRequestConsumer>();
-
-        x.AddConsumer<IndexTranscriptConsumer>().Endpoint(e => e.PrefetchCount = 1);
-
-        x.AddSagaStateMachine<IndexingSaga, IndexingSagaState>()
-            .InMemoryRepository();
-
     }
 }
