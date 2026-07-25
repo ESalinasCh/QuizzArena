@@ -72,7 +72,11 @@ internal partial class OpenAICompatibleTextGeneration(
             );
         }
 
-        LogSchemaGenerated(logger, targetType, schema.ToJsonString());
+        if (logger.IsEnabled(LogLevel.Debug))
+        {
+            var schemaJson = schema.ToJsonString();
+            LogSchemaGenerated(logger, targetType, schemaJson);
+        }
 
         var baseResponse = await GetCompletionAsync(model, prompt, schema);
         var baseContent = baseResponse.Choices.First().Message.Content;
@@ -133,7 +137,11 @@ internal partial class OpenAICompatibleTextGeneration(
         };
 
         var serializedPayload = JsonSerializer.Serialize(payload);
-        LogSendingRequest(logger, model, serializedPayload);
+
+        if (logger.IsEnabled(LogLevel.Debug))
+        {
+            LogSendingRequest(logger, model, serializedPayload);
+        }
 
         HttpResponseMessage response;
         try
@@ -161,7 +169,11 @@ internal partial class OpenAICompatibleTextGeneration(
         }
 
         var rawContent = await response.Content.ReadAsStringAsync();
-        LogResponseReceived(logger, (int)response.StatusCode, rawContent);
+
+        if (logger.IsEnabled(LogLevel.Debug))
+        {
+            LogResponseReceived(logger, (int)response.StatusCode, rawContent);
+        }
 
         var completionResponse = JsonSerializer.Deserialize<GroqChatCompletionResponse>(
             rawContent,
