@@ -187,7 +187,7 @@ services:
       RabbitMq__Host: rabbitmq
       RabbitMq__Username: guest
       RabbitMq__Password: guest
-      AzureStorage__AccountUrl: "http://azurite:10000/devstoreaccount1"
+      ConnectionStrings__AzureBlobStorage: "UseDevelopmentStorage=true;DevelopmentStorageProxyUri=http://azurite"
     depends_on:
       rabbitmq:
         condition: service_healthy

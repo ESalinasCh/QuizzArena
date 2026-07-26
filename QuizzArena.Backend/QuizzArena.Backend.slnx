@@ -12,5 +12,6 @@
     <Project Path="QuizzArena.Quizzing.Tests/QuizzArena.Quizzing.Tests.csproj" Id="69d0b10d-0363-492a-a545-36e52371c42e" />
     <Project Path="QuizzArena.Users.Tests/QuizzArena.Users.Tests.csproj" />
   </Folder>
+  <Project Path="../QuizzArena.Workers/src/QuizzArena.Workers.Contracts/QuizzArena.Workers.Contracts.csproj" />
   <Project Path="Shared/Shared.csproj" />
 </Solution>

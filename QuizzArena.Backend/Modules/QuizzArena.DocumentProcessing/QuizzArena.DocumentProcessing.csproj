@@ -33,6 +33,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\..\Shared\Shared.csproj" />
+	  <ProjectReference Include="..\..\..\QuizzArena.Workers\src\QuizzArena.Workers.Contracts\QuizzArena.Workers.Contracts.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
