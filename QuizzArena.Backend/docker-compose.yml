@@ -42,6 +42,9 @@ services:
       whisper-gpu:
         condition: service_started
         required: false
+      ffmpeg-worker:
+        condition: service_started
+        required: false
     restart: unless-stopped
 
   postgres:
@@ -172,6 +175,24 @@ services:
       default:
         aliases:
           - whisper
+    restart: unless-stopped
+
+  ffmpeg-worker:
+    build:
+      context: ../QuizzArena.Workers
+      dockerfile: Dockerfile.ffmpeg-worker
+    container_name: quizarena_ffmpeg_worker
+    environment:
+      DOTNET_ENVIRONMENT: Development
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Username: guest
+      RabbitMq__Password: guest
+      AzureStorage__AccountUrl: "http://azurite:10000/devstoreaccount1"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      azurite:
+        condition: service_started
     restart: unless-stopped
 
 volumes:
