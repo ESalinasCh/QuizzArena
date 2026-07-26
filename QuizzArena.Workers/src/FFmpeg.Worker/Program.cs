@@ -38,9 +38,13 @@ if (string.IsNullOrWhiteSpace(rabbitConnectionString) && string.IsNullOrWhiteSpa
     throw new InvalidOperationException("Configuration 'RabbitMq:ConnectionString' or 'RabbitMq:Host' is required but not found.");
 }
 
-if (string.IsNullOrWhiteSpace(builder.Configuration["AzureStorage:AccountUrl"]))
+var hasConnectionString = !string.IsNullOrWhiteSpace(builder.Configuration["ConnectionStrings:AzureBlobStorage"]);
+var hasAccountUrl = !string.IsNullOrWhiteSpace(builder.Configuration["AzureStorage:AccountUrl"]);
+
+if (!hasConnectionString && !hasAccountUrl)
 {
-    throw new InvalidOperationException("Configuration 'AzureStorage:AccountUrl' is required but not found.");
+    throw new InvalidOperationException(
+        "Se requiere 'ConnectionStrings:AzureBlobStorage' (desarrollo) o 'AzureStorage:AccountUrl' (producción), ninguno fue encontrado.");
 }
 
 builder.Services.AddHttpClient<FileDownloader>();

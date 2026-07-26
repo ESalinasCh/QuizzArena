@@ -1,4 +1,4 @@
-using Azure.Identity;
+﻿using Azure.Identity;
 using Azure.Storage.Blobs;
 
 namespace FFmpeg.Worker.Services;
@@ -12,14 +12,26 @@ public class BlobStorageService
     {
         _logger = logger;
 
-        var accountUrl = config["AzureStorage:AccountUrl"]
-            ?? throw new InvalidOperationException("AzureStorage:AccountUrl no está configurado.");
+        var connectionString = config["ConnectionStrings:AzureBlobStorage"];
 
-        // DefaultAzureCredential resuelve automáticamente según dónde corra:
-        // - En tu PC: usa la sesión de "az login" (AzureCliCredential)
-        // - En Container Apps: usa la identidad administrada del recurso (ManagedIdentityCredential)
-        // Mismo código, cero branching por entorno.
-        _client = new BlobServiceClient(new Uri(accountUrl), new DefaultAzureCredential());
+        if (!string.IsNullOrEmpty(connectionString))
+        {
+            // Local: Azurite via connection string (HTTP, sin credenciales Azure AD)
+            _client = new BlobServiceClient(connectionString);
+        }
+        else
+        {
+            // Producción: Blob Storage real via managed identity (HTTPS)
+            var accountUrl = config["AzureStorage:AccountUrl"]
+                ?? throw new InvalidOperationException("Se requiere 'AzureStorage:AccountUrl' cuando no hay connection string configurado.");
+
+            _client = new BlobServiceClient(
+                new Uri(accountUrl),
+                new DefaultAzureCredential(new DefaultAzureCredentialOptions
+                {
+                    ExcludeVisualStudioCredential = true
+                }));
+        }
     }
 
     public async Task<string> UploadAsync(string localFilePath, string containerName, string blobName, CancellationToken ct)
