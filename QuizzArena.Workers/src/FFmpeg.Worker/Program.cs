@@ -1,17 +1,47 @@
-// using FFmpeg.Worker;
-
-// var builder = Host.CreateApplicationBuilder(args);
-// builder.Services.AddHostedService<Worker>();
-
-// var host = builder.Build();
-// host.Run();
-
+﻿using Azure.Identity;
 using FFmpeg.Worker.Consumers;
 using FFmpeg.Worker.Services;
 using MassTransit;
 
 DotNetEnv.Env.TraversePath().Load();
 var builder = Host.CreateApplicationBuilder(args);
+
+Console.WriteLine($"Environment: {builder.Environment.EnvironmentName}");
+Console.WriteLine($"Is Development: {builder.Environment.IsDevelopment()}");
+
+if (!builder.Environment.IsDevelopment())
+{
+    var vaultUri = builder.Configuration["AzureKeyVault:VaultUri"];
+    if (!string.IsNullOrEmpty(vaultUri))
+    {
+        var options = new DefaultAzureCredentialOptions
+        {
+            ExcludeVisualStudioCredential = true,
+        };
+
+        var credential = new DefaultAzureCredential(options);
+        builder.Configuration.AddAzureKeyVault(new Uri(vaultUri), credential);
+    }
+    else
+    {
+        Console.WriteLine("AzureKeyVault:VaultUri is not configured, skipping Azure Key Vault integration.");
+    }
+}
+
+var rabbitConnectionString = builder.Configuration["RabbitMq:ConnectionString"];
+var rabbitHost = builder.Configuration["RabbitMq:Host"];
+var rabbitUsername = builder.Configuration["RabbitMq:Username"] ?? "guest";
+var rabbitPassword = builder.Configuration["RabbitMq:Password"] ?? "guest";
+
+if (string.IsNullOrWhiteSpace(rabbitConnectionString) && string.IsNullOrWhiteSpace(rabbitHost))
+{
+    throw new InvalidOperationException("Configuration 'RabbitMq:ConnectionString' or 'RabbitMq:Host' is required but not found.");
+}
+
+if (string.IsNullOrWhiteSpace(builder.Configuration["AzureStorage:AccountUrl"]))
+{
+    throw new InvalidOperationException("Configuration 'AzureStorage:AccountUrl' is required but not found.");
+}
 
 builder.Services.AddHttpClient<FileDownloader>();
 builder.Services.AddSingleton<FfmpegProcessRunner>();
@@ -21,21 +51,23 @@ builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<CompressAudioJobConsumer>();
     // Futuro: x.AddConsumer<TranscodeVideoJobConsumer>();
-    // Futuro: x.AddConsumer<GenerateThumbnailJobConsumer>();
 
     x.UsingRabbitMq((context, cfg) =>
     {
-        cfg.Host(builder.Configuration["RabbitMq:Host"], "/", h =>
+        if (!string.IsNullOrEmpty(rabbitConnectionString))
         {
-            h.Username(builder.Configuration["RabbitMq:Username"] ?? "guest");
-            h.Password(builder.Configuration["RabbitMq:Password"] ?? "guest");
-        });
+            cfg.Host(new Uri(rabbitConnectionString));
+        }
+        else
+        {
+            cfg.Host(rabbitHost, "/", h =>
+            {
+                h.Username(rabbitUsername);
+                h.Password(rabbitPassword);
+            });
+        }
 
-        cfg.PrefetchCount = 1; // un job pesado a la vez por réplica -> memoria/CPU predecible
-
-        // ConfigureEndpoints crea automáticamente una cola por cada consumer
-        // registrado arriba. Agregar un nuevo tipo de job = una línea de AddConsumer,
-        // no hay que tocar la configuración de endpoints.
+        cfg.PrefetchCount = 1;
         cfg.ConfigureEndpoints(context);
     });
 });
