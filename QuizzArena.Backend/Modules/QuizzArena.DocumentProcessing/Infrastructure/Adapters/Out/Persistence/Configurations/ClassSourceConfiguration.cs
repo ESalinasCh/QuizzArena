@@ -25,9 +25,6 @@ internal sealed class ClassSourceConfiguration : IEntityTypeConfiguration<ClassS
             .HasMaxLength(255)
             .IsRequired();
 
-        builder.Property(x => x.TranscriptUrl)
-            .HasMaxLength(255);
-
         builder.Property(x => x.Deleted)
             .HasDefaultValue(false);
 

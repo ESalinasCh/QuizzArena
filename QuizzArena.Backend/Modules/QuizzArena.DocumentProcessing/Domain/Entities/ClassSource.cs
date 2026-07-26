@@ -10,6 +10,8 @@ public class ClassSource
     public string Name { get; set; } = string.Empty;
     public string? TranscriptUrl { get; set; } = string.Empty;
     public string? FileUrl { get; set; }
+    public string? CompressedFileUrl { get; set; }
+
     public bool Deleted { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
