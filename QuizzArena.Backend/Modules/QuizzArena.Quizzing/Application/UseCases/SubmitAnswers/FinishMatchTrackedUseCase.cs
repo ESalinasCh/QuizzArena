@@ -71,7 +71,8 @@ public class FinishMatchTrackedUseCase(IMatchRepository matchRepository,
                     Id = x.Id,
                     Number = index + 1,
                     Text = x.Content,
-                    SelectedOptionId = answer?.OptionId ?? null
+                    SelectedOptionIds = answer?.SelectedOptions.Select(so => so.OptionId).ToList()
+                    ?? []
                 };
             }
             ).ToList()
