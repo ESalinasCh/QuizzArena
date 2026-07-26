@@ -24,6 +24,13 @@ public partial class CompressionStoringConsumer(
 
             classSource.CompressedFileUrl = command.CompressedFileUrl;
             await classSourceRepository.UpdateAsync(classSource);
+
+            await context.Publish(new CompressionSuccessEvent
+            {
+                ClassSourceId = command.ClassSourceId,
+                CompressedFileUrl = command.CompressedFileUrl
+            });
+
         }
         catch (Exception ex)
         {
