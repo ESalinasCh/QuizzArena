@@ -178,7 +178,7 @@ public class CreateMatchUseCaseTests
     // ── QuestionsAmount is always null ───────────────────────────────────────
 
     [Fact]
-    public async Task Execute_DtoWithQuestionsAmount_SetsQuestionsAmountToNull()
+    public async Task Execute_DtoWithQuestionsAmount_SetsQuestionsAmountToCorrectValue()
     {
         // Arrange
         var dto = BuildValidDto();
@@ -199,7 +199,8 @@ public class CreateMatchUseCaseTests
         await _useCase.Execute(dto);
 
         // Assert
-        Assert.Null(capturedMatch!.QuestionsAmount);
+        Assert.NotNull(capturedMatch);
+        Assert.Equal(10, capturedMatch.QuestionsAmount);
     }
 
     // ── Audit timestamps are set ─────────────────────────────────────────────
