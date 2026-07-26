@@ -33,10 +33,10 @@ public class CompressionSaga : MassTransitStateMachine<CompressionSagaState>
         });
 
         Event(() => JobSucceededEvent, e =>
-            e.CorrelateBy(state => state.CompressionIdKey, ctx => ctx.Message.CorrelationId.ToString()));
+            e.CorrelateById(ctx => ctx.Message.CorrelationId));
 
         Event(() => JobFailedEvent, e =>
-            e.CorrelateBy(state => state.CompressionIdKey, ctx => ctx.Message.CorrelationId.ToString()));
+            e.CorrelateById(ctx => ctx.Message.CorrelationId));
 
         Event(() => SuccessEvent, e =>
             e.CorrelateBy(state => state.CompressionIdKey, ctx => ctx.Message.ClassSourceId.ToString()));
@@ -53,7 +53,7 @@ public class CompressionSaga : MassTransitStateMachine<CompressionSagaState>
                     ctx.Saga.CompressionIdKey = ctx.Message.ClassSourceId.ToString();
                     Console.WriteLine($"[SAGA] Compression request received for ClassSourceId: {ctx.Message.ClassSourceId}. Starting compression process...");
                 })
-                .PublishAsync(ctx => ctx.Publish<ICompressAudioJob>(new
+                .ThenAsync(async ctx => await ctx.Publish<ICompressAudioJob>(new
                 {
                     JobId = Guid.NewGuid(),
                     CorrelationId = ctx.Saga.CorrelationId,
