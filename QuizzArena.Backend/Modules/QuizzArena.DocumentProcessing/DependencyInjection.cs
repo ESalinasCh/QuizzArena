@@ -3,7 +3,10 @@ using Azure.Storage.Blobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Http.Resilience;
+using Microsoft.Extensions.Logging;
 using Npgsql;
+using Polly;
 using QuizzArena.DocumentProcessing.Application.Ports.In;
 using QuizzArena.DocumentProcessing.Application.Ports.Out;
 using QuizzArena.DocumentProcessing.Application.UseCases;
@@ -15,6 +18,7 @@ using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.Repositories;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Services;
 using QuizzArena.DocumentProcessing.Infrastructure.Configuration;
+using QuizzArena.DocumentProcessing.Infrastructure.Configuration.Loggers;
 using Shared.Contracts;
 
 namespace QuizzArena.DocumentProcessing;
@@ -66,6 +70,31 @@ public static class DependencyInjection
                 client.BaseAddress = new Uri(transcriptionBaseUrl);
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
                 client.Timeout = TimeSpan.FromMinutes(30);
+            })
+            .AddResilienceHandler("transcription-retry", (pipeline, context) =>
+            {
+                int maxRetryAttempts = 5;
+                var loggerFactory = context.ServiceProvider.GetRequiredService<ILoggerFactory>();
+                var logger = loggerFactory.CreateLogger("DocumentProcessing.Resilience");
+
+                pipeline.AddRetry(new HttpRetryStrategyOptions
+                {
+                    MaxRetryAttempts = maxRetryAttempts,
+                    ShouldRetryAfterHeader = true,
+                    Delay = TimeSpan.FromSeconds(60),
+                    BackoffType = DelayBackoffType.Exponential,
+                    UseJitter = false,
+                    ShouldHandle = args => ValueTask.FromResult(
+                        args.Outcome.Result?.StatusCode == System.Net.HttpStatusCode.TooManyRequests
+                    ),
+                    OnRetry = args =>
+                    {
+                        var attempt = args.AttemptNumber + 1;
+                        var delay = args.RetryDelay.TotalSeconds;
+                        ResilienceLogs.LogResilienceRetry(logger, "GroqWhisper", attempt, maxRetryAttempts, delay);
+                        return ValueTask.CompletedTask;
+                    }
+                });
             });
         }
         else
@@ -95,6 +124,31 @@ public static class DependencyInjection
                     new AuthenticationHeaderValue("Bearer", apiKey);
 
                 client.Timeout = TimeSpan.FromMinutes(60);
+            })
+            .AddResilienceHandler("llm-retry", (pipeline, context) =>
+            {
+                int maxRetryAttempts = 5;
+                var loggerFactory = context.ServiceProvider.GetRequiredService<ILoggerFactory>();
+                var logger = loggerFactory.CreateLogger("DocumentProcessing.Resilience");
+
+                pipeline.AddRetry(new HttpRetryStrategyOptions
+                {
+                    MaxRetryAttempts = maxRetryAttempts,
+                    ShouldRetryAfterHeader = true,
+                    Delay = TimeSpan.FromSeconds(70),
+                    BackoffType = DelayBackoffType.Constant,
+                    UseJitter = false,
+                    ShouldHandle = args => ValueTask.FromResult(
+                        args.Outcome.Result?.StatusCode == System.Net.HttpStatusCode.TooManyRequests
+                    ),
+                    OnRetry = args =>
+                    {
+                        var attempt = args.AttemptNumber + 1;
+                        var delay = args.RetryDelay.TotalSeconds;
+                        ResilienceLogs.LogResilienceRetry(logger, "OpenAiApi", attempt, maxRetryAttempts, delay);
+                        return ValueTask.CompletedTask;
+                    }
+                });
             });
         }
         else
@@ -123,6 +177,31 @@ public static class DependencyInjection
                 client.BaseAddress = new Uri(embeddingBaseUrl);
                 client.Timeout = TimeSpan.FromMinutes(60);
                 client.DefaultRequestHeaders.Add("x-goog-api-key", apiKey);
+            })
+            .AddResilienceHandler("embedding-retry", (pipeline, context) =>
+            {
+                int maxRetryAttempts = 5;
+                var loggerFactory = context.ServiceProvider.GetRequiredService<ILoggerFactory>();
+                var logger = loggerFactory.CreateLogger("DocumentProcessing.Resilience");
+
+                pipeline.AddRetry(new HttpRetryStrategyOptions
+                {
+                    MaxRetryAttempts = maxRetryAttempts,
+                    ShouldRetryAfterHeader = true,
+                    Delay = TimeSpan.FromSeconds(70),
+                    BackoffType = DelayBackoffType.Constant,
+                    UseJitter = false,
+                    ShouldHandle = args => ValueTask.FromResult(
+                        args.Outcome.Result?.StatusCode == System.Net.HttpStatusCode.TooManyRequests
+                    ),
+                    OnRetry = args =>
+                    {
+                        var attempt = args.AttemptNumber + 1;
+                        var delay = args.RetryDelay.TotalSeconds;
+                        ResilienceLogs.LogResilienceRetry(logger, "GoogleGemini", attempt, maxRetryAttempts, delay);
+                        return ValueTask.CompletedTask;
+                    }
+                });
             });
         }
         else
