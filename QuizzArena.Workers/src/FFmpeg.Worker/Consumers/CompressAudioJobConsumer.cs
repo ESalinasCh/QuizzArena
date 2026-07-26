@@ -5,7 +5,9 @@ namespace FFmpeg.Worker.Consumers;
 
 public class CompressAudioJobConsumer : JobConsumerBase<ICompressAudioJob>
 {
-    // Límites de bitrate para mantener calidad mínima usable
+    // Bitrates estándar válidos en MP3 (libmp3lame) para evitar que FFmpeg redondee hacia arriba
+    private static readonly int[] ValidMp3BitratesKbps = [8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128];
+
     private const int MinBitrateKbps = 16;
     private const int MaxBitrateKbps = 128;
 
@@ -31,46 +33,48 @@ public class CompressAudioJobConsumer : JobConsumerBase<ICompressAudioJob>
 
         try
         {
-            // 1. Obtener duración para calcular el bitrate necesario
+            // 1. Obtener duración exacta
             var durationSeconds = await _ffmpeg.GetDurationSecondsAsync(inputPath, ct);
 
-            // 2. Calcular bitrate: (maxMB × 8192) / durationSeconds
-            //    8192 = 8 bits/byte × 1024 bytes/KB × 1024 KB/MB / 1000 ms... simplificado:
-            //    maxBytes = maxMB * 1024 * 1024, maxBits = maxBytes * 8
-            //    bitrate (kbps) = maxBits / durationSeconds / 1000
-            var maxSizeBytes = job.MaxOutputSizeMb * 1024 * 1024;
-            var calculatedBitrate = (int)((maxSizeBytes * 8) / durationSeconds / 1000);
-            var bitrateKbps = Math.Clamp(calculatedBitrate, MinBitrateKbps, MaxBitrateKbps);
+            // 2. Aplicar Factor de Seguridad del 90% (Margen para metadatos, cabeceras y varianza)
+            const double safetyFactor = 0.90;
+            var targetMaxSizeBytes = job.MaxOutputSizeMb * 1024 * 1024 * safetyFactor;
+
+            // 3. Bitrate teórico ideal en kbps
+            var theoreticalBitrateKbps = (targetMaxSizeBytes * 8) / durationSeconds / 1000;
+
+            // 4. Seleccionar el bitrate estándar MP3 más cercano pero SIEMPRE MENOR O IGUAL (Redondeo hacia abajo)
+            var selectedBitrateKbps = ValidMp3BitratesKbps
+                .Where(b => b <= theoreticalBitrateKbps)
+                .DefaultIfEmpty(MinBitrateKbps)
+                .Max();
+
+            var bitrateKbps = Math.Clamp(selectedBitrateKbps, MinBitrateKbps, MaxBitrateKbps);
 
             Logger.LogInformation(
-                "Job {JobId}: duración={Duration:F1}s, límite={MaxMb}MB, bitrate calculado={Calculated}kbps, bitrate usado={Used}kbps",
-                job.JobId, durationSeconds, job.MaxOutputSizeMb, calculatedBitrate, bitrateKbps);
+                "Job {JobId}: duración={Duration:F1}s, límite={MaxMb}MB, bitrate teórico={Theoretical:F1}kbps, bitrate final asignado={Used}kbps",
+                job.JobId, durationSeconds, job.MaxOutputSizeMb, theoreticalBitrateKbps, bitrateKbps);
 
-            // 3. Construir y ejecutar el comando ffmpeg
-            //    -vn: descarta video (si es mp4, extrae solo el audio)
-            //    -ac 1: convierte a mono
-            //    -ar 16000: 16kHz (suficiente para voz, compatible con Whisper)
-            //    -b:a {bitrate}k: bitrate objetivo
+            // 5. Ejecutar FFmpeg (-ac 1, -ar 16000 para optimización Whisper)
             var arguments = $"-i \"{inputPath}\" -vn -ac 1 -ar 16000 -b:a {bitrateKbps}k \"{outputPath}\"";
             await _ffmpeg.RunAsync(arguments, ct);
 
-            // 4. Verificar que el archivo resultante no supera el límite
+            // 6. Validación estricta final
             var outputSizeBytes = new FileInfo(outputPath).Length;
             var outputSizeMb = outputSizeBytes / 1024.0 / 1024.0;
 
             if (outputSizeMb > job.MaxOutputSizeMb)
             {
                 throw new InvalidOperationException(
-                    $"El archivo comprimido ({outputSizeMb:F2}MB) superó el límite de {job.MaxOutputSizeMb}MB. " +
-                    $"Bitrate usado: {bitrateKbps}kbps. Duración: {durationSeconds:F1}s. " +
-                    $"El cálculo de compresión no fue suficiente para este archivo.");
+                    $"El archivo comprimido ({outputSizeMb:F2}MB) superó el límite estricto de {job.MaxOutputSizeMb}MB. " +
+                    $"Bitrate usado: {bitrateKbps}kbps. Duración: {durationSeconds:F1}s.");
             }
 
             Logger.LogInformation(
-                "Job {JobId}: compresión exitosa. Tamaño final={SizeMb:F2}MB",
-                job.JobId, outputSizeMb);
+                "Job {JobId}: compresión exitosa. Tamaño final={SizeMb:F2}MB / {MaxMb}MB",
+                job.JobId, outputSizeMb, job.MaxOutputSizeMb);
 
-            // 5. Subir a blob y retornar la URL
+            // 7. Subir a Blob Storage
             return await _blobStorage.UploadAsync(outputPath, job.OutputBlobContainer, job.OutputFileName, ct);
         }
         finally

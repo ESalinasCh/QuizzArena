@@ -1,6 +1,8 @@
 ﻿using MassTransit;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Consumers;
+using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Consumers.Compression;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Consumers.Generation;
+using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Sagas.Compression;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Sagas.Generation;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Sagas.Indexing;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Sagas.Ingestion;
@@ -11,6 +13,10 @@ public class DocumentProcessingMassTransit
 {
     public static void AddConsumers(IBusRegistrationConfigurator x)
     {
+        x.AddSagaStateMachine<CompressionSaga, CompressionSagaState>().InMemoryRepository();
+        x.AddConsumer<CompressionStoringConsumer>();
+        x.AddConsumer<CompressionFailedConsumer>();
+
         x.AddSagaStateMachine<IngestionSaga, IngestionSagaState>().InMemoryRepository();
         x.AddConsumer<TranscriptionRequestConsumer>().Endpoint(e => e.PrefetchCount = 1);
         x.AddConsumer<TranscriptionFailedConsumer>();
