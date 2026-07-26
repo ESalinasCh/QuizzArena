@@ -1,4 +1,4 @@
-using MassTransit;
+﻿using MassTransit;
 using QuizzArena.Workers.Contracts;
 
 namespace FFmpeg.Worker.Consumers;
@@ -10,9 +10,9 @@ namespace FFmpeg.Worker.Consumers;
 /// </summary>
 public abstract class JobConsumerBase<TJob> : IConsumer<TJob> where TJob : class, IWorkerJob
 {
-    private readonly ILogger _logger;
+    protected readonly ILogger Logger;
 
-    protected JobConsumerBase(ILogger logger) => _logger = logger;
+    protected JobConsumerBase(ILogger logger) => Logger = logger;
 
     public async Task Consume(ConsumeContext<TJob> context)
     {
@@ -32,11 +32,11 @@ public abstract class JobConsumerBase<TJob> : IConsumer<TJob> where TJob : class
                 CompletedAtUtc = DateTime.UtcNow
             });
 
-            _logger.LogInformation("Job {JobId} ({JobType}) completado -> {BlobUrl}", job.JobId, jobType, outputBlobUrl);
+            Logger.LogInformation("Job {JobId} ({JobType}) completado -> {BlobUrl}", job.JobId, jobType, outputBlobUrl);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Job {JobId} ({JobType}) falló", job.JobId, jobType);
+            Logger.LogError(ex, "Job {JobId} ({JobType}) falló", job.JobId, jobType);
 
             await context.Publish<IJobFaulted>(new
             {

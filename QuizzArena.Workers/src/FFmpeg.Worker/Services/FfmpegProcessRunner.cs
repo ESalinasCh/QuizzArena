@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace FFmpeg.Worker.Services;
 
@@ -14,20 +14,21 @@ public class FfmpegProcessRunner
         _timeout = TimeSpan.FromMinutes(minutes);
     }
 
-    public async Task RunAsync(string inputPath, string outputPath, string ffmpegArgumentsTemplate, CancellationToken ct)
+    /// <summary>
+    /// Ejecuta: ffmpeg {arguments}
+    /// El caller es responsable de construir los argumentos completos,
+    /// incluyendo los paths de input/output.
+    /// </summary>
+    public async Task RunAsync(string arguments, CancellationToken ct)
     {
-        var args = ffmpegArgumentsTemplate
-            .Replace("{input}", inputPath)
-            .Replace("{output}", outputPath);
-
-        _logger.LogInformation("Running: ffmpeg {Args}", args);
+        _logger.LogInformation("Ejecutando: ffmpeg {Arguments}", arguments);
 
         using var process = new Process
         {
             StartInfo = new ProcessStartInfo
             {
                 FileName = "ffmpeg",
-                Arguments = args,
+                Arguments = arguments,
                 RedirectStandardError = true,
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
@@ -55,8 +56,40 @@ public class FfmpegProcessRunner
 
         if (process.ExitCode != 0)
         {
-            _logger.LogError("ffmpeg falló con código {Code}: {Stderr}", process.ExitCode, stderr);
+            _logger.LogError("ffmpeg falló (exit {Code}): {Stderr}", process.ExitCode, stderr);
             throw new InvalidOperationException($"ffmpeg salió con código {process.ExitCode}: {stderr}");
         }
+    }
+
+    /// <summary>
+    /// Usa ffprobe (incluido con ffmpeg) para obtener la duración del archivo en segundos.
+    /// </summary>
+    public async Task<double> GetDurationSecondsAsync(string filePath, CancellationToken ct)
+    {
+        using var process = new Process
+        {
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = "ffprobe",
+                Arguments = $"-v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 \"{filePath}\"",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            }
+        };
+
+        process.Start();
+        var output = await process.StandardOutput.ReadToEndAsync(ct);
+        await process.WaitForExitAsync(ct);
+
+        if (process.ExitCode != 0 || !double.TryParse(output.Trim(), System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture, out var duration))
+        {
+            throw new InvalidOperationException($"ffprobe no pudo obtener la duración de: {filePath}");
+        }
+
+        _logger.LogInformation("Duración detectada: {Duration:F1}s", duration);
+        return duration;
     }
 }

@@ -1,4 +1,4 @@
-namespace QuizzArena.Workers.Contracts.Jobs;
+﻿namespace QuizzArena.Workers.Contracts.Jobs;
 
 /// <summary>
 /// El primer tipo de job concreto. Los próximos (ej. ITranscodeVideoJob,
@@ -6,13 +6,17 @@ namespace QuizzArena.Workers.Contracts.Jobs;
 /// </summary>
 public interface ICompressAudioJob : IWorkerJob
 {
+    /// <summary>
+    /// URL pública o SAS del archivo de entrada (mp3, wav, mp4, etc.)
+    /// </summary>
     string SourceFileUrl { get; }
 
     /// <summary>
-    /// Argumentos de ffmpeg con placeholders {input} y {output}.
-    /// Ej: "-i {input} -b:a 64k -vn {output}"
+    /// Tamaño máximo permitido del audio de salida en MB.
+    /// El worker calculará el bitrate necesario para no superar este límite.
+    /// Si tras comprimir sigue superándolo, el job falla con IJobFaulted.
     /// </summary>
-    string FfmpegArguments { get; }
+    double MaxOutputSizeMb { get; }
 
     string OutputBlobContainer { get; }
     string OutputFileName { get; }
