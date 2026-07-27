@@ -24,7 +24,7 @@ public class FinishMatchTrackedUseCase(IMatchRepository matchRepository,
             throw new UnauthorizedAccessException("Invalid user identity.");
         }
 
-        MatchAttempt? attempt = await matchRepository.GetMatchAttemptsDetailById(attemptId) ?? throw new InvalidOperationException();
+        MatchAttempt? attempt = await matchRepository.GetMatchAttemptDetailById(attemptId) ?? throw new InvalidOperationException();
         if (attempt.UserId != userId)
         {
             throw new UnauthorizedAccessException("User doesn't belong to this match attempt.");

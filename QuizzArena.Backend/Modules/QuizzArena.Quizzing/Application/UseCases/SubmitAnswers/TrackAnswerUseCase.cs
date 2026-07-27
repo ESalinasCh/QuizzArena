@@ -15,7 +15,7 @@ public class TrackAnswerUseCase(IAnswerRepository answerRepository, IOptionRepos
     public async Task<MatchAttemptSmallProgressDto> Execute(Guid attemptId, Guid questionId, TrackAnswerRequestDto trackAnswerRequestDto)
     {
 
-        MatchAttempt? attempt = await matchRepository.GetMatchAttemptsDetailById(attemptId) ?? throw new InvalidOperationException();
+        MatchAttempt? attempt = await matchRepository.GetMatchAttemptDetailById(attemptId) ?? throw new InvalidOperationException();
         Question? question = await questionRepository.GetByIdWithOptionsAsync(questionId) ?? throw new InvalidOperationException("Question doesn't exist");
 
         if (!Guid.TryParse(currentUser.UserId, out Guid userId) ||
@@ -40,7 +40,7 @@ public class TrackAnswerUseCase(IAnswerRepository answerRepository, IOptionRepos
             throw new InvalidOperationException("Options not allowed or don't belong to the question");
         }
 
-        HashSet<Guid> correctOptionIds = question.Options.Where(x=> x.IsCorrect).Select(option => option.Id).ToHashSet();
+        HashSet<Guid> correctOptionIds = question.Options.Where(x => x.IsCorrect).Select(option => option.Id).ToHashSet();
         HashSet<Guid> selectedOptionIds = trackAnswerRequestDto.SelectedOptionIds.ToHashSet();
 
         Answer? answer = await answerRepository.GetByAttemptAndQuestionAsync(attemptId, questionId);
@@ -60,8 +60,8 @@ public class TrackAnswerUseCase(IAnswerRepository answerRepository, IOptionRepos
                 ? selectedOptionIds.SetEquals(correctOptionIds)
                 : selectedOptionIds.Count == 1 && correctOptionIds.Contains(selectedOptionIds.First());
 
-        List<SelectedOption> selectedOptions = mySelectedOptions.Select(option => new SelectedOption() { OptionId = option.Id, IsCorrect = option.IsCorrect}).ToList();
-        
+        List<SelectedOption> selectedOptions = mySelectedOptions.Select(option => new SelectedOption() { OptionId = option.Id, IsCorrect = option.IsCorrect }).ToList();
+
 
         if (isNew)
         {
