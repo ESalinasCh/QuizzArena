@@ -20,7 +20,7 @@ internal sealed class QuizConfiguration : IEntityTypeConfiguration<Quiz>
 
         builder.Property(x => x.Description)
             .HasMaxLength(255)
-            .IsRequired();
+            .IsRequired(false);
 
         builder.Property(x => x.Status)
             .IsRequired().HasColumnType($"{QuizzingConstants.Schema}.quiz_status");

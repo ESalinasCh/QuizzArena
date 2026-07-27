@@ -97,7 +97,9 @@ public sealed class GetQuizzesUseCaseTests : IDisposable
     public async Task Execute_Pagination_ReturnsCorrectPage()
     {
         for (int i = 1; i <= 10; i++)
+        {
             _context.Quizzes.Add(new Quiz { Id = Guid.NewGuid(), Title = $"Quiz {i}" });
+        }
         await _context.SaveChangesAsync();
 
         var page1 = await _useCase.Execute(new PagedRequest { Page = 1, PageSize = 4 });
@@ -112,7 +114,9 @@ public sealed class GetQuizzesUseCaseTests : IDisposable
     public async Task Execute_LastPage_ReturnsRemainingItems()
     {
         for (int i = 1; i <= 5; i++)
+        {
             _context.Quizzes.Add(new Quiz { Id = Guid.NewGuid(), Title = $"Quiz {i}" });
+        }
         await _context.SaveChangesAsync();
 
         var result = await _useCase.Execute(new PagedRequest { Page = 2, PageSize = 4 });
