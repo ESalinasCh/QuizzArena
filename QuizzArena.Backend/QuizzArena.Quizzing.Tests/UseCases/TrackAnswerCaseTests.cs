@@ -12,7 +12,6 @@ namespace QuizzArena.Quizzing.Tests.UseCases;
 public class TrackAnswerCaseTests
 {
     private readonly Mock<IAnswerRepository> _mockAnswerRepository;
-    private readonly Mock<IOptionRepository> _mockOptionRepository;
     private readonly Mock<IMatchRepository> _mockMatchRepository;
     private readonly Mock<ICurrentUser> _mockCurrentUser;
     private readonly Mock<IQuestionRepository> _mockQuestionRepository;
@@ -23,14 +22,12 @@ public class TrackAnswerCaseTests
     public TrackAnswerCaseTests()
     {
         _mockAnswerRepository = new Mock<IAnswerRepository>();
-        _mockOptionRepository = new Mock<IOptionRepository>();
         _mockMatchRepository = new Mock<IMatchRepository>();
         _mockCurrentUser = new Mock<ICurrentUser>();
         _mockQuestionRepository = new Mock<IQuestionRepository>();
 
         _useCase = new TrackAnswerUseCase(
             _mockAnswerRepository.Object,
-            _mockOptionRepository.Object,
             _mockMatchRepository.Object,
             _mockQuestionRepository.Object,
             _mockCurrentUser.Object
