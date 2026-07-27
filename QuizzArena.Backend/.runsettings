@@ -5,8 +5,15 @@
       <DataCollector friendlyName="XPlat Code Coverage">
         <Configuration>
           <Format>cobertura</Format>
+          <Include>
+            [*]*.Application.UseCases.*,
+            [*]*.Application.Validators.*,
+            [*]*.Application.Helpers.*,
+            [*]*.Infrastructure.Adapters.In.Web.*,
+            [*]*.Infrastructure.Adapters.In.Messaging.Consumers.*
+          </Include>
+
           <Exclude>
-            <!-- Excluir por namespace/patrón -->
             [*]*DTOs*,
             [*]*Domain.Entities*,
             [*]*Domain.Enums*,
