@@ -28,7 +28,7 @@ public class QueryableExtensionsTests
     {
         var result = MakeRange(20).Paginate(1, 0).ToList();
 
-        Assert.Equal(6, result.Count);
+        Assert.Equal(QueryableExtensions.DefaultPageSize, result.Count);
         Assert.Equal(1, result.First());
     }
 
@@ -37,7 +37,7 @@ public class QueryableExtensionsTests
     {
         var result = MakeRange(20).Paginate(1, -1).ToList();
 
-        Assert.Equal(6, result.Count);
+        Assert.Equal(QueryableExtensions.DefaultPageSize, result.Count);
     }
 
     [Fact]

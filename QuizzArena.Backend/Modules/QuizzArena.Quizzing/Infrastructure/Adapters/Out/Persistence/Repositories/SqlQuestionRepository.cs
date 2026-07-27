@@ -2,6 +2,7 @@
 using QuizzArena.Quizzing.Application.Filters;
 using QuizzArena.Quizzing.Application.Ports.Out;
 using QuizzArena.Quizzing.Domain.Entities;
+using Shared.Extensions;
 
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Repositories;
 
@@ -61,8 +62,7 @@ public class SqlQuestionRepository(QuizzingDbContext context) : IQuestionReposit
 
         return await query
             .OrderByDescending(x => x.CreatedAt)
-            .Skip((filters.Page - 1) * filters.PageSize)
-            .Take(filters.PageSize)
+            .Paginate(filters.Page, filters.PageSize)
             .ToListAsync();
     }
 }

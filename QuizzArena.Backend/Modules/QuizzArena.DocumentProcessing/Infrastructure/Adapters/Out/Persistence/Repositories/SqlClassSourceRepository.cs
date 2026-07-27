@@ -2,6 +2,7 @@
 using QuizzArena.DocumentProcessing.Application.Ports.Out;
 using QuizzArena.DocumentProcessing.Domain.Entities;
 using Shared.Contracts.DTOs;
+using Shared.Extensions;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.Repositories;
 
@@ -40,8 +41,7 @@ public class SqlClassSourceRepository(DocumentProcessingDbContext context) : ICl
 
         List<ClassSource> classSources = await q
             .OrderByDescending(cs => cs.CreatedAt)
-            .Skip((query.Page - 1) * query.PageSize)
-            .Take(query.PageSize)
+            .Paginate(query.Page, query.PageSize)
             .ToListAsync();
 
         var classSourceIds = classSources.Select(cs => cs.Id).ToList();
