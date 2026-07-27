@@ -184,9 +184,7 @@ services:
     container_name: quizarena_ffmpeg_worker
     environment:
       DOTNET_ENVIRONMENT: Development
-      RabbitMq__Host: rabbitmq
-      RabbitMq__Username: guest
-      RabbitMq__Password: guest
+      ConnectionStrings__RabbitMq: "amqp://guest:guest@rabbitmq:5672"
       ConnectionStrings__AzureBlobStorage: "UseDevelopmentStorage=true;DevelopmentStorageProxyUri=http://azurite"
     depends_on:
       rabbitmq:
