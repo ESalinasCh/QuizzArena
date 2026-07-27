@@ -118,11 +118,6 @@ public class SubmitAnswersUseCase(
 
             answer.MatchAttemptId = matchAttemptId;
 
-            // Placeholder only: answer.OptionId is still a NOT NULL FK to option, so it must
-            // hold a real option id. It carries no meaning — SelectedOptions is the answer.
-            // Delete this line when the column is dropped (see the note in Answer.cs).
-            answer.OptionId = selectedOptionIds.First();
-
             questionResultDtos.Add(new QuestionResultDto(
                 question.Id,
                 question.Content,

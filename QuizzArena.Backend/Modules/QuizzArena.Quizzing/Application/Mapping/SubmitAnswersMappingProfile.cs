@@ -33,11 +33,6 @@ public class SubmitAnswersMappingProfile : Profile
             )
 
             .ForMember(
-                dest => dest.OptionId,
-                opt => opt.Ignore()
-            )
-
-            .ForMember(
                 dest => dest.IsCorrect,
                 opt => opt.Ignore()
             )

@@ -55,7 +55,7 @@ public class TrackAnswerUseCase(IAnswerRepository answerRepository, IOptionRepos
             };
         }
         answer!.AnsweredAt = DateTimeOffset.UtcNow;
-        answer.OptionId = selectedOptionIds.First(); //we have to delete this
+
         answer.IsCorrect = question.Type == QuestionType.MultipleChoice
                 ? selectedOptionIds.SetEquals(correctOptionIds)
                 : selectedOptionIds.Count == 1 && correctOptionIds.Contains(selectedOptionIds.First());

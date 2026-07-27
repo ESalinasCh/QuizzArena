@@ -361,7 +361,7 @@ public class GetMatchAttemptDetailCaseTests
         };
 
         _mockMatchRepository
-            .Setup(x => x.GetMatchAttemptsDetailById(matchAttemptId))
+            .Setup(x => x.GetMatchAttemptDetailById(matchAttemptId))
             .ReturnsAsync(matchAttempt);
 
         _mockMatchRepository
@@ -434,7 +434,7 @@ public class GetMatchAttemptDetailCaseTests
         };
 
         _mockMatchRepository
-            .Setup(x => x.GetMatchAttemptsDetailById(matchAttemptId))
+            .Setup(x => x.GetMatchAttemptDetailById(matchAttemptId))
             .ReturnsAsync(matchAttempt);
 
         _mockMatchRepository

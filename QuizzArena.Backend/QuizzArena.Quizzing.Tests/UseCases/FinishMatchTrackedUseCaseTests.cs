@@ -73,7 +73,6 @@ public class FinishMatchTrackedUseCaseTests
                 new Answer
                 {
                     QuestionId = questionId1,
-                    OptionId = optionId1,
                     IsCorrect = true,
                     SelectedOptions = new List<SelectedOption>
                     {
@@ -83,7 +82,6 @@ public class FinishMatchTrackedUseCaseTests
                 new Answer
                 {
                     QuestionId = questionId2,
-                    OptionId = optionId2,
                     IsCorrect = false,
                     SelectedOptions = new List<SelectedOption>
                     {
