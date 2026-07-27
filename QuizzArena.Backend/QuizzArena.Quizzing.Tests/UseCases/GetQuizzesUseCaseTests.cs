@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using QuizzArena.Quizzing.Application.DTOs.Quiz;
 using QuizzArena.Quizzing.Application.UseCases.QuizUseCases;
 using QuizzArena.Quizzing.Domain.Entities;
@@ -9,7 +9,7 @@ using Shared.Contracts.DTOs;
 
 namespace QuizzArena.Quizzing.Tests.UseCases;
 
-public class GetQuizzesUseCaseTests : IDisposable
+public sealed class GetQuizzesUseCaseTests : IDisposable
 {
     private readonly QuizzingDbContext _context;
     private readonly GetQuizzesUseCase _useCase;

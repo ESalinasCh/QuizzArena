@@ -1,4 +1,4 @@
-using QuizzArena.Quizzing.Domain.Enums;
+﻿using QuizzArena.Quizzing.Domain.Enums;
 using Shared.Contracts.DTOs;
 
 namespace QuizzArena.Quizzing.Application.DTOs.Match;

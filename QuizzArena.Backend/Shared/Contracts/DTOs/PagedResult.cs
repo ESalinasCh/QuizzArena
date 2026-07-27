@@ -1,4 +1,4 @@
-namespace Shared.Contracts.DTOs;
+﻿namespace Shared.Contracts.DTOs;
 
 public class PagedResult<T>
 {

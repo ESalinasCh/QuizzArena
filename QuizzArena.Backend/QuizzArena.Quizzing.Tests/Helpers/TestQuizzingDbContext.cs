@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence;
 
 namespace QuizzArena.Quizzing.Tests.Helpers;

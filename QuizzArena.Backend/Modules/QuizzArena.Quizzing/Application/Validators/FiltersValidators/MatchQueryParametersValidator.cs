@@ -1,4 +1,4 @@
-using FluentValidation;
+﻿using FluentValidation;
 using QuizzArena.Quizzing.Application.DTOs.Match;
 
 namespace QuizzArena.Quizzing.Application.Validators.FiltersValidators;

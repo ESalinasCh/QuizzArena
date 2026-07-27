@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using QuizzArena.DocumentProcessing.Application.Ports.Out;
 using QuizzArena.DocumentProcessing.Domain.Entities;
 using Shared.Contracts.DTOs;
@@ -34,8 +34,8 @@ public class SqlClassSourceRepository(DocumentProcessingDbContext context) : ICl
 
         if (!string.IsNullOrWhiteSpace(query.Search))
         {
-            var searchLower = query.Search.ToLower().Trim();
-            q = q.Where(cs => cs.Name.ToLower().Contains(searchLower));
+            var search = query.Search.Trim();
+            q = q.Where(cs => cs.Name != null && cs.Name.Contains(search, StringComparison.OrdinalIgnoreCase));
         }
 
         List<ClassSource> classSources = await q

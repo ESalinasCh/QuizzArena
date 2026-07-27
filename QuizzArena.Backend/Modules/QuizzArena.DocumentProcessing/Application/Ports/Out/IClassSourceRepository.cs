@@ -1,4 +1,4 @@
-using QuizzArena.DocumentProcessing.Domain.Entities;
+﻿using QuizzArena.DocumentProcessing.Domain.Entities;
 using Shared.Contracts.DTOs;
 
 namespace QuizzArena.DocumentProcessing.Application.Ports.Out;

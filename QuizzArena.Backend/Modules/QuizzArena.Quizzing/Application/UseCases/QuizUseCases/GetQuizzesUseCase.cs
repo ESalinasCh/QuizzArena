@@ -1,7 +1,4 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using QuizzArena.Quizzing.Application.DTOs.Quiz;
 using QuizzArena.Quizzing.Application.Ports.In;
 using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence;
@@ -18,8 +15,8 @@ public class GetQuizzesUseCase(QuizzingDbContext context) : IGetQuizzesUseCase
 
         if (!string.IsNullOrWhiteSpace(query.Search))
         {
-            var searchLower = query.Search.ToLower().Trim();
-            q = q.Where(x => x.Title != null && x.Title.ToLower().Contains(searchLower));
+            var search = query.Search.Trim();
+            q = q.Where(x => x.Title != null && x.Title.Contains(search, StringComparison.OrdinalIgnoreCase));
         }
 
         var list = await q

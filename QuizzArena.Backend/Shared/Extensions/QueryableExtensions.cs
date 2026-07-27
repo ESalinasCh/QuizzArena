@@ -1,4 +1,4 @@
-namespace Shared.Extensions;
+﻿namespace Shared.Extensions;
 
 public static class QueryableExtensions
 {

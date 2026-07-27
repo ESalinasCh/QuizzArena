@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using QuizzArena.Quizzing.Application.DTOs.Match;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Domain.Entities;
@@ -56,8 +56,8 @@ internal sealed class SqlMatchRepository(QuizzingDbContext context) : IMatchRepo
 
         if (!string.IsNullOrWhiteSpace(query.Search))
         {
-            var searchLower = query.Search.ToLower().Trim();
-            q = q.Where(m => m.Title != null && m.Title.ToLower().Contains(searchLower));
+            var search = query.Search.Trim();
+            q = q.Where(m => m.Title != null && m.Title.Contains(search, StringComparison.OrdinalIgnoreCase));
         }
 
         q = q.Paginate(query.Page, query.PageSize);

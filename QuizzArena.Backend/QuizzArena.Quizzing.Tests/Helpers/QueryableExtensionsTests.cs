@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using Shared.Extensions;
 
 namespace QuizzArena.Quizzing.Tests.Helpers;
