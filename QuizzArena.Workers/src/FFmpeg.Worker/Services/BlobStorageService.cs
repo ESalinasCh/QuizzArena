@@ -1,5 +1,4 @@
-﻿using Azure.Identity;
-using Azure.Storage.Blobs;
+﻿using Azure.Storage.Blobs;
 
 namespace FFmpeg.Worker.Services;
 
@@ -12,26 +11,10 @@ public class BlobStorageService
     {
         _logger = logger;
 
-        var connectionString = config["ConnectionStrings:AzureBlobStorage"];
+        var connectionString = config.GetConnectionString("AzureBlobStorage")
+            ?? throw new InvalidOperationException("Connection string 'AzureBlobStorage' was not found.");
 
-        if (!string.IsNullOrEmpty(connectionString))
-        {
-            // Local: Azurite via connection string (HTTP, sin credenciales Azure AD)
-            _client = new BlobServiceClient(connectionString);
-        }
-        else
-        {
-            // Producción: Blob Storage real via managed identity (HTTPS)
-            var accountUrl = config["AzureStorage:AccountUrl"]
-                ?? throw new InvalidOperationException("Se requiere 'AzureStorage:AccountUrl' cuando no hay connection string configurado.");
-
-            _client = new BlobServiceClient(
-                new Uri(accountUrl),
-                new DefaultAzureCredential(new DefaultAzureCredentialOptions
-                {
-                    ExcludeVisualStudioCredential = true
-                }));
-        }
+        _client = new BlobServiceClient(connectionString);
     }
 
     public async Task<string> UploadAsync(string localFilePath, string containerName, string blobName, CancellationToken ct)

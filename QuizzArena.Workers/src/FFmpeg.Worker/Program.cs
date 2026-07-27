@@ -12,6 +12,8 @@ Console.WriteLine($"Is Development: {builder.Environment.IsDevelopment()}");
 if (!builder.Environment.IsDevelopment())
 {
     var vaultUri = builder.Configuration["AzureKeyVault:VaultUri"];
+    Console.WriteLine($"Azure Key Vault URI: {vaultUri}");
+
     if (!string.IsNullOrEmpty(vaultUri))
     {
         var options = new DefaultAzureCredentialOptions
@@ -25,26 +27,32 @@ if (!builder.Environment.IsDevelopment())
     else
     {
         Console.WriteLine("AzureKeyVault:VaultUri is not configured, skipping Azure Key Vault integration.");
+        throw new InvalidOperationException("AzureKeyVault:VaultUri is required in production but not found.");
+    }
+
+    // Sobrescribimos ConnectionStrings locales con los secretos de Key Vault
+    if (!string.IsNullOrEmpty(builder.Configuration["AzureStorage:BlobConnectionString"]))
+    {
+        builder.Configuration["ConnectionStrings:AzureBlobStorage"] = builder.Configuration["AzureStorage:BlobConnectionString"];
+    }
+
+    if (!string.IsNullOrEmpty(builder.Configuration["RabbitMQ:ConnectionStrings"]))
+    {
+        builder.Configuration["ConnectionStrings:RabbitMq"] = builder.Configuration["RabbitMQ:ConnectionStrings"];
     }
 }
 
-var rabbitConnectionString = builder.Configuration["RabbitMq:ConnectionString"];
-var rabbitHost = builder.Configuration["RabbitMq:Host"];
-var rabbitUsername = builder.Configuration["RabbitMq:Username"] ?? "guest";
-var rabbitPassword = builder.Configuration["RabbitMq:Password"] ?? "guest";
-
-if (string.IsNullOrWhiteSpace(rabbitConnectionString) && string.IsNullOrWhiteSpace(rabbitHost))
+// Lectura unificada de Connection Strings
+var rabbitConnectionString = builder.Configuration.GetConnectionString("RabbitMq");
+if (string.IsNullOrWhiteSpace(rabbitConnectionString))
 {
-    throw new InvalidOperationException("Configuration 'RabbitMq:ConnectionString' or 'RabbitMq:Host' is required but not found.");
+    throw new InvalidOperationException("Connection string 'RabbitMq' is required but not found.");
 }
 
-var hasConnectionString = !string.IsNullOrWhiteSpace(builder.Configuration["ConnectionStrings:AzureBlobStorage"]);
-var hasAccountUrl = !string.IsNullOrWhiteSpace(builder.Configuration["AzureStorage:AccountUrl"]);
-
-if (!hasConnectionString && !hasAccountUrl)
+var blobConnectionString = builder.Configuration.GetConnectionString("AzureBlobStorage");
+if (string.IsNullOrWhiteSpace(blobConnectionString))
 {
-    throw new InvalidOperationException(
-        "Se requiere 'ConnectionStrings:AzureBlobStorage' (desarrollo) o 'AzureStorage:AccountUrl' (producción), ninguno fue encontrado.");
+    throw new InvalidOperationException("Connection string 'AzureBlobStorage' is required but not found.");
 }
 
 builder.Services.AddHttpClient<FileDownloader>();
@@ -54,23 +62,10 @@ builder.Services.AddSingleton<BlobStorageService>();
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<CompressAudioJobConsumer>();
-    // Futuro: x.AddConsumer<TranscodeVideoJobConsumer>();
 
     x.UsingRabbitMq((context, cfg) =>
     {
-        if (!string.IsNullOrEmpty(rabbitConnectionString))
-        {
-            cfg.Host(new Uri(rabbitConnectionString));
-        }
-        else
-        {
-            cfg.Host(rabbitHost, "/", h =>
-            {
-                h.Username(rabbitUsername);
-                h.Password(rabbitPassword);
-            });
-        }
-
+        cfg.Host(new Uri(rabbitConnectionString));
         cfg.PrefetchCount = 1;
         cfg.ConfigureEndpoints(context);
     });

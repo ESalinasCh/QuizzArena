@@ -19,6 +19,9 @@ public abstract class JobConsumerBase<TJob> : IConsumer<TJob> where TJob : class
         var job = context.Message;
         var jobType = typeof(TJob).Name;
 
+        // 1. Log inmediato al recibir el mensaje
+        Logger.LogInformation(">>> Recibido trabajo {JobId} de tipo {JobType}", job.JobId, jobType);
+
         try
         {
             var outputBlobUrl = await ExecuteAsync(job, context.CancellationToken);
@@ -36,7 +39,7 @@ public abstract class JobConsumerBase<TJob> : IConsumer<TJob> where TJob : class
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Job {JobId} ({JobType}) falló", job.JobId, jobType);
+            Logger.LogError(ex, "Job {JobId} ({JobType}) falló con error: {Message}", job.JobId, jobType, ex.Message);
 
             await context.Publish<IJobFaulted>(new
             {
@@ -46,12 +49,11 @@ public abstract class JobConsumerBase<TJob> : IConsumer<TJob> where TJob : class
                 Reason = ex.Message,
                 FailedAtUtc = DateTime.UtcNow
             });
+
+            // Re-lanzar para que MassTransit active reintentos o mueva el mensaje a _error
+            throw;
         }
     }
 
-    /// <summary>
-    /// Cada tipo de job implementa su propio pipeline (descargar, procesar, subir)
-    /// y retorna la URL del blob resultante.
-    /// </summary>
     protected abstract Task<string> ExecuteAsync(TJob job, CancellationToken ct);
 }
