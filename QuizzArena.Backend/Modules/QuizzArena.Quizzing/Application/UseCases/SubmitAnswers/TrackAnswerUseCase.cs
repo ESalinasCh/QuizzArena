@@ -7,7 +7,7 @@ using QuizzArena.Quizzing.Domain.Enums;
 using Shared.Contracts;
 namespace QuizzArena.Quizzing.Application.UseCases.SubmitAnswers;
 
-public class TrackAnswerUseCase(IAnswerRepository answerRepository, IOptionRepository optionRepository,
+public class TrackAnswerUseCase(IAnswerRepository answerRepository,
     IMatchRepository matchRepository,
     IQuestionRepository questionRepository,
     ICurrentUser currentUser) : ITrackAnswerUseCase

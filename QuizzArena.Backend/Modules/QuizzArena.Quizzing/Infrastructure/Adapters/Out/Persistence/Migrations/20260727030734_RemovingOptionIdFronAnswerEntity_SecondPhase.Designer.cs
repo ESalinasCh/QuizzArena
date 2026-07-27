@@ -14,7 +14,7 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
 {
     [DbContext(typeof(QuizzingDbContext))]
     [Migration("20260727030734_RemovingOptionIdFronAnswerEntity_SecondPhase")]
-    partial class RemovingOptionIdFronAnswerEntity_SecondPhase
+    partial class RemovingOptionIdFronAnswerEntitySecondPhase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

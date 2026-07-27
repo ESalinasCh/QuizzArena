@@ -5,7 +5,7 @@
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations;
 
 /// <inheritdoc />
-public partial class RemovingOptionIdFronAnswerEntity_SecondPhase : Migration
+public partial class RemovingOptionIdFronAnswerEntitySecondPhase : Migration
 {
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
