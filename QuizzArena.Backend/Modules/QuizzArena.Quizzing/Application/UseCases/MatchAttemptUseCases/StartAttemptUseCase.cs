@@ -104,7 +104,7 @@ public sealed class StartAttemptUseCase(
             UserId = userId,
             StartDateTime = DateTimeOffset.UtcNow,
             JoinedAt = DateTimeOffset.UtcNow,
-            Nickname = "",
+            Nickname = currentUser.FullName,
             Score = 0,
             MatchAttemptQuestions = questions.Select(q => new MatchAttemptQuestion
             {
