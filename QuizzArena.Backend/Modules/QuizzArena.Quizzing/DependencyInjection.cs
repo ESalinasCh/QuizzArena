@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using QuizzArena.Quizzing.Application.DTOs.Match;
+using QuizzArena.Quizzing.Application.DTOs.Quiz;
 using QuizzArena.Quizzing.Application.Ports.In;
 using QuizzArena.Quizzing.Application.Ports.In.MatchAttempt;
 using QuizzArena.Quizzing.Application.Ports.In.Question;
@@ -93,6 +94,7 @@ public static class DependencyInjection
         #endregion
 
         services.AddScoped<IValidator<MatchQueryParametersDto>, MatchQueryParametersValidator>();
+        services.AddScoped<IValidator<QuizQueryParametersDto>, QuizQueryParametersValidator>();
         services.AddScoped<IGetMatchAttemptsByStudent, GetMatchAttemptsByStudent>();
 
         services.AddScoped<IGetMatchAttemptDetail, GetMatchAttemptDetail>();
