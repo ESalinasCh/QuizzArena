@@ -7,5 +7,7 @@ public interface IAnswerRepository
     Task<Answer?> GetByAttemptAndQuestionAsync(Guid attemptId, Guid questionId);
     Task<Answer> CreateAnswerAsync(Answer answer);
     Task<Answer> UpdateAnswerAsync(Answer answer);
+    Task<Answer> UpdateAnswerAndReplaceOptionsAsync(Answer answer, ICollection<SelectedOption> selectedOptions);
+
 
 }

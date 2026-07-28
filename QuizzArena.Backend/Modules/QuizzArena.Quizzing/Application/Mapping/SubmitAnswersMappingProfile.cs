@@ -14,9 +14,12 @@ public class SubmitAnswersMappingProfile : Profile
                 opt => opt.Ignore()
             )
 
+            // The picked options are the answer; IsCorrect is filled in while scoring.
             .ForMember(
-                dest => dest.OptionId,
-                opt => opt.MapFrom(src => src.SelectedOptionId)
+                dest => dest.SelectedOptions,
+                opt => opt.MapFrom(src => src.SelectedOptionIds
+                    .Select(id => new SelectedOption { OptionId = id })
+                    .ToList())
             )
 
             .ForMember(

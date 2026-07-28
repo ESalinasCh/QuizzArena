@@ -125,6 +125,7 @@ public sealed class StartAttemptUseCase(
             {
                 Id = q.Question.Id,
                 Statement = q.Question.Content,
+                QuestionType = q.Question.Type,
                 Options = q.Question.Options.Select(o => new StartAttemptOptionResponseDto()
                 {
                     Id = o.Id,

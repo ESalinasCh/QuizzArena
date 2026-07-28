@@ -55,9 +55,9 @@ internal sealed class SqlMatchRepository(QuizzingDbContext context) : IMatchRepo
 
         return await q.ToListAsync();
     }
-    public async Task<MatchAttempt?> GetMatchAttemptsDetailById(Guid matchAttemptId)
+    public async Task<MatchAttempt?> GetMatchAttemptDetailById(Guid matchAttemptId)
     {
-        return await context.MatchAttempts.Include(x => x.Answers).Include(x => x.MatchAttemptQuestions).FirstOrDefaultAsync(x => x.Id == matchAttemptId);
+        return await context.MatchAttempts.Include(x => x.MatchAttemptQuestions).Include(x => x.Answers).ThenInclude(y => y.SelectedOptions).FirstOrDefaultAsync(x => x.Id == matchAttemptId);
     }
 
     public async Task<Match> CreateMatchAsync(Match match)

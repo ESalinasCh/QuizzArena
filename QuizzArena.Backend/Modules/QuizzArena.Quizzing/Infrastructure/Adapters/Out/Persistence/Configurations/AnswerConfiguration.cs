@@ -18,11 +18,6 @@ internal sealed class AnswerConfiguration : IEntityTypeConfiguration<Answer>
         builder.Property(x => x.IsCorrect).IsRequired();
         builder.Property(x => x.TimeMs).IsRequired();
 
-        builder.HasOne<Option>()
-            .WithMany()
-            .HasForeignKey(x => x.OptionId)
-            .OnDelete(DeleteBehavior.Restrict);
-
         builder.HasOne<Question>()
             .WithMany()
             .HasForeignKey(x => x.QuestionId)

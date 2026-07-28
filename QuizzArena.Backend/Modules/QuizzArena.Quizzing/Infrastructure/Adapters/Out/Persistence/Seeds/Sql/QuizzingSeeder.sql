@@ -16,7 +16,8 @@ INSERT INTO quizzing.quiz
     "CreatedAt",
     "UpdatedAt",
     "DeletedAt",
-    "Origin"
+    "Origin",
+    "TeacherId"
 )
 VALUES
 (
@@ -28,7 +29,8 @@ VALUES
     NOW() - INTERVAL '70 days',
     NOW(),
     NULL,
-    'manually_created'
+    'manually_created',
+    '959d0300-4473-4198-b551-6c1c6fb214dc'
 ),
 (
     '30000000-0000-0000-0000-000000000002'::uuid,
@@ -39,7 +41,8 @@ VALUES
     NOW() - INTERVAL '65 days',
     NOW(),
     NULL,
-    'manually_created'
+    'manually_created',
+    '959d0300-4473-4198-b551-6c1c6fb214dc'
 ),
 (
     '30000000-0000-0000-0000-000000000003'::uuid,
@@ -50,7 +53,8 @@ VALUES
     NOW() - INTERVAL '60 days',
     NOW(),
     NULL,
-    'manually_created'
+    'manually_created',
+    '959d0300-4473-4198-b551-6c1c6fb214dc'
 ),
 (
     '30000000-0000-0000-0000-000000000004'::uuid,
@@ -61,7 +65,8 @@ VALUES
     NOW() - INTERVAL '55 days',
     NOW(),
     NULL,
-    'manually_created'
+    'manually_created',
+    '959d0300-4473-4198-b551-6c1c6fb214dc'
 ),
 (
     '30000000-0000-0000-0000-000000000005'::uuid,
@@ -72,7 +77,8 @@ VALUES
     NOW() - INTERVAL '50 days',
     NOW(),
     NULL,
-    'manually_created'
+    'manually_created',
+    '959d0300-4473-4198-b551-6c1c6fb214dc'
 ),
 (
     '30000000-0000-0000-0000-000000000006'::uuid,
@@ -83,7 +89,8 @@ VALUES
     NOW() - INTERVAL '42 days',
     NOW(),
     NULL,
-    'manually_created'
+    'manually_created',
+    '959d0300-4473-4198-b551-6c1c6fb214dc'
 ),
 (
     '30000000-0000-0000-0000-000000000007'::uuid,
@@ -94,7 +101,8 @@ VALUES
     NOW() - INTERVAL '34 days',
     NOW(),
     NULL,
-    'manually_created'
+    'manually_created',
+    '959d0300-4473-4198-b551-6c1c6fb214dc'
 ),
 (
     '30000000-0000-0000-0000-000000000008'::uuid,
@@ -105,7 +113,8 @@ VALUES
     NOW() - INTERVAL '20 days',
     NOW(),
     NULL,
-    'manually_created'
+    'manually_created',
+    '959d0300-4473-4198-b551-6c1c6fb214dc'
 ),
 (
     '30000000-0000-0000-0000-000000000009'::uuid,
@@ -116,7 +125,8 @@ VALUES
     NOW() - INTERVAL '10 days',
     NOW(),
     NULL,
-    'manually_created'
+    'manually_created',
+    '959d0300-4473-4198-b551-6c1c6fb214dc'
 )
 ON CONFLICT ("Id") DO NOTHING;
 
@@ -875,10 +885,13 @@ DECLARE
     attempt_id uuid := '50000000-0000-0000-0000-000000000001'::uuid;
     quiz_id uuid := '30000000-0000-0000-0000-000000000005'::uuid;
     rec RECORD;
-    correct_option_id uuid;
+    correct_option_ids uuid[];
+    incorrect_option_ids uuid[];
     start_time timestamp;
     time_ms int;
     position int := 1;
+    answer_id uuid;
+    is_multiple boolean;
 BEGIN
     -- Obtener la hora de inicio del intento
     SELECT "StartDateTime" INTO start_time 
@@ -887,33 +900,61 @@ BEGIN
     
     -- Para cada pregunta del quiz
     FOR rec IN 
-        SELECT q."Id" as question_id
+        SELECT q."Id" as question_id, q."Type" as question_type
         FROM quizzing.quiz_question qq
         JOIN quizzing.question q ON q."Id" = qq."QuestionId"
         WHERE qq."QuizId" = quiz_id
         ORDER BY qq."Position"
     LOOP
-        -- Obtener la opción correcta
-        SELECT "Id" INTO correct_option_id
+        -- Obtener todas las opciones correctas
+        SELECT ARRAY_AGG("Id") INTO correct_option_ids
         FROM quizzing."option"
-        WHERE "QuestionId" = rec.question_id AND "IsCorrect" = TRUE
-        LIMIT 1;
+        WHERE "QuestionId" = rec.question_id AND "IsCorrect" = TRUE;
+        
+        -- Obtener opciones incorrectas (para single choice, si necesitamos una incorrecta)
+        SELECT ARRAY_AGG("Id") INTO incorrect_option_ids
+        FROM quizzing."option"
+        WHERE "QuestionId" = rec.question_id AND "IsCorrect" = FALSE;
+        
+        is_multiple := rec.question_type = 'multiple_choice';
         
         -- Tiempo de respuesta entre 2 y 15 segundos
         time_ms := (2000 + (random() * 13000))::int;
         
-        -- Insertar respuesta
+        -- Crear la respuesta (sin OptionId)
+        answer_id := gen_random_uuid();
         INSERT INTO quizzing.answer
-        ("Id", "IsCorrect", "AnsweredAt", "TimeMs", "OptionId", "QuestionId", "MatchAttemptId")
+        ("Id", "IsCorrect", "AnsweredAt", "TimeMs", "QuestionId", "MatchAttemptId")
         VALUES (
-            gen_random_uuid(),
-            TRUE,
+            answer_id,
+            TRUE, -- Siempre correcto para este intento
             start_time + (position * INTERVAL '30 seconds') + (time_ms * INTERVAL '1 millisecond'),
             time_ms,
-            correct_option_id,
             rec.question_id,
             attempt_id
         );
+        
+        -- Insertar las opciones seleccionadas en selected_option
+        IF is_multiple THEN
+            -- Para multiple choice, seleccionamos todas las correctas
+            INSERT INTO quizzing.selected_option
+            ("Id", "OptionId", "AnswerId", "IsCorrect")
+            SELECT 
+                gen_random_uuid(),
+                unnest(correct_option_ids),
+                answer_id,
+                TRUE;
+        ELSE
+            -- Para single choice y true_false, seleccionamos solo la primera correcta
+            INSERT INTO quizzing.selected_option
+            ("Id", "OptionId", "AnswerId", "IsCorrect")
+            VALUES (
+                gen_random_uuid(),
+                correct_option_ids[1],
+                answer_id,
+                TRUE
+            );
+        END IF;
         
         position := position + 1;
     END LOOP;
@@ -925,13 +966,15 @@ DECLARE
     attempt_id uuid := '50000000-0000-0000-0000-000000000002'::uuid;
     quiz_id uuid := '30000000-0000-0000-0000-000000000006'::uuid;
     rec RECORD;
-    correct_option_id uuid;
-    incorrect_option_id uuid;
+    correct_option_ids uuid[];
+    incorrect_option_ids uuid[];
     start_time timestamp;
     time_ms int;
     position int := 1;
     is_correct boolean;
     question_counter int := 0;
+    answer_id uuid;
+    is_multiple boolean;
 BEGIN
     -- Obtener la hora de inicio del intento
     SELECT "StartDateTime" INTO start_time 
@@ -940,7 +983,7 @@ BEGIN
     
     -- Para cada pregunta del quiz
     FOR rec IN 
-        SELECT q."Id" as question_id
+        SELECT q."Id" as question_id, q."Type" as question_type
         FROM quizzing.quiz_question qq
         JOIN quizzing.question q ON q."Id" = qq."QuestionId"
         WHERE qq."QuizId" = quiz_id
@@ -948,42 +991,85 @@ BEGIN
     LOOP
         question_counter := question_counter + 1;
         
-        -- Obtener la opción correcta
-        SELECT "Id" INTO correct_option_id
+        -- Obtener todas las opciones correctas
+        SELECT ARRAY_AGG("Id") INTO correct_option_ids
         FROM quizzing."option"
-        WHERE "QuestionId" = rec.question_id AND "IsCorrect" = TRUE
-        LIMIT 1;
+        WHERE "QuestionId" = rec.question_id AND "IsCorrect" = TRUE;
+        
+        -- Obtener opciones incorrectas
+        SELECT ARRAY_AGG("Id") INTO incorrect_option_ids
+        FROM quizzing."option"
+        WHERE "QuestionId" = rec.question_id AND "IsCorrect" = FALSE;
+        
+        is_multiple := rec.question_type = 'multiple_choice';
         
         -- La pregunta 3 será incorrecta (para obtener 87.50% = 7/8 correctas)
         IF question_counter = 3 THEN
-            -- Obtener una opción incorrecta
-            SELECT "Id" INTO incorrect_option_id
-            FROM quizzing."option"
-            WHERE "QuestionId" = rec.question_id AND "IsCorrect" = FALSE
-            ORDER BY random()
-            LIMIT 1;
-            
             is_correct := FALSE;
         ELSE
-            incorrect_option_id := NULL;
             is_correct := TRUE;
         END IF;
         
         -- Tiempo de respuesta entre 2 y 15 segundos
         time_ms := (2000 + (random() * 13000))::int;
         
-        -- Insertar respuesta
+        -- Crear la respuesta (sin OptionId)
+        answer_id := gen_random_uuid();
         INSERT INTO quizzing.answer
-        ("Id", "IsCorrect", "AnsweredAt", "TimeMs", "OptionId", "QuestionId", "MatchAttemptId")
+        ("Id", "IsCorrect", "AnsweredAt", "TimeMs", "QuestionId", "MatchAttemptId")
         VALUES (
-            gen_random_uuid(),
+            answer_id,
             is_correct,
             start_time + (position * INTERVAL '35 seconds') + (time_ms * INTERVAL '1 millisecond'),
             time_ms,
-            CASE WHEN is_correct THEN correct_option_id ELSE incorrect_option_id END,
             rec.question_id,
             attempt_id
         );
+        
+        -- Insertar las opciones seleccionadas en selected_option
+        IF is_multiple THEN
+            IF is_correct THEN
+                -- Seleccionar todas las correctas
+                INSERT INTO quizzing.selected_option
+                ("Id", "OptionId", "AnswerId", "IsCorrect")
+                SELECT 
+                    gen_random_uuid(),
+                    unnest(correct_option_ids),
+                    answer_id,
+                    TRUE;
+            ELSE
+                -- Seleccionar todas las incorrectas (para simular error)
+                INSERT INTO quizzing.selected_option
+                ("Id", "OptionId", "AnswerId", "IsCorrect")
+                SELECT 
+                    gen_random_uuid(),
+                    unnest(incorrect_option_ids),
+                    answer_id,
+                    FALSE;
+            END IF;
+        ELSE
+            -- Para single choice y true_false
+            IF is_correct THEN
+                INSERT INTO quizzing.selected_option
+                ("Id", "OptionId", "AnswerId", "IsCorrect")
+                VALUES (
+                    gen_random_uuid(),
+                    correct_option_ids[1],
+                    answer_id,
+                    TRUE
+                );
+            ELSE
+                -- Seleccionar una opción incorrecta
+                INSERT INTO quizzing.selected_option
+                ("Id", "OptionId", "AnswerId", "IsCorrect")
+                VALUES (
+                    gen_random_uuid(),
+                    incorrect_option_ids[1],
+                    answer_id,
+                    FALSE
+                );
+            END IF;
+        END IF;
         
         position := position + 1;
     END LOOP;
@@ -995,13 +1081,15 @@ DECLARE
     attempt_id uuid := '50000000-0000-0000-0000-000000000003'::uuid;
     quiz_id uuid := '30000000-0000-0000-0000-000000000007'::uuid;
     rec RECORD;
-    correct_option_id uuid;
-    incorrect_option_id uuid;
+    correct_option_ids uuid[];
+    incorrect_option_ids uuid[];
     start_time timestamp;
     time_ms int;
     position int := 1;
     is_correct boolean;
     question_counter int := 0;
+    answer_id uuid;
+    is_multiple boolean;
 BEGIN
     -- Obtener la hora de inicio del intento
     SELECT "StartDateTime" INTO start_time 
@@ -1010,7 +1098,7 @@ BEGIN
     
     -- Para cada pregunta del quiz
     FOR rec IN 
-        SELECT q."Id" as question_id
+        SELECT q."Id" as question_id, q."Type" as question_type
         FROM quizzing.quiz_question qq
         JOIN quizzing.question q ON q."Id" = qq."QuestionId"
         WHERE qq."QuizId" = quiz_id
@@ -1018,96 +1106,88 @@ BEGIN
     LOOP
         question_counter := question_counter + 1;
         
-        -- Obtener la opción correcta
-        SELECT "Id" INTO correct_option_id
+        -- Obtener todas las opciones correctas
+        SELECT ARRAY_AGG("Id") INTO correct_option_ids
         FROM quizzing."option"
-        WHERE "QuestionId" = rec.question_id AND "IsCorrect" = TRUE
-        LIMIT 1;
+        WHERE "QuestionId" = rec.question_id AND "IsCorrect" = TRUE;
+        
+        -- Obtener opciones incorrectas
+        SELECT ARRAY_AGG("Id") INTO incorrect_option_ids
+        FROM quizzing."option"
+        WHERE "QuestionId" = rec.question_id AND "IsCorrect" = FALSE;
+        
+        is_multiple := rec.question_type = 'multiple_choice';
         
         -- Las preguntas 2 y 5 serán incorrectas (para obtener 75.00% = 6/8 correctas)
         IF question_counter = 2 OR question_counter = 5 THEN
-            -- Obtener una opción incorrecta
-            SELECT "Id" INTO incorrect_option_id
-            FROM quizzing."option"
-            WHERE "QuestionId" = rec.question_id AND "IsCorrect" = FALSE
-            ORDER BY random()
-            LIMIT 1;
-            
             is_correct := FALSE;
         ELSE
-            incorrect_option_id := NULL;
             is_correct := TRUE;
         END IF;
         
         -- Tiempo de respuesta entre 3 y 18 segundos (un poco más lentos)
         time_ms := (3000 + (random() * 15000))::int;
         
-        -- Insertar respuesta
+        -- Crear la respuesta (sin OptionId)
+        answer_id := gen_random_uuid();
         INSERT INTO quizzing.answer
-        ("Id", "IsCorrect", "AnsweredAt", "TimeMs", "OptionId", "QuestionId", "MatchAttemptId")
+        ("Id", "IsCorrect", "AnsweredAt", "TimeMs", "QuestionId", "MatchAttemptId")
         VALUES (
-            gen_random_uuid(),
+            answer_id,
             is_correct,
             start_time + (position * INTERVAL '40 seconds') + (time_ms * INTERVAL '1 millisecond'),
             time_ms,
-            CASE WHEN is_correct THEN correct_option_id ELSE incorrect_option_id END,
             rec.question_id,
             attempt_id
         );
         
+        -- Insertar las opciones seleccionadas en selected_option
+        IF is_multiple THEN
+            IF is_correct THEN
+                -- Seleccionar todas las correctas
+                INSERT INTO quizzing.selected_option
+                ("Id", "OptionId", "AnswerId", "IsCorrect")
+                SELECT 
+                    gen_random_uuid(),
+                    unnest(correct_option_ids),
+                    answer_id,
+                    TRUE;
+            ELSE
+                -- Seleccionar todas las incorrectas
+                INSERT INTO quizzing.selected_option
+                ("Id", "OptionId", "AnswerId", "IsCorrect")
+                SELECT 
+                    gen_random_uuid(),
+                    unnest(incorrect_option_ids),
+                    answer_id,
+                    FALSE;
+            END IF;
+        ELSE
+            -- Para single choice y true_false
+            IF is_correct THEN
+                INSERT INTO quizzing.selected_option
+                ("Id", "OptionId", "AnswerId", "IsCorrect")
+                VALUES (
+                    gen_random_uuid(),
+                    correct_option_ids[1],
+                    answer_id,
+                    TRUE
+                );
+            ELSE
+                -- Seleccionar una opción incorrecta
+                INSERT INTO quizzing.selected_option
+                ("Id", "OptionId", "AnswerId", "IsCorrect")
+                VALUES (
+                    gen_random_uuid(),
+                    incorrect_option_ids[1],
+                    answer_id,
+                    FALSE
+                );
+            END IF;
+        END IF;
+        
         position := position + 1;
     END LOOP;
 END $$;
-
--- ============================================================
-
--- Verificar usuarios
--- SELECT "Id", "UserName", "FirstName", "LastName", "Role" FROM users."user" 
--- WHERE "Id" IN ('37976960-c868-45d4-b3c2-4967cb46f4b0', '959d0300-4473-4198-b551-6c1c6fb214dc');
-
--- Verificar curso y matrícula
--- SELECT c."Name", c."Description", cs."StudentId" 
--- FROM users.course c 
--- JOIN users.course_student cs ON cs."CourseId" = c."Id"
--- WHERE cs."StudentId" = '37976960-c868-45d4-b3c2-4967cb46f4b0';
-
--- Verificar quizzes
--- SELECT "Id", "Title", "Status", "Origin" FROM quizzing.quiz;
-
--- Verificar preguntas por quiz
--- SELECT q."Title", COUNT(qq."QuestionId") as question_count,
---        SUM(qq."ValueScore") as total_score
--- FROM quizzing.quiz q
--- JOIN quizzing.quiz_question qq ON qq."QuizId" = q."Id"
--- GROUP BY q."Id", q."Title"
--- ORDER BY q."Title";
-
--- Verificar matches
--- SELECT "Id", "Code", "Mode", "Status", "Title" 
--- FROM quizzing."match" 
--- ORDER BY "StartedAt";
-
--- Verificar intentos del estudiante
--- SELECT ma."Id", ma."Score", ma."Status", m."Title", m."Mode"
--- FROM quizzing.match_attempt ma
--- JOIN quizzing."match" m ON m."Id" = ma."MatchId"
--- WHERE ma."UserId" = '37976960-c868-45d4-b3c2-4967cb46f4b0'
--- ORDER BY ma."StartDateTime";
-
--- Verificar respuestas del estudiante
--- SELECT COUNT(*) as total_answers,
---        SUM(CASE WHEN "IsCorrect" THEN 1 ELSE 0 END) as correct_answers
--- FROM quizzing.answer
--- WHERE "MatchAttemptId" IN (
---     SELECT "Id" FROM quizzing.match_attempt 
---     WHERE "UserId" = '37976960-c868-45d4-b3c2-4967cb46f4b0'
--- );
-
--- Verificar consistencia de puntuaciones
--- SELECT ma."Id", ma."Score", SUM(maq."ValueScore") as calculated_score
--- FROM quizzing.match_attempt ma
--- JOIN quizzing.match_attempt_question maq ON maq."MatchAttemptId" = ma."Id"
--- WHERE ma."UserId" = '37976960-c868-45d4-b3c2-4967cb46f4b0'
--- GROUP BY ma."Id", ma."Score";
 
 COMMIT;

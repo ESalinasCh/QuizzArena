@@ -24,7 +24,7 @@ public class FinishMatchTrackedUseCase(IMatchRepository matchRepository,
             throw new UnauthorizedAccessException("Invalid user identity.");
         }
 
-        MatchAttempt? attempt = await matchRepository.GetMatchAttemptsDetailById(attemptId) ?? throw new InvalidOperationException();
+        MatchAttempt? attempt = await matchRepository.GetMatchAttemptDetailById(attemptId) ?? throw new InvalidOperationException();
         if (attempt.UserId != userId)
         {
             throw new UnauthorizedAccessException("User doesn't belong to this match attempt.");
@@ -71,7 +71,8 @@ public class FinishMatchTrackedUseCase(IMatchRepository matchRepository,
                     Id = x.Id,
                     Number = index + 1,
                     Text = x.Content,
-                    SelectedOptionId = answer?.OptionId ?? null
+                    SelectedOptionIds = answer?.SelectedOptions.Select(so => so.OptionId).ToList()
+                    ?? []
                 };
             }
             ).ToList()
