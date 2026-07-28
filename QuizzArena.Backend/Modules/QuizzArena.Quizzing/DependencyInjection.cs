@@ -72,7 +72,6 @@ public static class DependencyInjection
         services.AddScoped<IGetMatchAttemptGradesUseCase, GetMatchAttemptGradesUseCase>();
         services.AddScoped<IPublishMatchUseCase, PublishMatchUseCase>();
         services.AddScoped<IUnpublishMatchUseCase, UnpublishMatchUseCase>();
-        services.AddScoped<IGetQuizzesUseCase, GetQuizzesUseCase>();
         services.AddScoped<IResetMatchAttemptUseCase, ResetMatchAttemptUseCase>();
         #endregion
 
