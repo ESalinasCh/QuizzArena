@@ -1,0 +1,25 @@
+{
+  "Title": "Math Quiz",
+  "Description": "Generated quiz",
+  "Questions": [
+    {
+      "Content": "What is 2 + 2?",
+      "Type": "MultipleChoice",
+      "Justification": "The sum of 2 and 2 is 4.",
+      "Position": 1,
+      "ValueScore": 10,
+      "Options": [
+        {
+          "Description": "3",
+          "Position": 1,
+          "IsCorrect": false
+        },
+        {
+          "Description": "4",
+          "Position": 2,
+          "IsCorrect": true
+        }
+      ]
+    }
+  ]
+}
