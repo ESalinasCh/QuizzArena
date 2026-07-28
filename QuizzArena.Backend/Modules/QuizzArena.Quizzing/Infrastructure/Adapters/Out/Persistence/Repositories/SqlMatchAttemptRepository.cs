@@ -4,6 +4,7 @@ using QuizzArena.Quizzing.Application.Filters;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Domain.Entities;
 using QuizzArena.Quizzing.Domain.Enums;
+using Shared.Extensions;
 
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Repositories;
 
@@ -101,8 +102,7 @@ internal sealed class SqlMatchAttemptRepository(QuizzingDbContext context) : IMa
 
         return await query
             .OrderByDescending(x => x.MatchAttempt.StartDateTime)
-            .Skip((filters.Page - 1) * filters.PageSize)
-            .Take(filters.PageSize)
+            .Paginate(filters.Page, filters.PageSize)
             .Select(x => x.MatchAttempt)
             .ToListAsync();
     }
@@ -128,8 +128,7 @@ internal sealed class SqlMatchAttemptRepository(QuizzingDbContext context) : IMa
         return await query
             .Where(x => bestAttemptIds.Contains(x.Id))
             .OrderBy(x => x.Nickname)
-            .Skip((filters.Page - 1) * filters.PageSize)
-            .Take(filters.PageSize)
+            .Paginate(filters.Page, filters.PageSize)
             .ToListAsync();
     }
 

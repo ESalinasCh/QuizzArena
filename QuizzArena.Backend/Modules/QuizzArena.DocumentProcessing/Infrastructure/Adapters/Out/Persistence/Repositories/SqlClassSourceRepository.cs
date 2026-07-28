@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using QuizzArena.DocumentProcessing.Application.Ports.Out;
 using QuizzArena.DocumentProcessing.Domain.Entities;
+using Shared.Contracts.DTOs;
+using Shared.Extensions;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.Repositories;
 
@@ -25,12 +27,21 @@ public class SqlClassSourceRepository(DocumentProcessingDbContext context) : ICl
         return classSource;
     }
 
-    public async Task<List<(ClassSource Source, List<Guid> ProcessingJobsIds)>> GetByUserIdAsync(Guid userId)
+    public async Task<List<(ClassSource Source, List<Guid> ProcessingJobsIds)>> GetByUserIdAsync(Guid userId, PagedRequest query)
     {
-        List<ClassSource> classSources = await context.ClassSource
+        IQueryable<ClassSource> q = context.ClassSource
             .AsNoTracking()
-            .Where(cs => cs.UserId == userId && !cs.Deleted)
+            .Where(cs => cs.UserId == userId && !cs.Deleted);
+
+        if (!string.IsNullOrWhiteSpace(query.Search))
+        {
+            var search = query.Search.Trim();
+            q = q.Where(cs => cs.Name != null && cs.Name.Contains(search, StringComparison.OrdinalIgnoreCase));
+        }
+
+        List<ClassSource> classSources = await q
             .OrderByDescending(cs => cs.CreatedAt)
+            .Paginate(query.Page, query.PageSize)
             .ToListAsync();
 
         var classSourceIds = classSources.Select(cs => cs.Id).ToList();

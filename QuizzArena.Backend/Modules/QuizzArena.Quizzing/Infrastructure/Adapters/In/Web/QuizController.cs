@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using QuizzArena.Quizzing.Application.DTOs.Quiz;
 using QuizzArena.Quizzing.Application.Ports.In;
-using QuizzArena.Quizzing.Domain.Enums;
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.In.Web;
 
 [ApiController]
@@ -22,9 +21,9 @@ public class QuizController(
 
     [HttpGet("users/me/quizzes")]
     [Authorize(Roles = "teacher")]
-    public async Task<ActionResult<List<TeacherQuizResponseDto>>> GetTeacherQuizzes([FromQuery] QuizOrigin? origin)
+    public async Task<ActionResult<List<TeacherQuizResponseDto>>> GetTeacherQuizzes([FromQuery] QuizQueryParametersDto query)
     {
-        List<TeacherQuizResponseDto> response = await getTeacherQuizzesUseCase.Execute(origin);
+        List<TeacherQuizResponseDto> response = await getTeacherQuizzesUseCase.Execute(query);
         return Ok(response);
     }
 }
