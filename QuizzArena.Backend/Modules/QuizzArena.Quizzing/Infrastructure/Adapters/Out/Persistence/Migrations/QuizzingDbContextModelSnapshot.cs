@@ -334,6 +334,9 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                     b.Property<QuizStatus>("Status")
                         .HasColumnType("quizzing.quiz_status");
 
+                    b.Property<Guid?>("TeacherId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(100)

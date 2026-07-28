@@ -4,7 +4,8 @@ using MassTransit;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using QuizzArena.DocumentProcessing.Application.DTOs.ClassSource;
-using QuizzArena.DocumentProcessing.Application.Messaging.Events;
+using QuizzArena.DocumentProcessing.Application.Messaging.Events.Indexing;
+using QuizzArena.DocumentProcessing.Application.Messaging.Events.Ingestion;
 using QuizzArena.DocumentProcessing.Application.Ports.Out;
 using QuizzArena.DocumentProcessing.Application.UseCases;
 using QuizzArena.DocumentProcessing.Application.Validators;
@@ -85,7 +86,7 @@ public class DocumentProcessingUseCasesTests
     }
 
     [Fact]
-    public async Task Execute_TextClassSource_SetsTranscriptUrlAndPublishesTranscriptionCompletedEvent()
+    public async Task Execute_TextClassSource_SetsTranscriptUrlAndPublishesIndexingRequestEvent()
     {
         // Arrange
         var teacherId = Guid.NewGuid();
@@ -113,8 +114,9 @@ public class DocumentProcessingUseCasesTests
         // Assert
         classSource.Type.Should().Be(SourceType.Text);
         classSource.TranscriptUrl.Should().Be(fileUrl);
+        classSource.Status.Should().Be(SourceStatus.Completed);
         _mockClassSourceRepository.Verify(r => r.CreateAsync(It.IsAny<ClassSource>()), Times.Once);
-        _mockPublishEndpoint.Verify(p => p.Publish(It.IsAny<TranscriptionCompletedEvent>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mockPublishEndpoint.Verify(p => p.Publish(It.IsAny<IndexingRequestEvent>(), It.IsAny<CancellationToken>()), Times.Once);
         _mockPublishEndpoint.Verify(p => p.Publish(It.IsAny<TranscriptionRequestEvent>(), It.IsAny<CancellationToken>()), Times.Never);
         result.Id.Should().Be(classSource.Id);
     }

@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using QuizzArena.Quizzing.Application.DTOs.Match;
+using QuizzArena.Quizzing.Application.DTOs.MatchAttempt;
 using QuizzArena.Quizzing.Application.Ports.In;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Domain.Entities;
@@ -13,6 +14,7 @@ public class GetMatchesUseCase(
     ICourseContract courseImpl,
     IMatchRepository matchRepository,
     IQuizQuestionQueriesRepository quizQuestionQueriesRepository,
+    IMatchAttemptRepository matchAttemptRepository,
     ICurrentUser currentUser
 ) : IGetMatchesUseCase
 {
@@ -43,18 +45,31 @@ public class GetMatchesUseCase(
         Dictionary<Guid, int> questionCountsByQuizId = quizIdsWithDefaultQuestionAmount.Count == 0 ? []
             : await quizQuestionQueriesRepository.GetQuestionCountsByQuizIdsAsync(quizIdsWithDefaultQuestionAmount) ?? [];
 
+        Dictionary<Guid, MatchAttemptSummaryDto> attemptSummariesByMatchId = role == "Student" && matches.Count > 0
+            ? await matchAttemptRepository.GetAttemptSummariesByMatchIdsAndUserIdAsync(matches.Select(m => m.Id).ToList(), Guid.Parse(userId)) ?? []
+            : [];
+
         List<MatchResponseDto> matchesDtos = matches.Select(m =>
         {
             CourseSummaryDTO course = courses.First(c => c.Id == m.CourseId);
+            MatchAttemptSummaryDto? attemptSummary = attemptSummariesByMatchId.GetValueOrDefault(m.Id);
             return new MatchResponseDto()
             {
                 Id = m.Id,
                 Title = m.Title,
                 CourseName = course.CourseName,
+                CourseId = course.Id,
                 CreatedAt = m.CreatedAt,
                 QuestionCount = m.QuestionsAmount ?? questionCountsByQuizId.GetValueOrDefault(m.QuizId),
                 ProfessorName = course.ProfessorName,
-                Duration = m.TimeMinutes
+                Duration = m.TimeMinutes,
+                Status = m.Status,
+                Mode = m.Mode,
+                StartedAt = m.StartedAt,
+                FinishedAt = m.FinishedAt,
+                AttemptsAmount = m.AttemptsAmount,
+                AttemptsUsed = role == "Student" ? attemptSummary?.Count ?? 0 : null,
+                HasActiveAttempt = role == "Student" ? attemptSummary?.HasActiveAttempt ?? false : null
             };
         }).ToList();
 

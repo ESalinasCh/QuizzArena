@@ -16,4 +16,6 @@ public class Quiz
     public DateTimeOffset? DeletedAt { get; set; }
 
     internal ICollection<QuizQuestion> QuizQuestions { get; set; } = [];
+
+    public Guid? TeacherId { get; set; }
 }

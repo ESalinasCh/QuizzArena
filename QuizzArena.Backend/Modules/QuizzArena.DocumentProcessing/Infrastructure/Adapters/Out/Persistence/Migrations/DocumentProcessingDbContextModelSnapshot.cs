@@ -35,6 +35,9 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("CompressedFileUrl")
+                        .HasColumnType("text");
+
                     b.Property<Guid>("CourseId")
                         .HasColumnType("uuid")
                         .HasColumnName("course_id");
@@ -64,8 +67,7 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.Out.Persistence.
                         .HasColumnType("document_processing.source_status");
 
                     b.Property<string>("TranscriptUrl")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<SourceType>("Type")
                         .HasColumnType("document_processing.source_type");
