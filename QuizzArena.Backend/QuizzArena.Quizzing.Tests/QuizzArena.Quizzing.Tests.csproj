@@ -26,4 +26,11 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <!-- GenerateQuizConsumer reads MockData/quiz.json from AppContext.BaseDirectory in Development. -->
+  <ItemGroup>
+    <None Update="MockData\quiz.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

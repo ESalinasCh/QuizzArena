@@ -37,4 +37,9 @@ public static class ClaimsPrincipalExtensions
     {
         return user.GetClaimRole().ToString();
     }
+
+    public static string GetFullName(this ClaimsPrincipal user)
+    {
+        return user.GetClaim("name");
+    }
 }

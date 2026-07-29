@@ -11,4 +11,5 @@ internal sealed class CurrentUserUseCase(IHttpContextAccessor accessor) : ICurre
     public string UserId => User.GetUserId();
     public string UserName => User.GetUserName();
     public string Role => User.GetRole();
+    public string FullName => User.GetFullName();
 }
