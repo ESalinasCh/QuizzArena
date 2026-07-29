@@ -1,5 +1,4 @@
-﻿using QuizzArena.Quizzing.Application.Filters;
-using QuizzArena.Quizzing.Application.Ports.In.MatchAttempt;
+﻿using QuizzArena.Quizzing.Application.Ports.In.MatchAttempt;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Domain.Entities;
 

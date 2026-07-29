@@ -1,5 +1,4 @@
 ﻿using Moq;
-using QuizzArena.Quizzing.Application.Filters;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Application.UseCases.MatchAttemptUseCases;
 using QuizzArena.Quizzing.Domain.Entities;
