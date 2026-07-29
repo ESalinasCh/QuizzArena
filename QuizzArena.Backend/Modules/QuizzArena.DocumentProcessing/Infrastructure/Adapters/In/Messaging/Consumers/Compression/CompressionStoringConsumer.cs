@@ -16,7 +16,8 @@ public partial class CompressionStoringConsumer(
     {
         CompressionStoringCommand command = context.Message;
 
-        try {
+        try
+        {
             LogStarted(logger, command.ClassSourceId, command.CompressedFileUrl);
 
             ClassSource? classSource = await classSourceRepository.GetByIdAsync(command.ClassSourceId) ??

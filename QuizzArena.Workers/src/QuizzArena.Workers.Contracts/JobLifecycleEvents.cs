@@ -1,4 +1,4 @@
-namespace QuizzArena.Workers.Contracts;
+﻿namespace QuizzArena.Workers.Contracts;
 
 /// <summary>
 /// Evento genérico de finalización exitosa. Se reutiliza para CUALQUIER tipo de job,

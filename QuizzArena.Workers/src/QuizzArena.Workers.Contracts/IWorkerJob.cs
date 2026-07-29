@@ -1,4 +1,4 @@
-namespace QuizzArena.Workers.Contracts;
+﻿namespace QuizzArena.Workers.Contracts;
 
 /// <summary>
 /// Contrato base que debe implementar cualquier evento de "trabajo" que este

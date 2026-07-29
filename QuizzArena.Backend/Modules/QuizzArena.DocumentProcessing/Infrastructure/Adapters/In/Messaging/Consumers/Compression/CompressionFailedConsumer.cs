@@ -1,7 +1,6 @@
 ﻿using MassTransit;
 using Microsoft.Extensions.Logging;
 using QuizzArena.DocumentProcessing.Application.Messaging.Commands.Compression;
-using QuizzArena.DocumentProcessing.Application.Messaging.Commands.Ingestion;
 using QuizzArena.DocumentProcessing.Application.Ports.Out;
 using QuizzArena.DocumentProcessing.Domain.Entities;
 using QuizzArena.DocumentProcessing.Domain.Enums;
@@ -17,7 +16,8 @@ internal partial class CompressionFailedConsumer(
     {
         CompressionFailedCommand command = context.Message;
 
-        try {
+        try
+        {
             LogStarted(logger, command.ClassSourceId, SourceStatus.Failed);
 
             ClassSource? classSource = await classSourceRepository.GetByIdAsync(command.ClassSourceId);
@@ -29,7 +29,7 @@ internal partial class CompressionFailedConsumer(
 
             classSource.Status = SourceStatus.Failed;
             await classSourceRepository.UpdateAsync(classSource);
-            LogUpdate(logger, command.ClassSourceId, classSource.Status);   
+            LogUpdate(logger, command.ClassSourceId, classSource.Status);
         }
         catch (Exception ex)
         {
