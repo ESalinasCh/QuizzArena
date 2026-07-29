@@ -62,12 +62,19 @@ public class ResetMatchAttemptUseCaseTests
         Guid matchId = Guid.NewGuid();
         Guid userId = Guid.NewGuid();
 
+        Domain.Entities.Match match = new Domain.Entities.Match
+        {
+            Id = matchId,
+            TimeMinutes = 30,
+            AttemptsAmount = 3,
+        };
+
         _mockMatchRepository
             .Setup(r => r.GetMatchByIdAsync(matchId))
-            .ReturnsAsync(new Domain.Entities.Match());
+            .ReturnsAsync(match);
 
         _mockMatchAttemptRepository
-            .Setup(r => r.GetAttemptsByUserIds(matchId, It.IsAny<List<Guid>>()))
+            .Setup(r => r.GetAttemptsByUserIds(match.Id, It.IsAny<List<Guid>>()))
             .ReturnsAsync([]);
 
         // Act & Assert
@@ -87,9 +94,16 @@ public class ResetMatchAttemptUseCaseTests
         Guid matchId = Guid.NewGuid();
         Guid userId = Guid.NewGuid();
 
+        Domain.Entities.Match match = new Domain.Entities.Match
+        {
+            Id = matchId,
+            TimeMinutes = 30,
+            AttemptsAmount = 3,
+        };
+
         _mockMatchRepository
             .Setup(r => r.GetMatchByIdAsync(matchId))
-            .ReturnsAsync(new Domain.Entities.Match());
+            .ReturnsAsync(match);
 
         List<MatchAttempt> attempts =
         [
@@ -98,11 +112,11 @@ public class ResetMatchAttemptUseCaseTests
         ];
 
         _mockMatchAttemptRepository
-            .Setup(r => r.GetAttemptsByUserIds(matchId, It.IsAny<List<Guid>>()))
+            .Setup(r => r.GetAttemptsByUserIds(match.Id, It.IsAny<List<Guid>>()))
             .ReturnsAsync(attempts);
 
         // Act
-        await _useCase.Execute(matchId, userId);
+        await _useCase.Execute(match.Id, userId);
 
         // Assert
         foreach (MatchAttempt attempt in attempts)
