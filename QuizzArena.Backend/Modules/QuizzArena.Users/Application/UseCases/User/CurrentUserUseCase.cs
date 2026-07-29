@@ -10,4 +10,5 @@ internal sealed class CurrentUserUseCase(IHttpContextAccessor accessor) : ICurre
     private ClaimsPrincipal User => accessor.HttpContext?.User ?? throw new UnauthorizedAccessException();
     public string UserId => User.GetUserId();
     public string Role => User.GetRole();
+    public string FullName => User.GetFullName();
 }
