@@ -18,4 +18,5 @@ public interface IMatchAttemptRepository
     Task<int> GetMatchAttemptCountByMatchIdAndStatusAsync(Guid matchId, QuizAttemptStatus status);
     Task UpdateMatchAttempts(List<MatchAttempt> matchAttempts);
     Task<Dictionary<Guid, MatchAttemptSummaryDto>> GetAttemptSummariesByMatchIdsAndUserIdAsync(List<Guid> matchIds, Guid userId);
+    Task<MatchAttempt?> GetPendingMatchAttemptByIdAsync(Guid matchId, Guid userId);
 }

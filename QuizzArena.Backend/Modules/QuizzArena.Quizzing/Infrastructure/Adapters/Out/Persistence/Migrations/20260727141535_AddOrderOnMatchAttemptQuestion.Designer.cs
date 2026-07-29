@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using QuizzArena.Quizzing.Domain.Enums;
@@ -12,9 +13,11 @@ using QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence;
 namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
 {
     [DbContext(typeof(QuizzingDbContext))]
-    partial class QuizzingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260727141535_AddOrderOnMatchAttemptQuestion")]
+    partial class AddOrderOnMatchAttemptQuestion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -46,6 +49,9 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                     b.Property<Guid>("MatchAttemptId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("OptionId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("QuestionId")
                         .HasColumnType("uuid");
 
@@ -55,6 +61,8 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("MatchAttemptId");
+
+                    b.HasIndex("OptionId");
 
                     b.HasIndex("QuestionId");
 
@@ -424,6 +432,12 @@ namespace QuizzArena.Quizzing.Infrastructure.Adapters.Out.Persistence.Migrations
                         .WithMany("Answers")
                         .HasForeignKey("MatchAttemptId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QuizzArena.Quizzing.Domain.Entities.Option", null)
+                        .WithMany()
+                        .HasForeignKey("OptionId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("QuizzArena.Quizzing.Domain.Entities.Question", null)

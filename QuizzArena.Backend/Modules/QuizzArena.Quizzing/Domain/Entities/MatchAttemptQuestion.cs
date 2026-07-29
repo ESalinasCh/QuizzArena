@@ -7,6 +7,7 @@ public class MatchAttemptQuestion
     public decimal? ValueScore { get; set; }
     public Guid MatchAttemptId { get; set; }
     public Guid QuestionId { get; set; }
+    public int Order { get; set; }
 
     public MatchAttempt? MatchAttempt { get; set; }
     public Question? Question { get; set; }

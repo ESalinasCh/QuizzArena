@@ -1,4 +1,5 @@
-﻿using QuizzArena.Quizzing.Application.DTOs.MatchAttempt;
+﻿using AutoMapper;
+using QuizzArena.Quizzing.Application.DTOs.MatchAttempt;
 using QuizzArena.Quizzing.Application.DTOs.Option;
 using QuizzArena.Quizzing.Application.DTOs.Question;
 using QuizzArena.Quizzing.Application.Ports.In.MatchAttempt;
@@ -18,6 +19,7 @@ public sealed class StartAttemptUseCase(
     IQuizRepository quizRepository,
     IQuizQuestionRepository quizQuestionRepository,
     IMatchAttemptRepository matchAttemptRepository,
+    IMapper mapper,
     Random? random = null
 ) : IStartAttemptUseCase
 {
@@ -26,6 +28,7 @@ public sealed class StartAttemptUseCase(
         var now = DateTimeOffset.UtcNow;
 
         Guid userId = Guid.Parse(currentUser.UserId);
+        string userName = currentUser.UserName;
         List<CourseSummaryDTO> courses = await courseImpl.GetCoursesByStudent(userId);
         List<Guid> coursesIds = courses.Select(c => c.Id).ToList();
 
@@ -50,16 +53,24 @@ public sealed class StartAttemptUseCase(
             throw new InvalidOperationException("Match has expired");
         }
 
+        bool isAnyOtherAttemptInProgress = await matchAttemptRepository.HasActiveAttemptByMatchIdAsync(match.Id, userId);
+        if (isAnyOtherAttemptInProgress && match.Mode == MatchMode.Exam)
+        {
+            MatchAttempt? pendingMatchAttempt = await matchAttemptRepository.GetPendingMatchAttemptByIdAsync(match.Id, userId) ?? throw new InvalidOperationException("No pending attempt found for this match.");
+            StartAttemptResponseDto response = mapper.Map<StartAttemptResponseDto>(pendingMatchAttempt);
+            response.Questions = mapper.Map<List<StartAttemptQuestionResponseDto>>(pendingMatchAttempt.MatchAttemptQuestions.OrderBy(q => q.Order).ToList());
+
+            return response;
+        }
+        else if (isAnyOtherAttemptInProgress && match.Mode != MatchMode.Exam)
+        {
+            throw new ActiveAttemptExistsException();
+        }
+
         int totalAttempts = await matchAttemptRepository.GetMatchAttemptCountByMatchIdAndUserIdAsync(match.Id, userId);
         if (totalAttempts >= match.AttemptsAmount)
         {
             throw new MaxAttemptsReachedException();
-        }
-
-        bool isAnyOtherAttemptInProgress = await matchAttemptRepository.HasActiveAttemptByMatchIdAsync(match.Id, userId);
-        if (isAnyOtherAttemptInProgress)
-        {
-            throw new ActiveAttemptExistsException();
         }
 
         Quiz quiz = await quizRepository.GetByIdAsync(match.QuizId) ?? throw new InvalidOperationException("No quiz and questions were found for this match.");
@@ -104,35 +115,23 @@ public sealed class StartAttemptUseCase(
             UserId = userId,
             StartDateTime = DateTimeOffset.UtcNow,
             JoinedAt = DateTimeOffset.UtcNow,
-            Nickname = currentUser.FullName,
+            Nickname = userName,
             Score = 0,
-            MatchAttemptQuestions = questions.Select(q => new MatchAttemptQuestion
+            MatchAttemptQuestions = questions.Select((q, index) => new MatchAttemptQuestion
             {
                 Id = Guid.NewGuid(),
                 QuestionId = q.Question.Id,
                 ValueScore = q.ValueScore,
-                MatchAttemptId = matchAttemptId
+                MatchAttemptId = matchAttemptId,
+                Order = index
             }).ToList()
         };
 
         MatchAttempt addedMatchAttempt = await matchAttemptRepository.AddMatchAttemptAsync(matchAttempt);
 
-        StartAttemptResponseDto AttemptQuestions = new StartAttemptResponseDto()
-        {
-            MatchId = match.Id,
-            MatchAttemptId = addedMatchAttempt.Id,
-            Questions = questions.Select(q => new StartAttemptQuestionResponseDto()
-            {
-                Id = q.Question.Id,
-                Statement = q.Question.Content,
-                QuestionType = q.Question.Type,
-                Options = q.Question.Options.Select(o => new StartAttemptOptionResponseDto()
-                {
-                    Id = o.Id,
-                    Label = o.Description
-                }).ToList()
-            }).ToList()
-        };
+        StartAttemptResponseDto AttemptQuestions = mapper.Map<StartAttemptResponseDto>(addedMatchAttempt);
+
+        AttemptQuestions.Questions = mapper.Map<List<StartAttemptQuestionResponseDto>>(questions);
 
         return AttemptQuestions;
     }

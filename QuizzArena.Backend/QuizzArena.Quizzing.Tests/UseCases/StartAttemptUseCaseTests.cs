@@ -1,5 +1,7 @@
-﻿using Moq;
+﻿using AutoMapper;
+using Moq;
 using QuizzArena.Quizzing.Application.DTOs.MatchAttempt;
+using QuizzArena.Quizzing.Application.DTOs.Option;
 using QuizzArena.Quizzing.Application.DTOs.Question;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Application.UseCases.MatchAttemptUseCases;
@@ -19,17 +21,32 @@ public class StartAttemptUseCaseTests
     private readonly Mock<IQuizRepository> _mockQuizRepository;
     private readonly Mock<IQuizQuestionRepository> _mockQuizQuestionRepository;
     private readonly Mock<IMatchAttemptRepository> _mockMatchAttemptRepository;
+    private readonly Mock<IMapper> _mockMapper;
 
     private readonly StartAttemptUseCase _useCase;
 
     public StartAttemptUseCaseTests()
     {
         _mockCurrentUser = new Mock<ICurrentUser>();
+        _mockCurrentUser.Setup(c => c.UserName).Returns("TestUser");
+
         _mockCourseImpl = new Mock<ICourseContract>();
         _mockMatchRepository = new Mock<IMatchRepository>();
         _mockQuizRepository = new Mock<IQuizRepository>();
         _mockQuizQuestionRepository = new Mock<IQuizQuestionRepository>();
         _mockMatchAttemptRepository = new Mock<IMatchAttemptRepository>();
+
+        _mockMapper = new Mock<IMapper>();
+        _mockMapper.Setup(m => m.Map<StartAttemptResponseDto>(It.IsAny<MatchAttempt>()))
+            .Returns((MatchAttempt ma) => new StartAttemptResponseDto { MatchId = ma.MatchId, MatchAttemptId = ma.Id, Questions = new List<StartAttemptQuestionResponseDto>() });
+
+        _mockMapper.Setup(m => m.Map<List<StartAttemptQuestionResponseDto>>(It.IsAny<List<AugmentedQuestionDto>>()))
+            .Returns((List<AugmentedQuestionDto> q) => q.Select(x => new StartAttemptQuestionResponseDto
+            {
+                Id = x.Question.Id,
+                Statement = x.Question.Content,
+                Options = x.Question.Options?.Select(o => new StartAttemptOptionResponseDto { Id = o.Id, Label = o.Description }).ToList() ?? new List<StartAttemptOptionResponseDto>()
+            }).ToList());
 
         _useCase = new StartAttemptUseCase(
             _mockCurrentUser.Object,
@@ -37,7 +54,8 @@ public class StartAttemptUseCaseTests
             _mockMatchRepository.Object,
             _mockQuizRepository.Object,
             _mockQuizQuestionRepository.Object,
-            _mockMatchAttemptRepository.Object
+            _mockMatchAttemptRepository.Object,
+            _mockMapper.Object
         );
     }
 
@@ -109,6 +127,7 @@ public class StartAttemptUseCaseTests
         Assert.Equal("Maximum number of attempts reached for this match.", ex.Message);
     }
 
+
     [Fact]
     public async Task Execute_UserHasActiveAttempt_ThrowsException()
     {
@@ -118,7 +137,7 @@ public class StartAttemptUseCaseTests
         var course = new CourseSummaryDTO { Id = Guid.NewGuid() };
         _mockCourseImpl.Setup(c => c.GetCoursesByStudent(Guid.Parse(userId))).ReturnsAsync(new List<CourseSummaryDTO> { course });
 
-        var match = new Domain.Entities.Match { Id = Guid.NewGuid(), CourseId = course.Id, Status = MatchStatus.Active, AttemptsAmount = 2 };
+        var match = new Domain.Entities.Match { Id = Guid.NewGuid(), CourseId = course.Id, Status = MatchStatus.Active, AttemptsAmount = 2, Mode = MatchMode.Solo };
         _mockMatchRepository.Setup(m => m.GetMatchByIdAsync(It.IsAny<Guid>())).ReturnsAsync(match);
         _mockMatchAttemptRepository.Setup(r => r.GetMatchAttemptCountByMatchIdAndUserIdAsync(match.Id, Guid.Parse(userId))).ReturnsAsync(0);
         _mockMatchAttemptRepository.Setup(r => r.HasActiveAttemptByMatchIdAsync(match.Id, Guid.Parse(userId))).ReturnsAsync(true);
@@ -128,6 +147,60 @@ public class StartAttemptUseCaseTests
         // Act & Assert
         var ex = await Assert.ThrowsAsync<ActiveAttemptExistsException>(() => _useCase.Execute(request));
         Assert.Equal("User already has an active attempt for this match.", ex.Message);
+    }
+
+    [Fact]
+    public async Task Execute_UserHasActiveExamAttempt_ReturnsPendingAttempt()
+    {
+        // Arrange
+        string userId = Guid.NewGuid().ToString();
+        _mockCurrentUser.Setup(c => c.UserId).Returns(userId);
+
+        var course = new CourseSummaryDTO { Id = Guid.NewGuid() };
+        _mockCourseImpl.Setup(c => c.GetCoursesByStudent(Guid.Parse(userId))).ReturnsAsync(new List<CourseSummaryDTO> { course });
+
+        var match = new Domain.Entities.Match { Id = Guid.NewGuid(), CourseId = course.Id, Status = MatchStatus.Active, AttemptsAmount = 2, Mode = MatchMode.Exam };
+
+        _mockMatchRepository.Setup(m => m.GetMatchByIdAsync(It.IsAny<Guid>())).ReturnsAsync(match);
+
+        _mockMatchAttemptRepository.Setup(r => r.GetMatchAttemptCountByMatchIdAndUserIdAsync(match.Id, Guid.Parse(userId))).ReturnsAsync(0);
+
+        _mockMatchAttemptRepository.Setup(r => r.HasActiveAttemptByMatchIdAsync(match.Id, Guid.Parse(userId))).ReturnsAsync(true);
+
+        var pendingAttempt = new MatchAttempt
+        {
+            Id = Guid.NewGuid(),
+            MatchId = match.Id,
+            UserId = Guid.Parse(userId),
+            MatchAttemptQuestions = new List<MatchAttemptQuestion>()
+        };
+
+        _mockMatchAttemptRepository.Setup(r => r.GetPendingMatchAttemptByIdAsync(match.Id, Guid.Parse(userId))).ReturnsAsync(pendingAttempt);
+
+        var expectedResponse = new StartAttemptResponseDto
+        {
+            MatchAttemptId = pendingAttempt.Id,
+            MatchId = match.Id,
+            Questions = new List<StartAttemptQuestionResponseDto>(),
+            AnsweredQuestions = 0,
+            TotalQuestions = 3
+        };
+
+        _mockMapper.Setup(m => m.Map<StartAttemptResponseDto>(pendingAttempt)).Returns(expectedResponse);
+
+        _mockMapper.Setup(m => m.Map<List<StartAttemptQuestionResponseDto>>(It.IsAny<List<MatchAttemptQuestion>>())).Returns(new List<StartAttemptQuestionResponseDto>());
+
+        var request = new StartAttemptRequestDto { MatchId = match.Id };
+
+        // Act
+        var result = await _useCase.Execute(request);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(expectedResponse.MatchAttemptId, result.MatchAttemptId);
+        Assert.Equal(expectedResponse.MatchId, result.MatchId);
+
+        _mockMatchAttemptRepository.Verify(r => r.GetPendingMatchAttemptByIdAsync(match.Id, Guid.Parse(userId)), Times.Once);
     }
 
     [Fact]
@@ -309,6 +382,7 @@ public class StartAttemptUseCaseTests
             _mockQuizRepository.Object,
             _mockQuizQuestionRepository.Object,
             _mockMatchAttemptRepository.Object,
+            _mockMapper.Object,
             seededRandom1
         );
 
@@ -319,6 +393,7 @@ public class StartAttemptUseCaseTests
             _mockQuizRepository.Object,
             _mockQuizQuestionRepository.Object,
             _mockMatchAttemptRepository.Object,
+            _mockMapper.Object,
             seededRandom2
         );
 
@@ -379,6 +454,7 @@ public class StartAttemptUseCaseTests
             _mockQuizRepository.Object,
             _mockQuizQuestionRepository.Object,
             _mockMatchAttemptRepository.Object,
+            _mockMapper.Object,
             seededRandom1
         );
 
@@ -389,6 +465,7 @@ public class StartAttemptUseCaseTests
             _mockQuizRepository.Object,
             _mockQuizQuestionRepository.Object,
             _mockMatchAttemptRepository.Object,
+            _mockMapper.Object,
             seededRandom2
         );
 
@@ -457,6 +534,7 @@ public class StartAttemptUseCaseTests
             _mockQuizRepository.Object,
             _mockQuizQuestionRepository.Object,
             _mockMatchAttemptRepository.Object,
+            _mockMapper.Object,
             seededRandom1
         );
 
@@ -467,6 +545,7 @@ public class StartAttemptUseCaseTests
             _mockQuizRepository.Object,
             _mockQuizQuestionRepository.Object,
             _mockMatchAttemptRepository.Object,
+            _mockMapper.Object,
             seededRandom2
         );
 
