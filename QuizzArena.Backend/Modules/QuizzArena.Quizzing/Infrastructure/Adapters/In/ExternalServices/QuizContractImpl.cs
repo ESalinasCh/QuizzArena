@@ -21,6 +21,7 @@ public class QuizContract(
             Status = QuizStatus.draft,
             Origin = QuizOrigin.AiGenerated,
             Deleted = false,
+            TeacherId = quizRequestDto.TeacherId,
             QuizQuestions = quizRequestDto.Questions.Select(q => new QuizQuestion()
             {
                 Id = Guid.NewGuid(),
