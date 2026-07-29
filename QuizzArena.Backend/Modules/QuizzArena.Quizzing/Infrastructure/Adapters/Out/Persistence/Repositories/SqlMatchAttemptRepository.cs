@@ -160,4 +160,16 @@ internal sealed class SqlMatchAttemptRepository(QuizzingDbContext context) : IMa
             })
             .ToDictionaryAsync(x => x.MatchId, x => x.Summary);
     }
+
+    public async Task<MatchAttempt?> GetPendingMatchAttemptByIdAsync(Guid matchId, Guid userId)
+    {
+        return await context.MatchAttempts
+            .AsNoTracking()
+            .Where(x => x.MatchId == matchId && x.UserId == userId && x.Status == QuizAttemptStatus.InProgress && !x.Deleted)
+            .Include(x => x.Answers)
+            .Include(x => x.MatchAttemptQuestions)
+                .ThenInclude(x => x.Question!)
+                    .ThenInclude(x => x.Options)
+            .FirstOrDefaultAsync();
+    }
 }
