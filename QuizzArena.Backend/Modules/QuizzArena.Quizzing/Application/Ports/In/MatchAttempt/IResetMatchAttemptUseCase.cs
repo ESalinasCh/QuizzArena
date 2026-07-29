@@ -2,5 +2,5 @@
 
 public interface IResetMatchAttemptUseCase
 {
-    Task Execute(Guid userId);
+    Task Execute(Guid matchId, Guid userId);
 }

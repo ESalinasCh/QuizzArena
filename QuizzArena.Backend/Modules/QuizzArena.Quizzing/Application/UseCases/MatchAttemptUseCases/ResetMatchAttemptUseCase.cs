@@ -1,27 +1,24 @@
-﻿using QuizzArena.Quizzing.Application.Filters;
-using QuizzArena.Quizzing.Application.Ports.In.MatchAttempt;
+﻿using QuizzArena.Quizzing.Application.Ports.In.MatchAttempt;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Domain.Entities;
 
 namespace QuizzArena.Quizzing.Application.UseCases.MatchAttemptUseCases;
 
 public class ResetMatchAttemptUseCase(
-    IMatchAttemptRepository matchAttemptRepository
+    IMatchAttemptRepository matchAttemptRepository,
+    IMatchRepository matchRepository
 ) : IResetMatchAttemptUseCase
 {
-    public async Task Execute(Guid userId)
+    public async Task Execute(Guid matchId, Guid userId)
     {
         if (userId == Guid.Empty)
         {
             throw new ArgumentException("User ID cannot be empty.", nameof(userId));
         }
 
-        MatchAttemptFilters filters = new MatchAttemptFilters
-        {
-            Page = 1,
-            PageSize = 10
-        };
-        List<MatchAttempt> matchAttempts = await matchAttemptRepository.GetAttemptsByStudentId(userId, filters);
+        Match? match = await matchRepository.GetMatchByIdAsync(matchId) ?? throw new InvalidOperationException("Match doesn't exist");
+
+        List<MatchAttempt> matchAttempts = await matchAttemptRepository.GetAttemptsByUserIds(match.Id, [userId]);
         if (matchAttempts.Count == 0)
         {
             throw new InvalidOperationException("User does not have any match attempts.");
