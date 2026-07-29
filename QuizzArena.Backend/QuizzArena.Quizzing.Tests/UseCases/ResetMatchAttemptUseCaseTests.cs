@@ -9,15 +9,18 @@ namespace QuizzArena.Quizzing.Tests.UseCases;
 public class ResetMatchAttemptUseCaseTests
 {
     private readonly Mock<IMatchAttemptRepository> _mockMatchAttemptRepository;
+    private readonly Mock<IMatchRepository> _mockMatchRepository;
 
     private readonly ResetMatchAttemptUseCase _useCase;
 
     public ResetMatchAttemptUseCaseTests()
     {
         _mockMatchAttemptRepository = new Mock<IMatchAttemptRepository>();
+        _mockMatchRepository = new Mock<IMatchRepository>();
 
         _useCase = new ResetMatchAttemptUseCase(
-            _mockMatchAttemptRepository.Object
+            _mockMatchAttemptRepository.Object,
+            _mockMatchRepository.Object
         );
     }
 
@@ -25,28 +28,51 @@ public class ResetMatchAttemptUseCaseTests
     public async Task Execute_UserIdIsEmpty_ThrowsArgumentException()
     {
         // Arrange
+        Guid matchId = Guid.NewGuid();
         Guid userId = Guid.Empty;
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<ArgumentException>(
-            () => _useCase.Execute(userId));
+            () => _useCase.Execute(matchId, userId));
 
         Assert.Equal("userId", exception.ParamName);
         Assert.Equal("User ID cannot be empty. (Parameter 'userId')", exception.Message);
     }
 
     [Fact]
-    public async Task Execute_WhenMatchAttemptsAreNull_ThrowsInvalidOperationException()
+    public async Task Execute_WhenMatchDoesNotExist_ThrowsInvalidOperationException()
     {
         // Arrange
+        Guid matchId = Guid.NewGuid();
         Guid userId = Guid.NewGuid();
 
+        _mockMatchRepository
+            .Setup(r => r.GetMatchByIdAsync(matchId))
+            .ReturnsAsync((Domain.Entities.Match?)null);
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _useCase.Execute(matchId, userId));
+
+        Assert.Equal("Match doesn't exist", exception.Message);
+    }
+
+    [Fact]
+    public async Task Execute_WhenMatchAttemptsAreEmpty_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        Guid matchId = Guid.NewGuid();
+        Guid userId = Guid.NewGuid();
+
+        _mockMatchRepository
+            .Setup(r => r.GetMatchByIdAsync(matchId))
+            .ReturnsAsync(new Domain.Entities.Match());
+
         _mockMatchAttemptRepository
-            .Setup(r => r.GetAttemptsByStudentId(userId, It.IsAny<MatchAttemptFilters>()))
+            .Setup(r => r.GetAttemptsByUserIds(matchId, It.IsAny<List<Guid>>()))
             .ReturnsAsync([]);
 
         // Act & Assert
-        InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _useCase.Execute(userId));
+        InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _useCase.Execute(matchId, userId));
 
         Assert.Equal("User does not have any match attempts.", exception.Message);
 
@@ -56,36 +82,15 @@ public class ResetMatchAttemptUseCaseTests
     }
 
     [Fact]
-    public async Task Execute_WhenMatchAttemptsAreEmpty_UpdatesEmptyList()
-    {
-        // Arrange
-        Guid userId = Guid.NewGuid();
-
-        List<MatchAttempt> attempts = new List<MatchAttempt>
-        {
-            new()
-            {
-                Id = Guid.NewGuid(),
-                StartDateTime = DateTimeOffset.UtcNow,
-            }
-        };
-
-        _mockMatchAttemptRepository
-            .Setup(r => r.GetAttemptsByStudentId(userId, It.IsAny<MatchAttemptFilters>()))
-            .ReturnsAsync(attempts);
-
-        // Act
-        await _useCase.Execute(userId);
-
-        // Assert
-        _mockMatchAttemptRepository.Verify(r => r.UpdateMatchAttempts(attempts), Times.Once);
-    }
-
-    [Fact]
     public async Task Execute_WhenMatchAttemptsExist_MarksAllAsDeletedAndUpdatesRepository()
     {
         // Arrange
+        Guid matchId = Guid.NewGuid();
         Guid userId = Guid.NewGuid();
+
+        _mockMatchRepository
+            .Setup(r => r.GetMatchByIdAsync(matchId))
+            .ReturnsAsync(new Domain.Entities.Match());
 
         List<MatchAttempt> attempts =
         [
@@ -94,11 +99,11 @@ public class ResetMatchAttemptUseCaseTests
         ];
 
         _mockMatchAttemptRepository
-            .Setup(r => r.GetAttemptsByStudentId(userId, It.IsAny<MatchAttemptFilters>()))
+            .Setup(r => r.GetAttemptsByUserIds(matchId, It.IsAny<List<Guid>>()))
             .ReturnsAsync(attempts);
 
         // Act
-        await _useCase.Execute(userId);
+        await _useCase.Execute(matchId, userId);
 
         // Assert
         foreach (MatchAttempt attempt in attempts)

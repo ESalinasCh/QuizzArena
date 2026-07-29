@@ -88,11 +88,11 @@ public class MatchAttemptController(
         return Ok(matchAttemptDetail);
     }
 
-    [HttpPost("match-attempts/{userId}/reset")]
+    [HttpPost("matches/{matchId}/users/{userId}/match-attempts/reset")]
     [Authorize(Roles = "teacher")]
-    public async Task<ActionResult<GetMatchAttemptDetailDTO>> ResetMatchAttempt([FromRoute] Guid userId)
+    public async Task<ActionResult<GetMatchAttemptDetailDTO>> ResetMatchAttempt([FromRoute] Guid matchId, [FromRoute] Guid userId)
     {
-        await resetMatchAttemptUseCase.Execute(userId);
+        await resetMatchAttemptUseCase.Execute(matchId, userId);
         return Ok();
     }
 }
