@@ -18,7 +18,7 @@ public class ResetMatchAttemptUseCase(
 
         Match? match = await matchRepository.GetMatchByIdAsync(matchId) ?? throw new InvalidOperationException("Match doesn't exist");
 
-        List<MatchAttempt> matchAttempts = await matchAttemptRepository.GetAttemptsByUserIds(matchId, [userId]);
+        List<MatchAttempt> matchAttempts = await matchAttemptRepository.GetAttemptsByUserIds(match.Id, [userId]);
         if (matchAttempts.Count == 0)
         {
             throw new InvalidOperationException("User does not have any match attempts.");
