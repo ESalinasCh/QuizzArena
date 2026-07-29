@@ -4,6 +4,7 @@ using MassTransit;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using QuizzArena.DocumentProcessing.Application.DTOs.ClassSource;
+using QuizzArena.DocumentProcessing.Application.Messaging.Events.Compression;
 using QuizzArena.DocumentProcessing.Application.Messaging.Events.Indexing;
 using QuizzArena.DocumentProcessing.Application.Messaging.Events.Ingestion;
 using QuizzArena.DocumentProcessing.Application.Ports.Out;
@@ -80,7 +81,8 @@ public class DocumentProcessingUseCasesTests
 
         // Assert
         _mockClassSourceRepository.Verify(r => r.CreateAsync(It.IsAny<ClassSource>()), Times.Once);
-        _mockPublishEndpoint.Verify(p => p.Publish(It.IsAny<TranscriptionRequestEvent>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mockPublishEndpoint.Verify(p => p.Publish(It.IsAny<CompressionRequestEvent>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mockPublishEndpoint.Verify(p => p.Publish(It.IsAny<TranscriptionRequestEvent>(), It.IsAny<CancellationToken>()), Times.Never);
         _mockPublishEndpoint.Verify(p => p.Publish(It.IsAny<TranscriptionCompletedEvent>(), It.IsAny<CancellationToken>()), Times.Never);
         result.Id.Should().Be(classSource.Id);
     }
