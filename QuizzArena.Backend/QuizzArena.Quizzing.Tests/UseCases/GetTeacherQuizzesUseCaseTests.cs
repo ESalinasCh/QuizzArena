@@ -95,6 +95,78 @@ public class GetTeacherQuizzesUseCaseTests
     }
 
     [Fact]
+    public async Task Execute_WithStatus_PassesStatusToRepository()
+    {
+        // Arrange
+        var teacherId = Guid.NewGuid();
+        _mockCurrentUser.Setup(c => c.UserId).Returns(teacherId.ToString());
+        _mockQuizRepo.Setup(r => r.GetByTeacherIdAsync(teacherId, It.IsAny<QuizQueryParametersDto>())).ReturnsAsync([]);
+        _mockMapper.Setup(m => m.Map<List<TeacherQuizResponseDto>>(It.IsAny<List<Quiz>>())).Returns([]);
+
+        // Act
+        await _useCase.Execute(new QuizQueryParametersDto { Status = QuizStatus.published });
+
+        // Assert
+        _mockQuizRepo.Verify(r => r.GetByTeacherIdAsync(
+            teacherId,
+            It.Is<QuizQueryParametersDto>(q => q.Status == QuizStatus.published)), Times.Once);
+    }
+
+    [Fact]
+    public async Task Execute_WithOriginAndStatus_PassesBothToRepository()
+    {
+        // Arrange
+        var teacherId = Guid.NewGuid();
+        _mockCurrentUser.Setup(c => c.UserId).Returns(teacherId.ToString());
+        _mockQuizRepo.Setup(r => r.GetByTeacherIdAsync(teacherId, It.IsAny<QuizQueryParametersDto>())).ReturnsAsync([]);
+        _mockMapper.Setup(m => m.Map<List<TeacherQuizResponseDto>>(It.IsAny<List<Quiz>>())).Returns([]);
+
+        // Act
+        await _useCase.Execute(new QuizQueryParametersDto
+        {
+            Origin = QuizOrigin.ManuallyCreated,
+            Status = QuizStatus.archived
+        });
+
+        // Assert
+        _mockQuizRepo.Verify(r => r.GetByTeacherIdAsync(
+            teacherId,
+            It.Is<QuizQueryParametersDto>(q =>
+                q.Origin == QuizOrigin.ManuallyCreated &&
+                q.Status == QuizStatus.archived)), Times.Once);
+    }
+
+    [Fact]
+    public async Task Execute_NoStatus_PassesNullStatusToRepository()
+    {
+        // Arrange
+        var teacherId = Guid.NewGuid();
+        _mockCurrentUser.Setup(c => c.UserId).Returns(teacherId.ToString());
+        _mockQuizRepo.Setup(r => r.GetByTeacherIdAsync(teacherId, It.IsAny<QuizQueryParametersDto>())).ReturnsAsync([]);
+        _mockMapper.Setup(m => m.Map<List<TeacherQuizResponseDto>>(It.IsAny<List<Quiz>>())).Returns([]);
+
+        // Act
+        await _useCase.Execute(new QuizQueryParametersDto());
+
+        // Assert
+        _mockQuizRepo.Verify(r => r.GetByTeacherIdAsync(
+            teacherId,
+            It.Is<QuizQueryParametersDto>(q => q.Status == null)), Times.Once);
+    }
+
+    [Fact]
+    public async Task Execute_StatusNotInEnum_ThrowsValidationException()
+    {
+        // Arrange
+        _mockCurrentUser.Setup(c => c.UserId).Returns(Guid.NewGuid().ToString());
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ValidationException>(
+            () => _useCase.Execute(new QuizQueryParametersDto { Status = (QuizStatus)99 }));
+        _mockQuizRepo.Verify(r => r.GetByTeacherIdAsync(It.IsAny<Guid>(), It.IsAny<QuizQueryParametersDto>()), Times.Never);
+    }
+
+    [Fact]
     public async Task Execute_DefaultQuery_PassesDefaultPaginationToRepository()
     {
         // Arrange

@@ -12,6 +12,11 @@ public class QuizQueryParametersValidator : AbstractValidator<QuizQueryParameter
             .When(x => x.Origin.HasValue)
             .WithMessage("Invalid quiz origin.");
 
+        RuleFor(x => x.Status)
+            .IsInEnum()
+            .When(x => x.Status.HasValue)
+            .WithMessage("Invalid quiz status.");
+
         RuleFor(x => x.Page)
             .GreaterThanOrEqualTo(1)
             .WithMessage("Page must be greater than or equal to 1.");

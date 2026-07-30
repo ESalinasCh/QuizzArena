@@ -6,4 +6,5 @@ namespace QuizzArena.Quizzing.Application.DTOs.Quiz;
 public record QuizQueryParametersDto : PagedRequest
 {
     public QuizOrigin? Origin { get; set; }
+    public QuizStatus? Status { get; set; }
 }
