@@ -68,7 +68,7 @@ public sealed class StartAttemptUseCase(
         }
 
         int totalAttempts = await matchAttemptRepository.GetMatchAttemptCountByMatchIdAndUserIdAsync(match.Id, userId);
-        if (totalAttempts >= match.AttemptsAmount)
+        if (totalAttempts >= match.AttemptsAmount && match.Mode == MatchMode.Exam)
         {
             throw new MaxAttemptsReachedException();
         }

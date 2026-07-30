@@ -116,7 +116,7 @@ public class StartAttemptUseCaseTests
         var course = new CourseSummaryDTO { Id = Guid.NewGuid() };
         _mockCourseImpl.Setup(c => c.GetCoursesByStudent(Guid.Parse(userId))).ReturnsAsync(new List<CourseSummaryDTO> { course });
 
-        var match = new Domain.Entities.Match { Id = Guid.NewGuid(), CourseId = course.Id, Status = MatchStatus.Active, AttemptsAmount = 1 };
+        var match = new Domain.Entities.Match { Id = Guid.NewGuid(), CourseId = course.Id, Status = MatchStatus.Active, AttemptsAmount = 1, Mode = MatchMode.Exam };
         _mockMatchRepository.Setup(m => m.GetMatchByIdAsync(It.IsAny<Guid>())).ReturnsAsync(match);
         _mockMatchAttemptRepository.Setup(r => r.GetMatchAttemptCountByMatchIdAndUserIdAsync(match.Id, Guid.Parse(userId))).ReturnsAsync(1);
 
