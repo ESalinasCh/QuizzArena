@@ -8,6 +8,7 @@ using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Application.Validators.Quiz;
 using QuizzArena.Quizzing.Domain.Entities;
 using QuizzArena.Quizzing.Domain.Enums;
+using Shared.Contracts;
 
 namespace QuizzArena.Quizzing.Application.UseCases.QuizUseCases;
 
@@ -15,7 +16,8 @@ public class CreateExamUseCase(
     IQuestionRepository questionRepository,
     IQuizRepository repository,
     IMapper mapper,
-    CreateExamDtoValidator createValidator
+    CreateExamDtoValidator createValidator,
+    ICurrentUser currentUser
     ) : ICreateExamUseCase
 {
     public async Task<CreateQuizResponseDto> Execute(CreateExamDto dto)
@@ -35,6 +37,7 @@ public class CreateExamUseCase(
         Quiz quiz = mapper.Map<Quiz>(dto);
 
         quiz.Origin = QuizOrigin.ManuallyCreated;
+        quiz.TeacherId = Guid.Parse(currentUser.UserId);
 
         quiz.QuizQuestions = questions
             .Select((question, index) => new QuizQuestion

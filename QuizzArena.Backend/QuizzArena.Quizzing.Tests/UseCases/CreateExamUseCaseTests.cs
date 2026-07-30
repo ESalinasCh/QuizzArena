@@ -8,6 +8,7 @@ using QuizzArena.Quizzing.Application.UseCases.QuizUseCases;
 using QuizzArena.Quizzing.Application.Validators.Quiz;
 using QuizzArena.Quizzing.Domain.Entities;
 using QuizzArena.Quizzing.Domain.Enums; // QuizStatus used in BuildValidDto
+using Shared.Contracts;
 
 namespace QuizzArena.Quizzing.Tests.UseCases;
 
@@ -17,12 +18,14 @@ public class CreateExamUseCaseTests
     private readonly Mock<IQuestionRepository> _mockQuestionRepository;
     private readonly Mock<IQuizRepository> _mockQuizRepository;
     private readonly Mock<IMapper> _mockMapper;
+    private readonly Mock<ICurrentUser> _mockCurrentUser;
 
     // Real
     private readonly CreateExamDtoValidator _validator;
 
     // Target
     private readonly CreateExamUseCase _useCase;
+    private readonly Guid _teacherId = Guid.NewGuid();
 
     public CreateExamUseCaseTests()
     {
@@ -30,13 +33,17 @@ public class CreateExamUseCaseTests
         _mockQuizRepository = new Mock<IQuizRepository>();
         _mockMapper = new Mock<IMapper>();
 
+        _mockCurrentUser = new Mock<ICurrentUser>();
+        _mockCurrentUser.Setup(u => u.UserId).Returns(_teacherId.ToString());
+
         _validator = new CreateExamDtoValidator();
 
         _useCase = new CreateExamUseCase(
             _mockQuestionRepository.Object,
             _mockQuizRepository.Object,
             _mockMapper.Object,
-            _validator
+            _validator,
+            _mockCurrentUser.Object
         );
     }
 
@@ -125,6 +132,35 @@ public class CreateExamUseCaseTests
             r => r.GetActiveByIdsAsync(It.Is<List<Guid>>(ids =>
                 ids.Contains(q1) && ids.Contains(q2))),
             Times.Once);
+    }
+
+    [Fact]
+    public async Task Execute_ValidDto_SetsTeacherIdFromCurrentUser()
+    {
+        // Arrange
+        Guid q1 = Guid.NewGuid();
+        CreateExamDto dto = BuildValidDto(q1);
+
+        _mockQuestionRepository
+            .Setup(r => r.GetActiveByIdsAsync(It.IsAny<List<Guid>>()))
+            .ReturnsAsync([new Question { Id = q1 }]);
+
+        _mockMapper.Setup(m => m.Map<Quiz>(dto)).Returns(new Quiz { Id = Guid.NewGuid() });
+
+        Quiz? persistedQuiz = null;
+        _mockQuizRepository
+            .Setup(r => r.CreateAsync(It.IsAny<Quiz>()))
+            .Callback<Quiz>(q => persistedQuiz = q)
+            .ReturnsAsync(new Quiz());
+
+        _mockMapper.Setup(m => m.Map<CreateQuizResponseDto>(It.IsAny<Quiz>()))
+            .Returns(new CreateQuizResponseDto());
+
+        // Act
+        await _useCase.Execute(dto);
+
+        // Assert
+        Assert.Equal(_teacherId, persistedQuiz?.TeacherId);
     }
 
     [Fact]
