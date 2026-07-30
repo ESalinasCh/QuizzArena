@@ -30,6 +30,11 @@ internal sealed class SqlQuizQueriesRepository(
             q = q.Where(quiz => quiz.Title.Contains(search, StringComparison.OrdinalIgnoreCase));
         }
 
+        if (query.Status is not null)
+        {
+            q = q.Where(quiz => quiz.Status == query.Status);
+        }
+
         return await q
             .OrderByDescending(quiz => quiz.CreatedAt)
             .Paginate(query.Page, query.PageSize)
