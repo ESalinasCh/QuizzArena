@@ -3,8 +3,8 @@ using FluentValidation;
 using MassTransit;
 using QuizzArena.DocumentProcessing.Application.DTOs.ClassSource;
 using QuizzArena.DocumentProcessing.Application.Helpers;
+using QuizzArena.DocumentProcessing.Application.Messaging.Events.Compression;
 using QuizzArena.DocumentProcessing.Application.Messaging.Events.Indexing;
-using QuizzArena.DocumentProcessing.Application.Messaging.Events.Ingestion;
 using QuizzArena.DocumentProcessing.Application.Ports.In;
 using QuizzArena.DocumentProcessing.Application.Ports.Out;
 using QuizzArena.DocumentProcessing.Application.Validators;
@@ -63,7 +63,7 @@ public class UploadSourceUseCase(
         }
         else
         {
-            await publishEnpoint.Publish(new TranscriptionRequestEvent
+            await publishEnpoint.Publish(new CompressionRequestEvent
             {
                 ClassSourceId = createdClass.Id,
                 FileUrl = createdClass.FileUrl!

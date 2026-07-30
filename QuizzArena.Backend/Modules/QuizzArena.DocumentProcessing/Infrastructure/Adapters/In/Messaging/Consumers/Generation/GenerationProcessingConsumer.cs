@@ -22,6 +22,7 @@ namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Con
 
 public partial class GenerationProcessingConsumer(
     IDocumentChunkRepository documentChunkRepository,
+    IClassSourceRepository classSourceRepository,
     IEmbeddingService embeddingGenerationService,
     ITextGenerationService textGenerationService,
     IQuizContract quizContract,
@@ -225,6 +226,10 @@ public partial class GenerationProcessingConsumer(
                 }).ToList()
             );
 
+            // Obtener el teacherId del classource:
+            ClassSource? classSource = await classSourceRepository.GetByIdAsync(command.ClassSourceId) ?? throw new InvalidOperationException($"ClassSource with ID {command.ClassSourceId} not found.");
+            Guid teacherId = classSource.UserId;
+
             // quizTitle/quizDescription nunca son null en este punto: si survivingQuestions.Count > 0,
             // necesariamente algún fragmento pasó por la asignación de 4b/4c.
             Guid quizId = await quizContract.CreateQuiz(new QuizCreationRequestDTO
@@ -232,6 +237,7 @@ public partial class GenerationProcessingConsumer(
                 Id = Guid.NewGuid(),
                 Title = quizTitle!,
                 Description = quizDescription!,
+                TeacherId = teacherId,
                 Questions = createdQuestionIds.Select((questionId, index) => new QuizQuestionRequestDTO
                 {
                     QuestionId = questionId,

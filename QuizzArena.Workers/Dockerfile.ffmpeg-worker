@@ -1,0 +1,12 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+COPY src/QuizzArena.Workers.Contracts/ src/QuizzArena.Workers.Contracts/
+COPY src/FFmpeg.Worker/ src/FFmpeg.Worker/
+RUN dotnet restore src/FFmpeg.Worker/FFmpeg.Worker.csproj
+RUN dotnet publish src/FFmpeg.Worker/FFmpeg.Worker.csproj -c Release -o /app
+
+FROM mcr.microsoft.com/dotnet/runtime:10.0
+RUN apt-get update && apt-get install -y ffmpeg && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+COPY --from=build /app .
+ENTRYPOINT ["dotnet", "FFmpeg.Worker.dll"]

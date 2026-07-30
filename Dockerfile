@@ -29,6 +29,9 @@ COPY QuizzArena.Backend/Modules/QuizzArena.Quizzing/QuizzArena.Quizzing.csproj Q
 COPY QuizzArena.Backend/Modules/QuizzArena.Users/QuizzArena.Users.csproj QuizzArena.Backend/Modules/QuizzArena.Users/
 COPY QuizzArena.Backend/Modules/QuizzArena.DocumentProcessing/QuizzArena.DocumentProcessing.csproj QuizzArena.Backend/Modules/QuizzArena.DocumentProcessing/
 
+COPY QuizzArena.Workers/src/QuizzArena.Workers.Contracts/QuizzArena.Workers.Contracts.csproj \
+     QuizzArena.Workers/src/QuizzArena.Workers.Contracts/
+
 RUN dotnet restore QuizzArena.Backend/Host/Host.csproj
 
 # Copy the remaining source and publish a release build.

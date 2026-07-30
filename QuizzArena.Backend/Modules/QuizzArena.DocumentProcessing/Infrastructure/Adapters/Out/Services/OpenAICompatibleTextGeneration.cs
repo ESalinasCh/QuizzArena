@@ -106,7 +106,9 @@ internal partial class OpenAICompatibleTextGeneration(
     private async Task<GroqChatCompletionResponse> GetCompletionAsync(
         string model,
         string prompt,
-        JsonNode? schema = null)
+        JsonNode? schema = null,
+        string? targetTypeName = null
+    )
     {
         var payload = new
         {
@@ -129,7 +131,7 @@ internal partial class OpenAICompatibleTextGeneration(
                     type = "json_schema",
                     json_schema = new
                     {
-                        name = typeof(object).Name.ToLowerInvariant(),
+                        name = targetTypeName ?? "structured_output",
                         strict = true,
                         schema
                     }

@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/FFmpeg.Worker/FFmpeg.Worker.csproj" />
+    <Project Path="src/QuizzArena.Workers.Contracts/QuizzArena.Workers.Contracts.csproj" />
+  </Folder>
+</Solution>

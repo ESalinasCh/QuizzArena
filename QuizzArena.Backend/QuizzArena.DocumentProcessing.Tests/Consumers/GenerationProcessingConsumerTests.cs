@@ -20,6 +20,7 @@ public class GenerationProcessingConsumerTests
     private static readonly float[][] _similarQuestionEmbeddings = [[1f, 0f], [0.99f, 0.01f]];
 
     private readonly Mock<IDocumentChunkRepository> _mockDocumentChunkRepository;
+    private readonly Mock<IClassSourceRepository> _mockClassSourceRepository;
     private readonly Mock<IEmbeddingService> _mockEmbeddingService;
     private readonly Mock<ITextGenerationService> _mockTextGenerationService;
     private readonly Mock<IQuizContract> _mockQuizContract;
@@ -34,6 +35,7 @@ public class GenerationProcessingConsumerTests
     public GenerationProcessingConsumerTests()
     {
         _mockDocumentChunkRepository = new Mock<IDocumentChunkRepository>();
+        _mockClassSourceRepository = new Mock<IClassSourceRepository>();
         _mockEmbeddingService = new Mock<IEmbeddingService>();
         _mockTextGenerationService = new Mock<ITextGenerationService>();
         _mockQuizContract = new Mock<IQuizContract>();
@@ -64,8 +66,13 @@ public class GenerationProcessingConsumerTests
 
         _mockContext.Setup(c => c.Message).Returns(_command);
 
+        _mockClassSourceRepository
+            .Setup(r => r.GetByIdAsync(_command.ClassSourceId))
+            .ReturnsAsync(new ClassSource { Id = _command.ClassSourceId, UserId = Guid.NewGuid() });
+
         _consumer = new GenerationProcessingConsumer(
             _mockDocumentChunkRepository.Object,
+            _mockClassSourceRepository.Object,
             _mockEmbeddingService.Object,
             _mockTextGenerationService.Object,
             _mockQuizContract.Object,
