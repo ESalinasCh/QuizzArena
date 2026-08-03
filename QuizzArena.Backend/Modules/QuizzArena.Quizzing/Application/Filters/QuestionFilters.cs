@@ -6,6 +6,7 @@ public class QuestionFilters
 {
     public QuestionStatus Status { get; set; } = QuestionStatus.Draft;
     public List<Guid> ProcessingJobIds { get; set; } = new List<Guid>();
+    public List<Guid> QuestionIds { get; set; } = new List<Guid>();
     public int Page { get; set; } = 1;
     public int PageSize { get; set; } = 5;
 }
