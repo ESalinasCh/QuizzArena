@@ -89,7 +89,7 @@ public class CompressionFailedConsumerTests
 
         _mockClassSourceRepository
             .Setup(r => r.UpdateAsync(It.IsAny<ClassSource>()))
-            .ThrowsAsync(new Exception("Database connection error"));
+            .ThrowsAsync(new InvalidOperationException("Database connection error"));
 
         // Act
         var exception = await Record.ExceptionAsync(() => _consumer.Consume(_mockContext.Object));

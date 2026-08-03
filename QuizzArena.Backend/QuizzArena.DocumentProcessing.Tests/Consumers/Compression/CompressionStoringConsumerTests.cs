@@ -112,7 +112,7 @@ public class CompressionStoringConsumerTests
 
         _mockClassSourceRepository
             .Setup(r => r.UpdateAsync(It.IsAny<ClassSource>()))
-            .ThrowsAsync(new Exception(errorMessage));
+            .ThrowsAsync(new InvalidOperationException(errorMessage));
 
         _mockContext
             .Setup(c => c.Publish(It.IsAny<CompressionFailedEvent>(), It.IsAny<CancellationToken>()))
