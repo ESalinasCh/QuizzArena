@@ -10,7 +10,7 @@ using QuizzArena.DocumentProcessing.Domain.Enums;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Consumers;
 using QuizzArena.DocumentProcessing.Infrastructure.Configuration;
 
-namespace QuizzArena.DocumentProcessing.Tests.Consumers;
+namespace QuizzArena.DocumentProcessing.Tests.Consumers.Indexing;
 
 public class IndexingTranscriptConsumerTests
 {
