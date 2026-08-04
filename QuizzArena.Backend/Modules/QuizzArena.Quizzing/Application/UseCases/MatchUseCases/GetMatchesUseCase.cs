@@ -56,6 +56,7 @@ public class GetMatchesUseCase(
             return new MatchResponseDto()
             {
                 Id = m.Id,
+                QuizId = m.QuizId,
                 Title = m.Title,
                 CourseName = course.CourseName,
                 CourseId = course.Id,

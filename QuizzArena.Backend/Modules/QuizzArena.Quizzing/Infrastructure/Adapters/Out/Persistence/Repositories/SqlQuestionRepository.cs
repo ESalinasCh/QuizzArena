@@ -56,9 +56,11 @@ public class SqlQuestionRepository(QuizzingDbContext context) : IQuestionReposit
             .AsNoTracking()
             .Where(q =>
                 !q.Deleted &&
-                q.ProcessingJobId.HasValue &&
-                filters.ProcessingJobIds.Contains(q.ProcessingJobId.Value) &&
-                q.Status == filters.Status);
+                q.Status == filters.Status &&
+                (
+                    (q.ProcessingJobId.HasValue && filters.ProcessingJobIds.Contains(q.ProcessingJobId.Value)) ||
+                    filters.QuestionIds.Contains(q.Id)
+                ));
 
         return await query
             .OrderByDescending(x => x.CreatedAt)

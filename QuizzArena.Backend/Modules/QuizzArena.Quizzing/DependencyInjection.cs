@@ -78,6 +78,8 @@ public static class DependencyInjection
         services.AddScoped<IUnpublishMatchUseCase, UnpublishMatchUseCase>();
         services.AddScoped<IResetMatchAttemptUseCase, ResetMatchAttemptUseCase>();
         services.AddScoped<IGetTeacherQuizzesUseCase, GetTeacherQuizzesUseCase>();
+        services.AddScoped<IUpdateMatchUseCase, UpdateMatchUseCase>();
+
         #endregion
 
         #region Validators
@@ -93,6 +95,9 @@ public static class DependencyInjection
         services.AddScoped<CreateOptionDtoValidator>();
         services.AddScoped<CreateOptionsDtoValidator>();
         services.AddScoped<CreateMatchDtoValidator>();
+        services.AddScoped<UpdateMatchDtoValidator>();
+        services.AddScoped<UpdateMatchValidator>();
+
         #endregion
 
         services.AddScoped<IValidator<MatchQueryParametersDto>, MatchQueryParametersValidator>();

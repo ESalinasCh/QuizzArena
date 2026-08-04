@@ -22,7 +22,9 @@ internal sealed class SqlMatchRepository(QuizzingDbContext context) : IMatchRepo
 
     public async Task<List<Match>> GetMatchesAsync(List<Guid> courseIds, MatchQueryParametersDto? query = null)
     {
-        IQueryable<Match> q = context.Matches.Where(m => courseIds.Contains(m.CourseId));
+        IQueryable<Match> q = context.Matches
+            .Where(m => courseIds.Contains(m.CourseId))
+            .OrderByDescending(x => x.CreatedAt);
 
         if (query == null)
         {

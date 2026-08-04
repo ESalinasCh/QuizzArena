@@ -8,7 +8,7 @@ using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Consume
 using Shared.Contracts;
 using Shared.Contracts.DTOs;
 
-namespace QuizzArena.DocumentProcessing.Tests.Consumers;
+namespace QuizzArena.DocumentProcessing.Tests.Consumers.Generation;
 
 public class GenerationEndingConsumerTests
 {

@@ -133,6 +133,37 @@ public class GetMatchesUseCaseTests
         Assert.Equal("My Match", result[0].Title);
         Assert.Equal("Electricity", result[0].CourseName);
     }
+
+    [Fact]
+    public async Task GetMatches_MatchesMappedCorrectly_IncludesQuizId()
+    {
+        // Arrange
+        string userId = Guid.NewGuid().ToString();
+        Guid quizId = Guid.NewGuid();
+        _mockCurrentUser.Setup(c => c.UserId).Returns(userId);
+        _mockCurrentUser.Setup(c => c.Role).Returns("Student");
+        var courses = new List<CourseSummaryDTO>
+        {
+            new CourseSummaryDTO { Id = Guid.NewGuid(), CourseName = "Electricity", ProfessorName = "Nikola Tesla" }
+        };
+        _mockCourseImpl.Setup(c => c.GetCoursesByStudent(Guid.Parse(userId))).ReturnsAsync(courses);
+        var matches = new List<Domain.Entities.Match>
+        {
+            new Domain.Entities.Match { Id = Guid.NewGuid(), Title = "My Match", CourseId = courses[0].Id, QuizId = quizId }
+        };
+        _mockMatchRepository.Setup(m => m.GetMatchesAsync(
+            It.IsAny<List<Guid>>(),
+            It.IsAny<MatchQueryParametersDto>())
+        ).ReturnsAsync(matches);
+        var query = new MatchQueryParametersDto();
+
+        // Act
+        List<MatchResponseDto> result = await _getMatchesUseCase.Execute(query);
+
+        // Assert
+        Assert.Single(result);
+        Assert.Equal(quizId, result[0].QuizId);
+    }
     [Fact]
     public async Task GetMatches_MatchesMappedCorrectlyForTheachers_ReturnsCorrectDtos()
     {

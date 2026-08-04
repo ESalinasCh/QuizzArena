@@ -8,7 +8,7 @@ using QuizzArena.DocumentProcessing.Domain.Entities;
 using QuizzArena.DocumentProcessing.Domain.Enums;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Messaging.Consumers;
 
-namespace QuizzArena.DocumentProcessing.Tests.Consumers;
+namespace QuizzArena.DocumentProcessing.Tests.Consumers.Ingestion;
 
 public class TranscriptionRequestConsumerTests
 {
