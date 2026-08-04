@@ -708,7 +708,7 @@ public class SubmitAnswersUseCaseTests
             .ReturnsAsync(new MatchAttempt { Id = matchAttemptId, MatchId = matchId, UserId = Guid.Parse(userId) });
         _mockMatchRepository
             .Setup(repo => repo.GetMatchByIdAsync(matchId))
-            .ReturnsAsync(new DomainMatch { Id = matchId, AttemptsAmount = 1 });
+            .ReturnsAsync(new DomainMatch { Id = matchId, AttemptsAmount = 1, Mode = MatchMode.Exam });
         _mockMatchAttemptRepository
             .Setup(repo => repo.GetMatchAttemptCountByMatchIdAndUserIdAsync(matchId, Guid.Parse(userId)))
             .ReturnsAsync(2);
@@ -724,5 +724,65 @@ public class SubmitAnswersUseCaseTests
         );
 
         _mockMapper.Verify(mapper => mapper.Map<List<Answer>>(It.IsAny<object>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task SubmitAnswer_AttemptCountExceedsMatchLimitInSoloMode_DoesNotThrow()
+    {
+        // Arrange
+        string userId = Guid.NewGuid().ToString();
+        var matchAttemptId = Guid.NewGuid();
+        var matchId = Guid.NewGuid();
+        var questionId = Guid.NewGuid();
+        var optionId = Guid.NewGuid();
+
+        _mockCurrentUser.Setup(user => user.UserId).Returns(userId);
+
+        var matchAttempt = new MatchAttempt { Id = matchAttemptId, MatchId = matchId, UserId = Guid.Parse(userId) };
+        _mockMatchAttemptRepository
+            .Setup(repo => repo.GetByIdAsync(matchAttemptId))
+            .ReturnsAsync(matchAttempt);
+        _mockMatchRepository
+            .Setup(repo => repo.GetMatchByIdAsync(matchId))
+            .ReturnsAsync(new DomainMatch { Id = matchId, AttemptsAmount = 1, Mode = MatchMode.Solo });
+        _mockMatchAttemptRepository
+            .Setup(repo => repo.GetMatchAttemptCountByMatchIdAndUserIdAsync(matchId, Guid.Parse(userId)))
+            .ReturnsAsync(5);
+
+        var dto = new SubmitAnswersRequestDto
+        {
+            Answers = [new SubmitAnswerBody(questionId, [optionId], DateTimeOffset.UtcNow.AddMinutes(-1))]
+        };
+
+        var answers = new List<Answer>
+        {
+            new() { QuestionId = questionId, SelectedOptions = [new SelectedOption { OptionId = optionId }] }
+        };
+        _mockMapper.Setup(m => m.Map<List<Answer>>(dto.Answers)).Returns(answers);
+
+        _mockMatchAttemptRepository
+            .Setup(repo => repo.UpdateAsync(It.IsAny<MatchAttempt>()))
+            .ReturnsAsync(matchAttempt);
+
+        var question = new Question
+        {
+            Id = questionId,
+            Content = "Sample question",
+            Type = QuestionType.SingleChoice,
+            Options = [new Option { Id = optionId, IsCorrect = true }]
+        };
+        _mockQuestionRepository
+            .Setup(repo => repo.GetByIdsWithOptionsAsync(It.IsAny<List<Guid>>()))
+            .ReturnsAsync([question]);
+
+        // Act
+        SubmitAnswersResponseDto result = await _submitAnswersUseCase.Execute(matchAttemptId, dto);
+
+        // Assert
+        Assert.Equal(100, result.ScorePercentage);
+        _mockMatchAttemptRepository.Verify(
+            repo => repo.GetMatchAttemptCountByMatchIdAndUserIdAsync(It.IsAny<Guid>(), It.IsAny<Guid>()),
+            Times.Never
+        );
     }
 }

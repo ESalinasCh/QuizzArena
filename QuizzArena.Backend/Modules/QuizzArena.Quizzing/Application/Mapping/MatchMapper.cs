@@ -10,6 +10,9 @@ internal sealed class MatchMapper : Profile
     {
         CreateMap<Match, MatchCreateDto>().ReverseMap();
         CreateMap<MatchCreatedResponseDto, Match>().ReverseMap();
+        CreateMap<Match, MatchDetailResponseDto>()
+            .ForMember(dest => dest.Duration, opt => opt.MapFrom(src => src.TimeMinutes))
+            .ForMember(dest => dest.QuestionCount, opt => opt.MapFrom(src => src.QuestionsAmount));
     }
 
 }
