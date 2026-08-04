@@ -23,6 +23,8 @@ public class UpdateMatchUseCase(IMatchRepository matchRepository,
         match.FinishedAt = matchUpdateDto.FinishedAt ?? match.FinishedAt;
         match.TimeMinutes = matchUpdateDto.TimeMinutes ?? match.TimeMinutes;
         match.AttemptsAmount = matchUpdateDto.AttemptsAmount ?? match.AttemptsAmount;
+        match.ShuffleQuestion = matchUpdateDto.ShuffleQuestion ?? match.ShuffleQuestion;
+        match.ShuffleOptions = matchUpdateDto.ShuffleOptions ?? match.ShuffleOptions;
 
         if (matchUpdateDto.QuestionsAmount.HasValue)
         {
