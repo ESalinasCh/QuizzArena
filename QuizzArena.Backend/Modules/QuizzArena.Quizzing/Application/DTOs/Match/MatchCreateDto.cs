@@ -2,6 +2,7 @@
 
 public class MatchCreateDto
 {
+    public string Title { get; set; } = string.Empty;
     public DateTimeOffset StartedAt { get; set; }
     public DateTimeOffset FinishedAt { get; set; }
     public int TimeMinutes { get; set; }

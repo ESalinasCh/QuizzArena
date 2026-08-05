@@ -42,6 +42,7 @@ public class CreateMatchUseCaseTests
 
     private static MatchCreateDto BuildValidDto() => new()
     {
+        Title = "Test Match",
         StartedAt = DateTimeOffset.UtcNow.AddHours(1),
         FinishedAt = DateTimeOffset.UtcNow.AddHours(2),
         TimeMinutes = 30,
@@ -146,33 +147,6 @@ public class CreateMatchUseCaseTests
         Assert.NotNull(capturedMatch!.Code);
         Assert.Equal(6, capturedMatch.Code.Length);
         Assert.True(int.TryParse(capturedMatch.Code, out _));
-    }
-
-    // ── Title uses quiz title ────────────────────────────────────────────────
-
-    [Fact]
-    public async Task Execute_ValidDto_SetsTitleFromQuizTitle()
-    {
-        // Arrange
-        var dto = BuildValidDto();
-        var quiz = new Quiz { Id = dto.QuizId, Title = "Cloud Quiz" };
-        var mappedMatch = new Match();
-        Match? capturedMatch = null;
-
-        _mockQuizRepository.Setup(r => r.GetByIdAsync(dto.QuizId)).ReturnsAsync(quiz);
-        _mockMapper.Setup(m => m.Map<Match>(dto)).Returns(mappedMatch);
-        _mockMatchRepository
-            .Setup(r => r.CreateMatchAsync(It.IsAny<Match>()))
-            .Callback<Match>(m => capturedMatch = m)
-            .ReturnsAsync(new Match());
-        _mockMapper.Setup(m => m.Map<MatchCreatedResponseDto>(It.IsAny<Match>())).Returns(new MatchCreatedResponseDto());
-
-        // Act
-        await _useCase.Execute(dto);
-
-        // Assert
-        Assert.NotNull(capturedMatch!.Title);
-        Assert.StartsWith(quiz.Title, capturedMatch.Title);
     }
 
     // ── QuestionsAmount is always null ───────────────────────────────────────

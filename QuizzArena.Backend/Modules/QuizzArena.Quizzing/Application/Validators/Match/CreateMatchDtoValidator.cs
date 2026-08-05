@@ -7,6 +7,12 @@ public class CreateMatchDtoValidator : AbstractValidator<MatchCreateDto>
 {
     public CreateMatchDtoValidator()
     {
+        RuleFor(x => x.Title)
+            .NotEmpty()
+            .Must(title => !string.IsNullOrWhiteSpace(title))
+            .WithMessage("Title cannot be empty or whitespace.")
+            .MaximumLength(200).WithMessage("Title cannot exceed 200 characters."); ;
+
         RuleFor(x => x.StartedAt)
             .NotEmpty()
             .WithMessage("Start date is required")
