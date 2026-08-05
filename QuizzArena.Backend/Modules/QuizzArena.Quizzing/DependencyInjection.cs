@@ -6,6 +6,7 @@ using Npgsql;
 using QuizzArena.Quizzing.Application.DTOs.Match;
 using QuizzArena.Quizzing.Application.DTOs.Quiz;
 using QuizzArena.Quizzing.Application.Ports.In;
+using QuizzArena.Quizzing.Application.Ports.In.Match;
 using QuizzArena.Quizzing.Application.Ports.In.MatchAttempt;
 using QuizzArena.Quizzing.Application.Ports.In.Question;
 using QuizzArena.Quizzing.Application.Ports.Out;
@@ -58,6 +59,7 @@ public static class DependencyInjection
 
         #region UseCases
         services.AddScoped<IGetMatchesUseCase, GetMatchesUseCase>();
+        services.AddScoped<IGetMatchByIdUseCase, GetMatchByIdUseCase>();
         services.AddScoped<IStartAttemptUseCase, StartAttemptUseCase>();
         services.AddScoped<ISubmitAnswersUseCase, SubmitAnswersUseCase>();
         services.AddScoped<ICreateQuizUseCase, CreateQuizUseCase>();

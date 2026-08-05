@@ -56,14 +56,14 @@ public class CreateExamDtoValidatorTests
     // ── Description ─────────────────────────────────────────────────────────
 
     [Fact]
-    public void Validate_EmptyDescription_ShouldHaveValidationError()
+    public void Validate_EmptyDescription_ShouldNotHaveValidationError()
     {
         var dto = CreateValidDto();
         dto.Description = string.Empty;
 
         var result = _validator.TestValidate(dto);
 
-        result.ShouldHaveValidationErrorFor(x => x.Description);
+        result.ShouldNotHaveValidationErrorFor(x => x.Description);
     }
 
     [Fact]

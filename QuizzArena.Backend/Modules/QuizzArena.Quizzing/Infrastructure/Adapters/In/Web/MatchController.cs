@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using QuizzArena.Quizzing.Application.DTOs.Match;
 using QuizzArena.Quizzing.Application.Ports.In;
+using QuizzArena.Quizzing.Application.Ports.In.Match;
 using QuizzArena.Quizzing.Application.Ports.In.Question;
 
 namespace QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Web;
@@ -13,8 +14,8 @@ public class MatchController(
     ICreateMatchUseCase createMatchUseCase,
     IPublishMatchUseCase publishMatchUseCase,
     IUnpublishMatchUseCase unpublishMatchUseCase,
+    IGetMatchByIdUseCase getMatchByIdUseCase,
     IUpdateMatchUseCase updateMatchUseCase
-
 ) : ControllerBase
 {
     [HttpGet("users/me/matches")]
@@ -25,6 +26,14 @@ public class MatchController(
     {
         List<MatchResponseDto> matches = await getMatchesUseCase.Execute(query);
         return Ok(matches);
+    }
+
+    [HttpGet("matches/{matchId:guid}")]
+    [Authorize(Roles = "teacher")]
+    public async Task<ActionResult<MatchDetailResponseDto>> GetMatchById(Guid matchId)
+    {
+        MatchDetailResponseDto response = await getMatchByIdUseCase.Execute(matchId);
+        return Ok(response);
     }
 
     [HttpPost("matches")]

@@ -14,8 +14,6 @@ public class CreateExamDtoValidator : AbstractValidator<CreateExamDto>
             .WithMessage("Title must not exceed 100 characters");
 
         RuleFor(x => x.Description)
-            .NotEmpty()
-            .WithMessage("Description is required")
             .MaximumLength(255)
             .WithMessage("Description must not exceed 255 characters");
 

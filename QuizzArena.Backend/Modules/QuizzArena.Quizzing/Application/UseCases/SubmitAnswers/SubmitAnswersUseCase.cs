@@ -45,10 +45,14 @@ public class SubmitAnswersUseCase(
         Guid matchId = matchAttempt.MatchId;
         Match match = await matchRepository.GetMatchByIdAsync(matchId)
             ?? throw new InvalidOperationException($"Match not found for {matchAttemptId}.");
-        int totalAttempts = await matchAttemptRepository.GetMatchAttemptCountByMatchIdAndUserIdAsync(matchId, userId);
-        if (totalAttempts > match.AttemptsAmount)
+
+        if (match.Mode == Domain.Enums.MatchMode.Exam)
         {
-            throw new MaxAttemptsReachedException();
+            int totalAttempts = await matchAttemptRepository.GetMatchAttemptCountByMatchIdAndUserIdAsync(matchId, userId);
+            if (totalAttempts > match.AttemptsAmount)
+            {
+                throw new MaxAttemptsReachedException();
+            }
         }
 
         // Validate incoming object

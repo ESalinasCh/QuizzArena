@@ -202,12 +202,32 @@ public class CreateExamUseCaseTests
     }
 
     [Fact]
-    public async Task Execute_EmptyDescription_ThrowsValidationException()
+    public async Task Execute_EmptyDescription_CreatesQuiz()
     {
-        CreateExamDto dto = BuildValidDto();
+        Guid quizId = Guid.NewGuid();
+        Guid questionId = Guid.NewGuid();
+
+        CreateExamDto dto = BuildValidDto(questionId);
         dto.Description = string.Empty;
 
-        await Assert.ThrowsAsync<ValidationException>(() => _useCase.Execute(dto));
+        Quiz createdQuiz = new() { Id = quizId, Title = dto.Title, Description = dto.Description };
+        CreateQuizResponseDto expectedResponse = new() { Id = quizId, Title = dto.Title };
+
+        _mockQuestionRepository
+            .Setup(r => r.GetActiveByIdsAsync(It.IsAny<List<Guid>>()))
+            .ReturnsAsync([new Question { Id = questionId }]);
+
+        _mockMapper.Setup(m => m.Map<Quiz>(dto)).Returns(new Quiz { Id = quizId });
+
+        _mockQuizRepository
+            .Setup(r => r.CreateAsync(It.IsAny<Quiz>()))
+            .ReturnsAsync(createdQuiz);
+
+        _mockMapper.Setup(m => m.Map<CreateQuizResponseDto>(createdQuiz)).Returns(expectedResponse);
+
+        CreateQuizResponseDto result = await _useCase.Execute(dto);
+
+        Assert.Equal(expectedResponse, result);
     }
 
     [Fact]
