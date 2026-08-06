@@ -5,6 +5,7 @@ using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Application.UseCases.MatchAttemptUseCases;
 using QuizzArena.Quizzing.Domain.Entities;
 using QuizzArena.Quizzing.Domain.Enums;
+using Shared.Contracts;
 
 
 namespace QuizzArena.Quizzing.Tests.UseCases;
@@ -13,6 +14,7 @@ public class GetMatchAttemptDetailCaseTests
 {
     private readonly Mock<IMatchRepository> _mockMatchRepository;
     private readonly Mock<IQuestionRepository> _mockQuestionRepository;
+    private readonly Mock<ICurrentUser> _mockCurrentUser;
 
     private readonly GetMatchAttemptDetail _getMatchAttemptDetail;
 
@@ -20,10 +22,13 @@ public class GetMatchAttemptDetailCaseTests
     {
         _mockMatchRepository = new Mock<IMatchRepository>();
         _mockQuestionRepository = new Mock<IQuestionRepository>();
+        _mockCurrentUser = new Mock<ICurrentUser>();
+        _mockCurrentUser.Setup(x => x.Role).Returns("Student");
 
         _getMatchAttemptDetail = new GetMatchAttemptDetail(
             _mockMatchRepository.Object,
-            _mockQuestionRepository.Object
+            _mockQuestionRepository.Object,
+            _mockCurrentUser.Object
         );
     }
 
@@ -303,6 +308,90 @@ public class GetMatchAttemptDetailCaseTests
 
         // The student's own picks are not a result, so hiding results must not hide them.
         Assert.Equal(optionId, Assert.Single(question.SelectedOptionIds));
+    }
+
+    [Fact]
+    public async Task Execute_ActiveExam_TeacherStillSeesResults()
+    {
+        Guid matchId = Guid.NewGuid();
+        Guid matchAttemptId = Guid.NewGuid();
+        Guid questionId = Guid.NewGuid();
+        Guid optionId = Guid.NewGuid();
+
+        _mockCurrentUser.Setup(x => x.Role).Returns("Teacher");
+
+        var match = new Domain.Entities.Match
+        {
+            Id = matchId,
+            StartedAt = DateTimeOffset.UtcNow.AddMinutes(-60),
+            FinishedAt = DateTimeOffset.UtcNow.AddMinutes(10),
+            Mode = MatchMode.Exam
+        };
+
+        var matchAttempt = new MatchAttempt
+        {
+            Id = matchAttemptId,
+            MatchId = matchId,
+            Score = 100,
+            Status = QuizAttemptStatus.Completed,
+            MatchAttemptQuestions =
+            [
+                new MatchAttemptQuestion
+                {
+                    QuestionId = questionId
+                }
+            ],
+            Answers =
+            [
+                new Answer
+                {
+                    QuestionId = questionId,
+                    SelectedOptions = [new SelectedOption { OptionId = optionId, IsCorrect = true }],
+                    IsCorrect = true
+                }
+            ]
+        };
+
+        var questions = new List<Question>
+        {
+            new()
+            {
+                Id = questionId,
+                Content = "Question content",
+                Justification = "Justification",
+                Options =
+                [
+                    new Option
+                    {
+                        Id = optionId,
+                        Description = "Option A",
+                        IsCorrect = true
+                    }
+                ]
+            }
+        };
+
+        _mockMatchRepository
+            .Setup(x => x.GetMatchAttemptDetailById(matchAttemptId))
+            .ReturnsAsync(matchAttempt);
+
+        _mockMatchRepository
+            .Setup(x => x.GetMatchByIdAsync(matchId))
+            .ReturnsAsync(match);
+
+        _mockQuestionRepository
+            .Setup(x => x.GetByIdsWithOptionsAsync(It.IsAny<List<Guid>>()))
+            .ReturnsAsync(questions);
+
+        var result = await _getMatchAttemptDetail.Execute(matchAttemptId);
+
+        var question = result.Questions.Single();
+        var option = question.Options.Single();
+
+        Assert.Equal(100, result.Score);
+        Assert.Equal("Justification", question.Justification);
+        Assert.True(question.IsCorrect);
+        Assert.True(option.IsCorrect);
     }
 
     [Fact]
