@@ -4,6 +4,7 @@ using Moq;
 using QuizzArena.DocumentProcessing.Infrastructure.Adapters.In.Web;
 using QuizzArena.Quizzing.Application.DTOs.Match;
 using QuizzArena.Quizzing.Application.Ports.In;
+using QuizzArena.Quizzing.Application.Ports.In.Match;
 using QuizzArena.Quizzing.Application.Ports.In.Question;
 using QuizzArena.Quizzing.Domain.Enums;
 
@@ -15,6 +16,7 @@ public class MatchControllerTests
     private readonly Mock<ICreateMatchUseCase> _mockCreateMatchUseCase;
     private readonly Mock<IPublishMatchUseCase> _mockPublishMatchUseCase;
     private readonly Mock<IUnpublishMatchUseCase> _mockUnpublishMatchUseCase;
+    private readonly Mock<IGetMatchByIdUseCase> _mockGetMatchByIdUseCase;
     private readonly Mock<IUpdateMatchUseCase> _mockUpdateMatchUseCase;
     private readonly MatchController _controller;
 
@@ -24,6 +26,7 @@ public class MatchControllerTests
         _mockCreateMatchUseCase = new Mock<ICreateMatchUseCase>();
         _mockPublishMatchUseCase = new Mock<IPublishMatchUseCase>();
         _mockUnpublishMatchUseCase = new Mock<IUnpublishMatchUseCase>();
+        _mockGetMatchByIdUseCase = new Mock<IGetMatchByIdUseCase>();
         _mockUpdateMatchUseCase = new Mock<IUpdateMatchUseCase>();
 
         _controller = new MatchController(
@@ -31,6 +34,7 @@ public class MatchControllerTests
             _mockCreateMatchUseCase.Object,
             _mockPublishMatchUseCase.Object,
             _mockUnpublishMatchUseCase.Object,
+            _mockGetMatchByIdUseCase.Object,
             _mockUpdateMatchUseCase.Object
         );
     }
