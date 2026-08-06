@@ -32,7 +32,7 @@ public class UpdateMatchUseCase(IMatchRepository matchRepository,
 
             if (quizQuestions.Count < matchUpdateDto.QuestionsAmount)
             {
-                throw new InvalidOperationException("Questiom Amount can not be greater than the total number of questions available for this match");
+                throw new InvalidOperationException($"Questiom Amount can not be greater than the total number of questions available for this match ({quizQuestions.Count})");
             }
             match.QuestionsAmount = matchUpdateDto.QuestionsAmount;
         }

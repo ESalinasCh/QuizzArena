@@ -17,6 +17,7 @@ public class CreateMatchUseCaseTests
     private readonly Mock<IMatchRepository> _mockMatchRepository;
     private readonly Mock<IQuizRepository> _mockQuizRepository;
     private readonly Mock<IMapper> _mockMapper;
+    private readonly Mock<IQuizQuestionRepository> _mockQuizQuestionRepository;
 
     // Real
     private readonly CreateMatchDtoValidator _validator;
@@ -29,6 +30,7 @@ public class CreateMatchUseCaseTests
         _mockMatchRepository = new Mock<IMatchRepository>();
         _mockQuizRepository = new Mock<IQuizRepository>();
         _mockMapper = new Mock<IMapper>();
+        _mockQuizQuestionRepository = new Mock<IQuizQuestionRepository>();
 
         _validator = new CreateMatchDtoValidator();
 
@@ -36,7 +38,8 @@ public class CreateMatchUseCaseTests
             _mockMatchRepository.Object,
             _validator,
             _mockMapper.Object,
-            _mockQuizRepository.Object
+            _mockQuizRepository.Object,
+            _mockQuizQuestionRepository.Object
         );
     }
 
@@ -48,7 +51,8 @@ public class CreateMatchUseCaseTests
         TimeMinutes = 30,
         AttemptsAmount = 1,
         QuizId = Guid.NewGuid(),
-        CourseId = Guid.NewGuid()
+        CourseId = Guid.NewGuid(),
+        QuestionsAmount = 3
     };
 
     // ── Happy path ───────────────────────────────────────────────────────────
@@ -67,7 +71,7 @@ public class CreateMatchUseCaseTests
         _mockMapper.Setup(m => m.Map<Match>(dto)).Returns(mappedMatch);
         _mockMatchRepository.Setup(r => r.CreateMatchAsync(It.IsAny<Match>())).ReturnsAsync(createdMatch);
         _mockMapper.Setup(m => m.Map<MatchCreatedResponseDto>(createdMatch)).Returns(expectedResponse);
-
+        _mockQuizQuestionRepository.Setup(m => m.GetQuestionsByQuizIdAsync(dto.QuizId)).ReturnsAsync(new List<Question>() { new(), new(), new() });
         // Act
         var result = await _useCase.Execute(dto);
 
@@ -87,6 +91,7 @@ public class CreateMatchUseCaseTests
         _mockMapper.Setup(m => m.Map<Match>(dto)).Returns(mappedMatch);
         _mockMatchRepository.Setup(r => r.CreateMatchAsync(It.IsAny<Match>())).ReturnsAsync(new Match());
         _mockMapper.Setup(m => m.Map<MatchCreatedResponseDto>(It.IsAny<Match>())).Returns(new MatchCreatedResponseDto());
+        _mockQuizQuestionRepository.Setup(m => m.GetQuestionsByQuizIdAsync(dto.QuizId)).ReturnsAsync(new List<Question>() { new(), new(), new() });
 
         // Act
         await _useCase.Execute(dto);
@@ -113,6 +118,7 @@ public class CreateMatchUseCaseTests
             .Callback<Match>(m => capturedMatch = m)
             .ReturnsAsync(new Match());
         _mockMapper.Setup(m => m.Map<MatchCreatedResponseDto>(It.IsAny<Match>())).Returns(new MatchCreatedResponseDto());
+        _mockQuizQuestionRepository.Setup(m => m.GetQuestionsByQuizIdAsync(dto.QuizId)).ReturnsAsync(new List<Question>() { new(), new(), new() });
 
         // Act
         await _useCase.Execute(dto);
@@ -139,6 +145,7 @@ public class CreateMatchUseCaseTests
             .Callback<Match>(m => capturedMatch = m)
             .ReturnsAsync(new Match());
         _mockMapper.Setup(m => m.Map<MatchCreatedResponseDto>(It.IsAny<Match>())).Returns(new MatchCreatedResponseDto());
+        _mockQuizQuestionRepository.Setup(m => m.GetQuestionsByQuizIdAsync(dto.QuizId)).ReturnsAsync(new List<Question>() { new(), new(), new() });
 
         // Act
         await _useCase.Execute(dto);
@@ -156,9 +163,9 @@ public class CreateMatchUseCaseTests
     {
         // Arrange
         var dto = BuildValidDto();
-        dto.QuestionsAmount = 10;
+        dto.QuestionsAmount = 3;
         var quiz = new Quiz { Id = dto.QuizId, Title = "Cloud Quiz" };
-        var mappedMatch = new Match { QuestionsAmount = 10 };
+        var mappedMatch = new Match { QuestionsAmount = 3 };
         Match? capturedMatch = null;
 
         _mockQuizRepository.Setup(r => r.GetByIdAsync(dto.QuizId)).ReturnsAsync(quiz);
@@ -168,13 +175,14 @@ public class CreateMatchUseCaseTests
             .Callback<Match>(m => capturedMatch = m)
             .ReturnsAsync(new Match());
         _mockMapper.Setup(m => m.Map<MatchCreatedResponseDto>(It.IsAny<Match>())).Returns(new MatchCreatedResponseDto());
+        _mockQuizQuestionRepository.Setup(m => m.GetQuestionsByQuizIdAsync(dto.QuizId)).ReturnsAsync(new List<Question>() { new(), new(), new() });
 
         // Act
         await _useCase.Execute(dto);
 
         // Assert
         Assert.NotNull(capturedMatch);
-        Assert.Equal(10, capturedMatch.QuestionsAmount);
+        Assert.Equal(3, capturedMatch.QuestionsAmount);
     }
 
     // ── Audit timestamps are set ─────────────────────────────────────────────
@@ -196,6 +204,7 @@ public class CreateMatchUseCaseTests
             .Callback<Match>(m => capturedMatch = m)
             .ReturnsAsync(new Match());
         _mockMapper.Setup(m => m.Map<MatchCreatedResponseDto>(It.IsAny<Match>())).Returns(new MatchCreatedResponseDto());
+        _mockQuizQuestionRepository.Setup(m => m.GetQuestionsByQuizIdAsync(dto.QuizId)).ReturnsAsync(new List<Question>() { new(), new(), new() });
 
         // Act
         await _useCase.Execute(dto);
@@ -259,5 +268,33 @@ public class CreateMatchUseCaseTests
 
         // Assert
         _mockMatchRepository.Verify(r => r.CreateMatchAsync(It.IsAny<Match>()), Times.Never);
+    }
+
+
+    [Fact]
+    public async Task Execute_ShouldThrowException_WhenQuestionsAmountExceedsAvailableQuestions()
+    {
+        var dto = BuildValidDto();
+        dto.QuestionsAmount = 1000;
+
+        _mockQuizRepository
+            .Setup(x => x.GetByIdAsync(dto.QuizId))
+            .ReturnsAsync(new Quiz());
+
+        _mockMapper
+            .Setup(x => x.Map<Match>(dto))
+            .Returns(new Match());
+
+        _mockQuizQuestionRepository
+            .Setup(x => x.GetQuestionsByQuizIdAsync(dto.QuizId))
+            .ReturnsAsync(new List<Question>
+            {
+            new(),
+            new(),
+            new()
+            });
+
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => _useCase.Execute(dto));
     }
 }

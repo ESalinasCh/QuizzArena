@@ -14,14 +14,23 @@ public class CreateMatchUseCase(
     IMatchRepository matchRepository,
     CreateMatchDtoValidator createValidator,
     IMapper mapper,
-    IQuizRepository quizRepository
+    IQuizRepository quizRepository,
+    IQuizQuestionRepository quizQuestionRepository
     ) : ICreateMatchUseCase
 {
     public async Task<MatchCreatedResponseDto> Execute(MatchCreateDto dto)
     {
         await createValidator.ValidateAndThrowAsync(dto);
+
         Quiz? quiz = await quizRepository.GetByIdAsync(dto.QuizId) ?? throw new KeyNotFoundException("Quiz not found.");
         Match match = mapper.Map<Match>(dto);
+
+        var quizQuestions = await quizQuestionRepository.GetQuestionsByQuizIdAsync(dto.QuizId);
+
+        if (quizQuestions.Count < dto.QuestionsAmount)
+        {
+            throw new InvalidOperationException($"Question Amount can not be greater than the total number of questions available for this match ({quizQuestions.Count})");
+        }
 
         match.Mode = MatchMode.Exam;
         match.CreatedAt = DateTimeOffset.UtcNow;
