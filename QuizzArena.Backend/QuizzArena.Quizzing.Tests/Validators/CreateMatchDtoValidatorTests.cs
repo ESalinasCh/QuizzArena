@@ -10,6 +10,7 @@ public class CreateMatchDtoValidatorTests
 
     private static MatchCreateDto CreateValidDto() => new()
     {
+        Title = "Test Match",
         StartedAt = DateTimeOffset.UtcNow.AddHours(1),
         FinishedAt = DateTimeOffset.UtcNow.AddHours(2),
         TimeMinutes = 30,
@@ -28,6 +29,51 @@ public class CreateMatchDtoValidatorTests
         var result = _validator.TestValidate(dto);
 
         result.ShouldNotHaveAnyValidationErrors();
+    }
+
+    // - Title ------------------------
+    [Fact]
+    public void Validate_EmptyTitle_ShouldHaveValidationError()
+    {
+        var dto = CreateValidDto();
+        dto.Title = string.Empty;
+
+        var result = _validator.TestValidate(dto);
+
+        result.ShouldHaveValidationErrorFor(x => x.Title);
+    }
+
+    [Fact]
+    public void Validate_TitleLongerThan200Characters_ShouldHaveValidationError()
+    {
+        var dto = CreateValidDto();
+        dto.Title = new string('A', 201);
+
+        var result = _validator.TestValidate(dto);
+
+        result.ShouldHaveValidationErrorFor(x => x.Title);
+    }
+
+    [Fact]
+    public void Validate_ValidTitle_ShouldNotHaveValidationError()
+    {
+        var dto = CreateValidDto();
+        dto.Title = "My Match";
+
+        var result = _validator.TestValidate(dto);
+
+        result.ShouldNotHaveValidationErrorFor(x => x.Title);
+    }
+
+    [Fact]
+    public void Validate_WhitespaceTitle_ShouldHaveValidationError()
+    {
+        var dto = CreateValidDto();
+        dto.Title = "   ";
+
+        var result = _validator.TestValidate(dto);
+
+        result.ShouldHaveValidationErrorFor(x => x.Title);
     }
 
     // ── StartedAt ────────────────────────────────────────────────────────────
