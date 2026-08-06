@@ -4,10 +4,15 @@ using QuizzArena.Quizzing.Application.Ports.Out;
 using QuizzArena.Quizzing.Application.Ports.Out.Repositories;
 using QuizzArena.Quizzing.Domain.Entities;
 using QuizzArena.Quizzing.Domain.Enums;
+using Shared.Contracts;
 
 namespace QuizzArena.Quizzing.Application.UseCases.MatchAttemptUseCases;
 
-public class GetMatchAttemptDetail(IMatchRepository matchRepository, IQuestionRepository questionRepository) : IGetMatchAttemptDetail
+public class GetMatchAttemptDetail(
+    IMatchRepository matchRepository,
+    IQuestionRepository questionRepository,
+    ICurrentUser currentUser
+) : IGetMatchAttemptDetail
 {
     public async Task<GetMatchAttemptDetailDTO> Execute(Guid matchAttemptId)
     {
@@ -16,7 +21,10 @@ public class GetMatchAttemptDetail(IMatchRepository matchRepository, IQuestionRe
         var answersDictionary = matchAttempt.Answers.ToDictionary(x => x.QuestionId);
 
         Match match = await matchRepository.GetMatchByIdAsync(matchAttempt.MatchId) ?? throw new InvalidOperationException();
-        bool showResults = match.FinishedAt == null || DateTimeOffset.UtcNow > match.FinishedAt || match.Mode != MatchMode.Exam;
+        bool showResults = currentUser.Role == "Teacher"
+            || match.FinishedAt == null
+            || DateTimeOffset.UtcNow > match.FinishedAt
+            || match.Mode != MatchMode.Exam;
 
         var matchAttemptDetail = new GetMatchAttemptDetailDTO()
         {

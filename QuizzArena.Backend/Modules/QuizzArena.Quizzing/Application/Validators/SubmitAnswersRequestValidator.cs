@@ -21,6 +21,10 @@ public class SubmitAnswersRequestValidator : AbstractValidator<SubmitAnswersRequ
 
 public class SubmitAnswerBodyValidator : AbstractValidator<SubmitAnswerBody>
 {
+    // Clients report AnsweredAt from their own clock, which can drift a few
+    // minutes from the server's; this tolerance absorbs that skew.
+    private static readonly TimeSpan _clockSkewTolerance = TimeSpan.FromMinutes(10);
+
     public SubmitAnswerBodyValidator()
     {
         RuleFor(x => x.QuestionId)
@@ -35,7 +39,7 @@ public class SubmitAnswerBodyValidator : AbstractValidator<SubmitAnswerBody>
 
         RuleFor(x => x.AnsweredAt)
             .NotEmpty().WithMessage("AnsweredAt is required.")
-            .Must(at => at <= DateTimeOffset.UtcNow)
+            .Must(at => at <= DateTimeOffset.UtcNow + _clockSkewTolerance)
             .WithMessage("AnsweredAt cannot be in the future.");
     }
 }

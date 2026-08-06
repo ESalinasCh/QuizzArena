@@ -99,8 +99,22 @@ public class SubmitAnswersRequestValidatorTests
     }
 
     [Fact]
-    public void Validate_AnsweredAtInFuture_ShouldHaveValidationError()
+    public void Validate_AnsweredAtBeyondClockSkewTolerance_ShouldHaveValidationError()
     {
+        SubmitAnswersRequestDto request = new()
+        {
+            Answers = [new SubmitAnswerBody(Guid.NewGuid(), [Guid.NewGuid()], DateTimeOffset.UtcNow.AddMinutes(15))]
+        };
+
+        TestValidationResult<SubmitAnswersRequestDto> result = _validator.TestValidate(request);
+
+        result.ShouldHaveValidationErrorFor("Answers[0].AnsweredAt");
+    }
+
+    [Fact]
+    public void Validate_AnsweredAtWithinClockSkewTolerance_ShouldNotHaveValidationErrors()
+    {
+        // A client clock a few minutes ahead of the server must not fail submission.
         SubmitAnswersRequestDto request = new()
         {
             Answers = [new SubmitAnswerBody(Guid.NewGuid(), [Guid.NewGuid()], DateTimeOffset.UtcNow.AddMinutes(5))]
@@ -108,7 +122,7 @@ public class SubmitAnswersRequestValidatorTests
 
         TestValidationResult<SubmitAnswersRequestDto> result = _validator.TestValidate(request);
 
-        result.ShouldHaveValidationErrorFor("Answers[0].AnsweredAt");
+        result.ShouldNotHaveValidationErrorFor("Answers[0].AnsweredAt");
     }
 
     [Fact]
