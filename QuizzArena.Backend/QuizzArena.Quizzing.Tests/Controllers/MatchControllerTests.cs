@@ -13,7 +13,7 @@ namespace QuizzArena.Quizzing.Tests.Controllers;
 public class MatchControllerTests
 {
     private readonly Mock<IGetMatchesUseCase> _mockGetMatchesUseCase;
-    private readonly Mock<ICreateMatchUseCase> _mockCreateMatchUseCase; 
+    private readonly Mock<ICreateMatchUseCase> _mockCreateMatchUseCase;
     private readonly Mock<IPublishMatchUseCase> _mockPublishMatchUseCase;
     private readonly Mock<IUnpublishMatchUseCase> _mockUnpublishMatchUseCase;
     private readonly Mock<IGetMatchByIdUseCase> _mockGetMatchByIdUseCase;
