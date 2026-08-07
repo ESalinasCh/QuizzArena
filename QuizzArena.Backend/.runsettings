@@ -23,6 +23,7 @@
             [*]*Persistence.Seeds*,
             [*]*DependencyInjection*
           </Exclude>
+          <ExcludeByFile>**/*.g.cs</ExcludeByFile>
           <Threshold>40</Threshold>
           <ThresholdType>line</ThresholdType>
           <ExcludeByAttribute>ExcludeFromCodeCoverage</ExcludeByAttribute>

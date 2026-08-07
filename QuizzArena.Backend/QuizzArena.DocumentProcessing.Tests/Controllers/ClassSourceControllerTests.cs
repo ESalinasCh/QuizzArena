@@ -38,6 +38,59 @@ public class ClassSourceControllerTests
         };
     }
 
+    private static UploadClassSourceRequestDto BuildUploadRequest(string fileName = "clase-1.mp4")
+    {
+        var content = new MemoryStream("fake content"u8.ToArray());
+        var file = new FormFile(content, 0, content.Length, "File", fileName)
+        {
+            Headers = new HeaderDictionary(),
+            ContentType = "video/mp4"
+        };
+
+        return new UploadClassSourceRequestDto
+        {
+            Name = "Clase 1",
+            CourseId = Guid.NewGuid(),
+            File = file
+        };
+    }
+
+    [Fact]
+    public async Task UploadClassSource_ReturnsOkWithUploadedSource()
+    {
+        var dto = BuildUploadRequest();
+        var expected = new UploadClassSourceResponseDto
+        {
+            Id = Guid.NewGuid(),
+            Name = dto.Name,
+            CourseId = dto.CourseId,
+            UserId = Guid.NewGuid(),
+            SourceType = SourceType.Video,
+            Status = SourceStatus.Pending
+        };
+
+        _mockUploadUseCase.Setup(uc => uc.Execute(dto)).ReturnsAsync(expected);
+
+        var result = await _controller.UploadClassSource(dto);
+
+        var ok = result.Result.Should().BeOfType<OkObjectResult>().Subject;
+        ok.Value.Should().BeEquivalentTo(expected);
+        _mockUploadUseCase.Verify(uc => uc.Execute(dto), Times.Once);
+    }
+
+    [Fact]
+    public async Task UploadClassSource_WhenUseCaseThrows_PropagatesException()
+    {
+        var dto = BuildUploadRequest("clase-1.exe");
+        _mockUploadUseCase
+            .Setup(uc => uc.Execute(dto))
+            .ThrowsAsync(new InvalidOperationException("unsupported file type"));
+
+        Func<Task> act = () => _controller.UploadClassSource(dto);
+
+        await act.Should().ThrowAsync<InvalidOperationException>().WithMessage("unsupported file type");
+    }
+
     [Fact]
     public async Task GetMyClassSources_WithValidSubClaim_ReturnsOkWithList()
     {
